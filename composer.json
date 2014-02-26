@@ -1,0 +1,10 @@
+{
+  "require": {
+    "slim/slim": "2.2.*",
+    "albertofem/savant3": "dev-master",
+    "mf2/mf2": "0.1.*",
+    "indieweb/mention-client": "0.*",
+    "indieweb/date-formatter": "0.1.*",
+    "indieauth/client": "0.1.*"
+  }
+}
