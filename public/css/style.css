@@ -1,7 +1,10 @@
-
+body {
+  padding-top: 70px;
+}
 
 .footer {
   padding: 40px;
+  margin-top: 20px;
   text-align: center;
   color: #999;
   background-color: #f9f9f9;

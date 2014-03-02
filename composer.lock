@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "6cdb110607ec920bb3ec3e6524f4639e",
+    "hash": "2f699bcd64a5b2f3f034fa8a115f0939",
     "packages": [
         {
             "name": "albertofem/savant3",
@@ -41,16 +41,16 @@
         },
         {
             "name": "indieauth/client",
-            "version": "0.1.1",
+            "version": "0.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/indieweb/indieauth-client-php.git",
-                "reference": "70e45a480a70402e7c47e29f0a0185730c8276a1"
+                "reference": "2b660d2024b1b86f339b54489dd01306b465be87"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/indieweb/indieauth-client-php/zipball/70e45a480a70402e7c47e29f0a0185730c8276a1",
-                "reference": "70e45a480a70402e7c47e29f0a0185730c8276a1",
+                "url": "https://api.github.com/repos/indieweb/indieauth-client-php/zipball/2b660d2024b1b86f339b54489dd01306b465be87",
+                "reference": "2b660d2024b1b86f339b54489dd01306b465be87",
                 "shasum": ""
             },
             "require": {
@@ -74,7 +74,7 @@
                 }
             ],
             "description": "IndieAuth Client Library",
-            "time": "2014-01-02 06:39:26"
+            "time": "2014-01-19 22:26:13"
         },
         {
             "name": "indieweb/date-formatter",

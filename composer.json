@@ -5,6 +5,6 @@
     "mf2/mf2": "0.1.*",
     "indieweb/mention-client": "0.*",
     "indieweb/date-formatter": "0.1.*",
-    "indieauth/client": "0.1.*"
+    "indieauth/client": ">=0.1.2"
   }
 }
