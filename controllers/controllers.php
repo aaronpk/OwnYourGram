@@ -4,6 +4,10 @@ function buildRedirectURI() {
   return 'http://' . $_SERVER['SERVER_NAME'] . '/auth/callback';
 }
 
+function clientID() {
+  return 'https://ownyourgram.com';
+}
+
 function build_url($parsed_url) { 
   $scheme   = isset($parsed_url['scheme']) ? $parsed_url['scheme'] . '://' : ''; 
   $host     = isset($parsed_url['host']) ? $parsed_url['host'] : ''; 
@@ -86,9 +90,10 @@ $app->get('/auth/start', function() use($app) {
   // aaronparecki.com http://aaronparecki.com http://aaronparecki.com/
   // Normlize the value now (move this into a function in IndieAuth\Client later)
   if(!array_key_exists('me', $params) || !($me = normalizeMeURL($params['me']))) {
-    $html = render('auth_start_error', array(
+    $html = render('auth_error', array(
       'title' => 'Sign In',
-      'input' => $params['me']
+      'error' => 'Invalid "me" Parameter',
+      'errorDescription' => 'The ID you entered, <strong>' . $params['me'] . '</strong> is not valid.'
     ));
     $app->response()->body($html);
     return;
@@ -104,7 +109,7 @@ $app->get('/auth/start', function() use($app) {
     $_SESSION['auth_state'] = $state;
 
     $scope = 'post';
-    $authorizationURL = IndieAuth\Client::buildAuthorizationURL($authorizationEndpoint, $me, buildRedirectURI(), 'https://ownyourgram.com', $state, $scope);
+    $authorizationURL = IndieAuth\Client::buildAuthorizationURL($authorizationEndpoint, $me, buildRedirectURI(), clientID(), $state, $scope);
   } else {
     $authorizationURL = false;
   }
@@ -121,4 +126,76 @@ $app->get('/auth/start', function() use($app) {
   $app->response()->body($html);
 });
 
+$app->get('/auth/callback', function() use($app) {
+  $req = $app->request();
+  $params = $req->params();
+
+  // Double check there is a "me" parameter
+  // Should only fail for really hacked up requests
+  if(!array_key_exists('me', $params) || !($me = normalizeMeURL($params['me']))) {
+    $html = render('auth_error', array(
+      'title' => 'Auth Callback',
+      'error' => 'Invalid "me" Parameter',
+      'errorDescription' => 'The ID you entered, <strong>' . $params['me'] . '</strong> is not valid.'
+    ));
+    $app->response()->body($html);
+    return;
+  }
+
+  if(!array_key_exists('code', $params) || trim($params['code']) == '') {
+    $html = render('auth_error', array(
+      'title' => 'Auth Callback',
+      'error' => 'Missing authorization code',
+      'errorDescription' => 'No authorization code was provided in the request.'
+    ));
+    $app->response()->body($html);
+    return;
+  }
+
+  // Verify the state came back and matches what we set in the session
+  // Should only fail for malicious attempts, ok to show a not as nice error message
+  if(!array_key_exists('state', $params) || !array_key_exists('auth_state', $_SESSION)) {
+    $html = render('auth_error', array(
+      'title' => 'Auth Callback',
+      'error' => 'Missing state parameter',
+      'errorDescription' => 'No state parameter was provided in the request and/or in the session. It is possible this is a malicious authorization attempt.'
+    ));
+    $app->response()->body($html);
+    return;
+  }
+
+  if($params['state'] != $_SESSION['auth_state']) {
+    $html = render('auth_error', array(
+      'title' => 'Auth Callback',
+      'error' => 'Invalid state',
+      'errorDescription' => 'The state parameter provided did not match the state provided at the start of authorization. This is most likely caused by a malicious authorization attempt.'
+    ));
+    $app->response()->body($html);
+    return;
+  }
+
+  // Now the basic sanity checks have passed. Time to start providing more helpful messages when there is an error.
+  // An authorization code is in the query string, and we want to exchange that for an access token at the token endpoint.
+
+  // Discover the token endpoint
+  $tokenEndpoint = IndieAuth\Client::discoverTokenEndpoint($me);
+
+  if($tokenEndpoint) {
+    $token = IndieAuth\Client::getAccessToken($tokenEndpoint, $params['code'], $params['me'], buildRedirectURI(), clientID(), $_SESSION['auth_state'], true);
+
+  } else {
+    $token = false;
+  }
+
+
+  $html = render('auth_callback', array(
+    'title' => 'Sign In',
+    'me' => $me,
+    'meParts' => parse_url($me),
+    'tokenEndpoint' => $tokenEndpoint,
+    'token' => $token['auth'],
+    'debug' => $token['response']
+  ));
+  $app->response()->body($html);
+});
 

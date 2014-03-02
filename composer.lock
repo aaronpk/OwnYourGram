@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "2f699bcd64a5b2f3f034fa8a115f0939",
+    "hash": "b88e94acade71e4eaa3f561158aaec47",
     "packages": [
         {
             "name": "albertofem/savant3",
@@ -41,17 +41,11 @@
         },
         {
             "name": "indieauth/client",
-            "version": "0.1.2",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/indieweb/indieauth-client-php.git",
-                "reference": "2b660d2024b1b86f339b54489dd01306b465be87"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/indieweb/indieauth-client-php/zipball/2b660d2024b1b86f339b54489dd01306b465be87",
-                "reference": "2b660d2024b1b86f339b54489dd01306b465be87",
-                "shasum": ""
+                "url": "/Users/aaronpk/Code/indieauth-client-php",
+                "reference": "d0a9748aa643d826616ec1b02fb121f4aba0c9fc"
             },
             "require": {
                 "indieweb/link-rel-parser": "0.1.1",
@@ -63,7 +57,6 @@
                     "IndieAuth": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "Apache 2.0"
             ],
@@ -74,7 +67,7 @@
                 }
             ],
             "description": "IndieAuth Client Library",
-            "time": "2014-01-19 22:26:13"
+            "time": "2014-03-02 21:07:38"
         },
         {
             "name": "indieweb/date-formatter",
@@ -303,7 +296,8 @@
     ],
     "minimum-stability": "stable",
     "stability-flags": {
-        "albertofem/savant3": 20
+        "albertofem/savant3": 20,
+        "indieauth/client": 20
     },
     "platform": [
 
