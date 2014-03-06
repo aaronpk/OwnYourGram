@@ -54,6 +54,23 @@ function normalizeMeURL($url) {
   return build_url($me);
 }
 
+function k($a, $k, $default=null) {
+  if(is_array($k)) {
+    $result = true;
+    foreach($k as $key) {
+      $result = $result && array_key_exists($key, $a);
+    }
+    return $result;
+  } else {
+    if(is_array($a) && array_key_exists($k, $a) && $a[$k])
+      return $a[$k];
+    elseif(is_object($a) && property_exists($a, $k) && $a->$k)
+      return $a->$k;
+    else
+      return $default;
+  }
+}
+
 $app->get('/', function($format='html') use($app) {
   $res = $app->response();
 
@@ -184,7 +201,7 @@ $app->get('/auth/callback', function() use($app) {
     $token = IndieAuth\Client::getAccessToken($tokenEndpoint, $params['code'], $params['me'], buildRedirectURI(), clientID(), $_SESSION['auth_state'], true);
 
   } else {
-    $token = false;
+    $token = array('auth'=>false, 'response'=>false);
   }
 
 
@@ -193,8 +210,8 @@ $app->get('/auth/callback', function() use($app) {
     'me' => $me,
     'meParts' => parse_url($me),
     'tokenEndpoint' => $tokenEndpoint,
-    'token' => $token['auth'],
-    'debug' => $token['response']
+    'auth' => $token['auth'],
+    'response' => $token['response']
   ));
   $app->response()->body($html);
 });
