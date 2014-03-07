@@ -47,10 +47,14 @@
         <li><a href="/about">About</a></li>
         <li><a href="/contact">Contact</a></li>
       </ul>
-      <? if(session('user')) { ?>
-        <ul class="nav navbar-right">
-          <li><a href="/user?domain=<?= session('user') ?>"><?= session('user') ?></a></li>
+      <? if(session('me')) { ?>
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="/user?domain=<?= urlencode(session('me')) ?>"><?= session('me') ?></a></li>
           <li><a href="/signout">Sign Out</a></li>
+        </ul>
+      <? } else if(property_exists($this, 'authorizing')) { ?>
+        <ul class="nav navbar-right">
+          <li class="navbar-text"><?= $this->authorizing ?></li>
         </ul>
       <? } else { ?>
         <ul class="nav navbar-right" style="font-size: 8pt;">

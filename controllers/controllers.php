@@ -134,6 +134,7 @@ $app->get('/auth/start', function() use($app) {
   $html = render('auth_start', array(
     'title' => 'Sign In',
     'me' => $me,
+    'authorizing' => $me,
     'meParts' => parse_url($me),
     'tokenEndpoint' => $tokenEndpoint,
     'micropubEndpoint' => $micropubEndpoint,
@@ -204,15 +205,40 @@ $app->get('/auth/callback', function() use($app) {
     $token = array('auth'=>false, 'response'=>false);
   }
 
+  // If a valid access token was returned, store the token info in the session and they are signed in
+  if(k($token['auth'], array('me','access_token','scope'))) {
+    $_SESSION['auth'] = $token['auth'];
+    $_SESSION['me'] = $params['me'];
+  }
+
+  unset($_SESSION['auth_state']);
 
   $html = render('auth_callback', array(
     'title' => 'Sign In',
     'me' => $me,
+    'authorizing' => $me,
     'meParts' => parse_url($me),
     'tokenEndpoint' => $tokenEndpoint,
     'auth' => $token['auth'],
     'response' => $token['response']
   ));
   $app->response()->body($html);
+});
+
+$app->get('/dashboard', function() use($app) {
+
+
+
+  $html = render('dashboard', array(
+    'title' => 'Dashboard'
+  ));
+  $app->response()->body($html);
+});
+
+$app->get('/signout', function() use($app) {
+  unset($_SESSION['auth']);
+  unset($_SESSION['me']);
+  unset($_SESSION['auth_state']);
+  $app->redirect('/', 301);
 });
 

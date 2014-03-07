@@ -1,9 +1,4 @@
-<h2><?= $this->me ?></h2>
-
-
-
 <?php if($this->tokenEndpoint): ?>
-
 
   <?php if(!$this->auth): ?>
 
@@ -16,8 +11,10 @@
 
       <h3>Error</h3>
       <p>Got an error response from the token endpoint:</p>
-      <h4><?= $this->auth['error'] ?></h4>
-      <?= k($this->auth, 'error_description') ? ('<p>'.$this->auth['error_description'].'</p>') : '' ?>
+      <div class="bs-callout bs-callout-danger">
+        <h4><?= $this->auth['error'] ?></h4>
+        <?= k($this->auth, 'error_description') ? ('<p>'.$this->auth['error_description'].'</p>') : '' ?>
+      </div>
 
     <?php else: ?>
 
@@ -27,7 +24,7 @@
         <h3>Success!</h3>
 
         <p>All required values were found! You are now signed in.</p>
-        <p><a href="" class="btn btn-primary">Continue</a></p>
+        <p><a href="/dashboard" class="btn btn-primary">Continue</a></p>
 
       <?php else: ?>
 
@@ -55,7 +52,9 @@
   <h3>Token endpoint response</h3>
 
   <p>Below is the raw response from your token endpoint:</p>
-  <pre><?= htmlspecialchars($this->response) ?></pre>
+  <div class="bs-callout bs-callout-info pre">
+    <?= htmlspecialchars($this->response) ?>
+  </div>
 
 
 <?php else: ?>
