@@ -5,12 +5,6 @@
     "mf2/mf2": "0.1.*",
     "indieweb/mention-client": "0.*",
     "indieweb/date-formatter": "0.1.*",
-    "indieauth/client": "dev-master"
-  },
-  "repositories": [
-    {
-      "type": "git",
-      "url": "/Users/aaronpk/Code/indieauth-client-php"
-    }
-  ]
+    "indieauth/client": "0.1.3"
+  }
 }
