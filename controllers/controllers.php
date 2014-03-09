@@ -87,7 +87,8 @@ $app->get('/dashboard', function() use($app) {
         'title' => 'Dashboard',
         'entry' => $entry,
         'photo_url' => $photo_url,
-        'micropub_endpoint' => $user->micropub_endpoint
+        'micropub_endpoint' => $user->micropub_endpoint,
+        'test_response' => $user->last_micropub_response
       ));
       $app->response()->body($html);
     }

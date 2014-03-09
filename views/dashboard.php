@@ -1,7 +1,5 @@
-<h1>Congrats, you successfully signed in!</h1>
 
 <?php if($this->entry): ?>
-  <p>Below is the latest photo from your Instagram account</p>
   <div class="row">
     <div class="col-md-4">
       <form role="form">
@@ -38,11 +36,18 @@
       <button class="btn btn-success" id="btn_test_post">Test Post</button>
       <p>Click the "Test" button to send a Micropub request with this photo to your endpoint. After you successfully handle the request and post this photo to your site, the real-time stream will be enabled for your Instagram account.</p>
       <p>The request will be sent to your Micropub endpoint, <code><?= $this->micropub_endpoint ?></code>. See below the photo on the left to see the full list of fields that will be sent to the endpoint.</p>
+
       <div class="alert alert-success hidden" id="test_success"><strong>Success! We found a Location header in the response!</strong><br>Your photo should be posted on your website now, and the realtime stream for your account is enabled!</div>
       <div class="alert alert-danger hidden" id="test_error"><strong>Your endpoint did not return a Location header.</strong><br>See <a href="/creating-a-micropub-endpoint">Creating a Micropub Endpoint</a> for more information.</div>
-      <pre id="test_response" style="width: 100%; min-height: 240px;"></pre>
+
+      <?php if($this->test_response): ?>
+        <h4>Last response from your Micropub endpoint</h4>
+      <?php endif; ?>
+      <pre id="test_response" style="width: 100%; min-height: 240px;"><?= $this->test_response ?></pre>
     </div>
   </div>
+<?php else: ?>
+  <p>We couldn't find any photos in your Instagram account. Come back after you've posted a photo.</p>
 <?php endif; ?>
 
 <script>
