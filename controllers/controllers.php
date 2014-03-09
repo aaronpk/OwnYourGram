@@ -77,7 +77,7 @@ $app->get('/dashboard', function() use($app) {
       // Go fetch the latest Instagram photo and show it to them for testing the micropub endpoint
       $photo = IG\get_latest_photo($user);
       if($photo) {
-        $photo = $photo[2];
+        $photo = $photo[0];
 
         $date = date('c', $photo->created_time);
 
@@ -90,7 +90,9 @@ $app->get('/dashboard', function() use($app) {
             $response = curl_exec($ch);
             $tz = @json_decode($response);
             if($tz) {
-              $date = date('Y-m-d\TH:i:s').$tz->offset;
+              $d = DateTime::createFromFormat('U', $photo->created_time);
+              $d->setTimeZone(new DateTimeZone($tz->timezone));
+              $date = $d->format('c');
             }
           } catch(Exception $e) {
           }
