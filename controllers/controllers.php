@@ -75,34 +75,19 @@ $app->get('/dashboard', function() use($app) {
     } else {
 
       // Go fetch the latest Instagram photo and show it to them for testing the micropub endpoint
-      $photo = IG\get_latest_photo($user);
-      if($photo) {
-        $photo = $photo[0];
-
-        $date = date('c', $photo->created_time);
-
-        // Look up the timezone of the photo if location data is present
-        if(property_exists($photo, 'location') && $photo->location) {
-          try {
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, 'http://timezone-api.geoloqi.com/timezone/'.$photo->location->latitude.'/'.$photo->location->longitude);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            $response = curl_exec($ch);
-            $tz = @json_decode($response);
-            if($tz) {
-              $d = DateTime::createFromFormat('U', $photo->created_time);
-              $d->setTimeZone(new DateTimeZone($tz->timezone));
-              $date = $d->format('c');
-            }
-          } catch(Exception $e) {
-          }
-        }
+      if($photos = IG\get_latest_photos($user)) {
+        $entry = h_entry_from_photo($photos[0]);
+        $photo_url = $photos[0]->images->standard_resolution->url;
+      } else {
+        $entry = false;
+        $photo_url = false;
       }
 
       $html = render('dashboard', array(
         'title' => 'Dashboard',
-        'photo' => $photo,
-        'date' => $date
+        'entry' => $entry,
+        'photo_url' => $photo_url,
+        'micropub_endpoint' => $user->micropub_endpoint
       ));
       $app->response()->body($html);
     }
@@ -114,40 +99,28 @@ $app->post('/micropub/test', function() use($app) {
     $params = $app->request()->params();
 
     // Download the file to a temp folder
-    $filename = tempnam(sys_get_temp_dir(), 'ig');
-    $fp = fopen($filename, 'w+');
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $params['url']);
-    curl_setopt($ch, CURLOPT_FILE, $fp);
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-    curl_exec($ch);
-    curl_close($ch);
-    fclose($fp);
+    $filename = download_file($params['url']);
 
     // Now send to the micropub endpoint
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $user->micropub_endpoint);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-      'Authorization: Bearer '.$user->micropub_access_token
-    ));
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, array(
-      'h' => 'entry',
-      'published' => $params['published'],
-      'location' => $params['location'],
-      'place_name' => $params['place_name'],
-      'category' => $params['category'],
-      'content' => $params['content'],
-      'photo' => '@'.$filename
-    ));
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HEADER, true);
-    $response = curl_exec($ch);
+    $response = micropub_post($user->micropub_endpoint, $params, $filename, $user->micropub_access_token);
 
     unlink($filename);
 
+    $user->last_micropub_response = $response;
+
+    // Check the response and look for a "Location" header containing the URL
+    if($response && preg_match('/Location: (.+)/', $response, $match)) {
+      $location = $match[1];
+      $user->micropub_success = 1;
+    } else {
+      $location = false;
+    }
+
+    $user->save();
+
     $app->response()->body(json_encode(array(
-      'response' => $response
+      'response' => htmlspecialchars($response),
+      'location' => $location
     )));
   }
 });
@@ -173,9 +146,6 @@ $app->post('/instagram/callback', function() use($app) {
     ...
   ]
   */
-
-  // Look up the access token for the user ID
-
 
   // Queue a job to process this request
   bs()->putInTube(Config::$hostname.'-worker', $app->request()->getBody());

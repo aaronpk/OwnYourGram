@@ -1,42 +1,45 @@
 <h1>Congrats, you successfully signed in!</h1>
 
-<?php if($this->photo): ?>
+<?php if($this->entry): ?>
   <p>Below is the latest photo from your Instagram account</p>
   <div class="row">
     <div class="col-md-4">
       <form role="form">
         <div class="form-group">
-          <img src="<?= $this->photo->images->standard_resolution->url ?>" class="img-thumbnail">
+          <img src="<?= $this->photo_url ?>" class="img-thumbnail">
         </div>
         <div class="form-group">
           <label for="photo_url"><code>content</code></label>
-          <input type="text" id="photo_content" value="<?= $this->photo->caption ? k($this->photo->caption, 'text') : '' ?>" class="form-control">
+          <input type="text" id="photo_content" value="<?= $this->entry['content'] ?>" class="form-control">
         </div>
         <div class="form-group">
           <label for="photo_url">Date (<code>published</code>)</label>
-          <input type="text" id="photo_published" value="<?= $this->date ?>" class="form-control">
+          <input type="text" id="photo_published" value="<?= $this->entry['published'] ?>" class="form-control">
         </div>
         <div class="form-group">
           <label for="photo_url">Location (<code>location</code>)</label>
-          <input type="text" id="photo_location" value="<?= $this->photo->location ? ('geo:'.$this->photo->location->latitude.','.$this->photo->location->longitude) : '' ?>" class="form-control">
+          <input type="text" id="photo_location" value="<?= $this->entry['location'] ?>" class="form-control">
         </div>
         <div class="form-group">
           <label for="photo_url">Place Name (<code>place_name</code>)</label>
-          <input type="text" id="photo_place_name" value="<?= $this->photo->location ? k($this->photo->location, 'name') : '' ?>" class="form-control">
+          <input type="text" id="photo_place_name" value="<?= $this->entry['place_name'] ?>" class="form-control">
         </div>
         <div class="form-group">
           <label for="photo_url">Category (<code>category</code>)</label>
-          <input type="text" id="photo_category" value="<?= $this->photo->tags ? implode(',', $this->photo->tags) : '' ?>" class="form-control">
+          <input type="text" id="photo_category" value="<?= $this->entry['category'] ?>" class="form-control">
         </div>
         <div class="form-group">
           <label for="photo_url">URL (sent as a file named <code>photo</code>)</label>
-          <input type="text" id="photo_url" value="<?= $this->photo->images->standard_resolution->url ?>" class="form-control">
+          <input type="text" id="photo_url" value="<?= $this->photo_url ?>" class="form-control">
         </div>
       </form>
     </div>
     <div class="col-md-8">
       <button class="btn btn-success" id="btn_test_post">Test Post</button>
       <p>Click the "Test" button to send a Micropub request with this photo to your endpoint. After you successfully handle the request and post this photo to your site, the real-time stream will be enabled for your Instagram account.</p>
+      <p>The request will be sent to your Micropub endpoint, <code><?= $this->micropub_endpoint ?></code>. See below the photo on the left to see the full list of fields that will be sent to the endpoint.</p>
+      <div class="alert alert-success hidden" id="test_success"><strong>Success! We found a Location header in the response!</strong><br>Your photo should be posted on your website now, and the realtime stream for your account is enabled!</div>
+      <div class="alert alert-danger hidden" id="test_error"><strong>Your endpoint did not return a Location header.</strong><br>See <a href="/creating-a-micropub-endpoint">Creating a Micropub Endpoint</a> for more information.</div>
       <pre id="test_response" style="width: 100%; min-height: 240px;"></pre>
     </div>
   </div>
@@ -54,7 +57,13 @@ $(function(){
       category: $("#photo_category").val(),
     }, function(data){
       var response = JSON.parse(data);
-      console.debug(response.response);
+      if(response.location != false) {
+        $("#test_success").removeClass('hidden');
+        $("#test_error").addClass('hidden');
+      } else {
+        $("#test_success").addClass('hidden');
+        $("#test_error").removeClass('hidden');
+      }
       $("#test_response").html(response.response);
     })
   });

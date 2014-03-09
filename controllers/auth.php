@@ -54,23 +54,6 @@ function normalizeMeURL($url) {
   return build_url($me);
 }
 
-function k($a, $k, $default=null) {
-  if(is_array($k)) {
-    $result = true;
-    foreach($k as $key) {
-      $result = $result && array_key_exists($key, $a);
-    }
-    return $result;
-  } else {
-    if(is_array($a) && array_key_exists($k, $a) && $a[$k])
-      return $a[$k];
-    elseif(is_object($a) && property_exists($a, $k) && $a->$k)
-      return $a->$k;
-    else
-      return $default;
-  }
-}
-
 $app->get('/', function($format='html') use($app) {
   $res = $app->response();
 
@@ -161,10 +144,10 @@ $app->get('/auth/callback', function() use($app) {
   }
 
   // If there is no state in the session, start the login again
-  if(!array_key_exists('auth_state', $_SESSION)) {
-    $app->redirect('/auth/start?me='.urlencode($params['me']));
-    return;
-  }
+  // if(!array_key_exists('auth_state', $_SESSION)) {
+  //   $app->redirect('/auth/start?me='.urlencode($params['me']));
+  //   return;
+  // }
 
   if(!array_key_exists('code', $params) || trim($params['code']) == '') {
     $html = render('auth_error', array(
@@ -187,7 +170,7 @@ $app->get('/auth/callback', function() use($app) {
     $app->response()->body($html);
     return;
   }
-
+/*
   if($params['state'] != $_SESSION['auth_state']) {
     $html = render('auth_error', array(
       'title' => 'Auth Callback',
@@ -197,7 +180,7 @@ $app->get('/auth/callback', function() use($app) {
     $app->response()->body($html);
     return;
   }
-
+*/
   // Now the basic sanity checks have passed. Time to start providing more helpful messages when there is an error.
   // An authorization code is in the query string, and we want to exchange that for an access token at the token endpoint.
 
@@ -206,7 +189,7 @@ $app->get('/auth/callback', function() use($app) {
   $tokenEndpoint = IndieAuth\Client::discoverTokenEndpoint($me);
 
   if($tokenEndpoint) {
-    $token = IndieAuth\Client::getAccessToken($tokenEndpoint, $params['code'], $params['me'], buildRedirectURI(), clientID(), $_SESSION['auth_state'], true);
+    $token = IndieAuth\Client::getAccessToken($tokenEndpoint, $params['code'], $params['me'], buildRedirectURI(), clientID(), $params['state'], true);
 
   } else {
     $token = array('auth'=>false, 'response'=>false);
@@ -243,7 +226,8 @@ $app->get('/auth/callback', function() use($app) {
     'meParts' => parse_url($me),
     'tokenEndpoint' => $tokenEndpoint,
     'auth' => $token['auth'],
-    'response' => $token['response']
+    'response' => $token['response'],
+    'curl_error' => (array_key_exists('error', $token) ? $token['error'] : false)
   ));
   $app->response()->body($html);
 });
