@@ -1,5 +1,9 @@
 <?php
 
+ORM::configure('mysql:host=' . Config::$dbHost . ';dbname=' . Config::$dbName);
+ORM::configure('username', Config::$dbUsername);
+ORM::configure('password', Config::$dbPassword);
+
 function render($page, $data) {
   global $app;
   return $app->render('layout.php', array_merge($data, array('page' => $page)));
@@ -30,3 +34,12 @@ function session($key) {
     return null;
 }
 
+function bs()
+{
+  static $pheanstalk;
+  if(!isset($pheanstalk))
+  {
+    $pheanstalk = new Pheanstalk_Pheanstalk(Config::$beanstalkServer, Config::$beanstalkPort);
+  }
+  return $pheanstalk;
+}

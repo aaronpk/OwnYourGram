@@ -2,9 +2,11 @@
   "require": {
     "slim/slim": "2.2.*",
     "albertofem/savant3": "dev-master",
+    "j4mie/idiorm": "1.4.*",
     "mf2/mf2": "0.1.*",
     "indieweb/mention-client": "0.*",
     "indieweb/date-formatter": "0.1.*",
-    "indieauth/client": "0.1.3"
+    "indieauth/client": "0.1.3",
+    "pda/pheanstalk": "dev-master"
   }
 }

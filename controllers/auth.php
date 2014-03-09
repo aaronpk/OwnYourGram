@@ -160,6 +160,12 @@ $app->get('/auth/callback', function() use($app) {
     return;
   }
 
+  // If there is no state in the session, start the login again
+  if(!array_key_exists('auth_state', $_SESSION)) {
+    $app->redirect('/auth/start?me='.urlencode($params['me']));
+    return;
+  }
+
   if(!array_key_exists('code', $params) || trim($params['code']) == '') {
     $html = render('auth_error', array(
       'title' => 'Auth Callback',
@@ -172,11 +178,11 @@ $app->get('/auth/callback', function() use($app) {
 
   // Verify the state came back and matches what we set in the session
   // Should only fail for malicious attempts, ok to show a not as nice error message
-  if(!array_key_exists('state', $params) || !array_key_exists('auth_state', $_SESSION)) {
+  if(!array_key_exists('state', $params)) {
     $html = render('auth_error', array(
       'title' => 'Auth Callback',
       'error' => 'Missing state parameter',
-      'errorDescription' => 'No state parameter was provided in the request and/or in the session. It is possible this is a malicious authorization attempt.'
+      'errorDescription' => 'No state parameter was provided in the request. This shouldn\'t happen. It is possible this is a malicious authorization attempt.'
     ));
     $app->response()->body($html);
     return;
@@ -195,7 +201,8 @@ $app->get('/auth/callback', function() use($app) {
   // Now the basic sanity checks have passed. Time to start providing more helpful messages when there is an error.
   // An authorization code is in the query string, and we want to exchange that for an access token at the token endpoint.
 
-  // Discover the token endpoint
+  // Discover the endpoints
+  $micropubEndpoint = IndieAuth\Client::discoverMicropubEndpoint($me);
   $tokenEndpoint = IndieAuth\Client::discoverTokenEndpoint($me);
 
   if($tokenEndpoint) {
@@ -209,6 +216,22 @@ $app->get('/auth/callback', function() use($app) {
   if(k($token['auth'], array('me','access_token','scope'))) {
     $_SESSION['auth'] = $token['auth'];
     $_SESSION['me'] = $params['me'];
+
+    $user = ORM::for_table('users')->where('url', $me)->find_one();
+    if($user) {
+      // Already logged in, update the last login date
+      $user->last_login = date('Y-m-d H:i:s');
+    } else {
+      // New user! Store the user in the database
+      $user = ORM::for_table('users')->create();
+      $user->url = $me;
+      $user->date_created = date('Y-m-d H:i:s');
+    }
+    $user->micropub_endpoint = $micropubEndpoint;
+    $user->micropub_access_token = $token['auth']['access_token'];
+    $user->micropub_response = $token['response'];
+    $user->save();
+    $_SESSION['user_id'] = $user->id();
   }
 
   unset($_SESSION['auth_state']);
