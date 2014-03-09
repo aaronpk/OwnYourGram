@@ -144,10 +144,10 @@ $app->get('/auth/callback', function() use($app) {
   }
 
   // If there is no state in the session, start the login again
-  // if(!array_key_exists('auth_state', $_SESSION)) {
-  //   $app->redirect('/auth/start?me='.urlencode($params['me']));
-  //   return;
-  // }
+  if(!array_key_exists('auth_state', $_SESSION)) {
+    $app->redirect('/auth/start?me='.urlencode($params['me']));
+    return;
+  }
 
   if(!array_key_exists('code', $params) || trim($params['code']) == '') {
     $html = render('auth_error', array(
@@ -170,7 +170,7 @@ $app->get('/auth/callback', function() use($app) {
     $app->response()->body($html);
     return;
   }
-/*
+
   if($params['state'] != $_SESSION['auth_state']) {
     $html = render('auth_error', array(
       'title' => 'Auth Callback',
@@ -180,7 +180,7 @@ $app->get('/auth/callback', function() use($app) {
     $app->response()->body($html);
     return;
   }
-*/
+
   // Now the basic sanity checks have passed. Time to start providing more helpful messages when there is an error.
   // An authorization code is in the query string, and we want to exchange that for an access token at the token endpoint.
 
