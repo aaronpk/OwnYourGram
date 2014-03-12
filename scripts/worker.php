@@ -69,7 +69,10 @@ function process_job(&$jobData) {
 
           // Send the photo to the micropub endpoint
           echo "Sending photo to micropub endpoint: ".$user->micropub_endpoint."\n";
+          print_r($entry);
+          echo "\n";
           $response = micropub_post($user->micropub_endpoint, $entry, $filename, $user->micropub_access_token);
+          echo $response."\n";
           unlink($filename);
 
           // Store the request and response from the micropub endpoint in the DB so it can be displayed to the user
