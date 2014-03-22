@@ -7,28 +7,32 @@
           <img src="<?= $this->photo_url ?>" class="img-thumbnail">
         </div>
         <div class="form-group">
-          <label for="photo_url"><code>content</code></label>
+          <label for="photo_content"><code>content</code></label>
           <input type="text" id="photo_content" value="<?= $this->entry['content'] ?>" class="form-control">
         </div>
         <div class="form-group">
-          <label for="photo_url">Date (<code>published</code>)</label>
+          <label for="photo_published">Date (<code>published</code>)</label>
           <input type="text" id="photo_published" value="<?= $this->entry['published'] ?>" class="form-control">
         </div>
         <div class="form-group">
-          <label for="photo_url">Location (<code>location</code>)</label>
+          <label for="photo_location">Location (<code>location</code>)</label>
           <input type="text" id="photo_location" value="<?= $this->entry['location'] ?>" class="form-control">
         </div>
         <div class="form-group">
-          <label for="photo_url">Place Name (<code>place_name</code>)</label>
+          <label for="photo_place_name">Place Name (<code>place_name</code>)</label>
           <input type="text" id="photo_place_name" value="<?= $this->entry['place_name'] ?>" class="form-control">
         </div>
         <div class="form-group">
-          <label for="photo_url">Category (<code>category</code>)</label>
+          <label for="photo_category">Category (<code>category</code>)</label>
           <input type="text" id="photo_category" value="<?= $this->entry['category'] ?>" class="form-control">
         </div>
         <div class="form-group">
           <label for="photo_url">URL (sent as a file named <code>photo</code>)</label>
           <input type="text" id="photo_url" value="<?= $this->photo_url ?>" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="photo_syndication">Instagram URL (<code>syndication</code>)</label>
+          <input type="text" id="photo_syndication" value="<?= $this->entry['syndication'] ?>" class="form-control">
         </div>
       </form>
     </div>
