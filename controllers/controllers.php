@@ -103,9 +103,10 @@ $app->post('/micropub/test', function() use($app) {
     $filename = download_file($params['url']);
 
     // Now send to the micropub endpoint
-    $response = micropub_post($user->micropub_endpoint, $params, $filename, $user->micropub_access_token);
+    $r = micropub_post($user->micropub_endpoint, $params, $filename, $user->micropub_access_token);
+    $response = $r['response'];
 
-    unlink($filename);
+    #unlink($filename);
 
     $user->last_micropub_response = $response;
 
@@ -121,7 +122,10 @@ $app->post('/micropub/test', function() use($app) {
 
     $app->response()->body(json_encode(array(
       'response' => htmlspecialchars($response),
-      'location' => $location
+      'location' => $location,
+      'error' => $r['error'],
+      'curlinfo' => $r['curlinfo'],
+      'filename' => $filename
     )));
   }
 });

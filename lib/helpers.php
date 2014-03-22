@@ -102,12 +102,18 @@ function micropub_post($endpoint, $params, $filename, $access_token) {
     'location' => $params['location'],
     'place_name' => $params['place_name'],
     'category' => $params['category'],
-    'content' => $params['content'],
+    'content' => urlencode($params['content']),
     'photo' => '@'.$filename
   ));
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
   curl_setopt($ch, CURLOPT_HEADER, true);
-  return curl_exec($ch);
+  $response = curl_exec($ch);
+  $error = curl_error($ch);
+  return array(
+    'response' => $response,
+    'error' => $error,
+    'curlinfo' => curl_getinfo($ch)
+  );
 }
 
 // Given an Instagram photo object, return an h-entry array with all the necessary keys
