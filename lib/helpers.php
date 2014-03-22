@@ -102,7 +102,8 @@ function micropub_post($endpoint, $params, $filename, $access_token) {
     'location' => $params['location'],
     'place_name' => $params['place_name'],
     'category' => $params['category'],
-    'content' => $params['content'],
+    'content' => (substr($params['content'],0,1) == '@' ? ' ' : '') . $params['content'],
+    'syndication' => $params['syndication'],
     'photo' => '@'.$filename
   ));
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -117,7 +118,8 @@ function h_entry_from_photo(&$photo) {
     'location' => null,
     'place_name' => null,
     'category' => array(),
-    'content' => ''
+    'content' => '',
+    'syndication' => ''
   );
 
   $entry['published'] = date('c', $photo->created_time);
@@ -142,6 +144,8 @@ function h_entry_from_photo(&$photo) {
 
   if($photo->caption)
     $entry['content'] = $photo->caption->text;
+
+  $entry['syndication'] = $photo->link;
 
   return $entry;
 }
