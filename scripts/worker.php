@@ -76,7 +76,7 @@ function process_job(&$jobData) {
           unlink($filename);
 
           // Store the request and response from the micropub endpoint in the DB so it can be displayed to the user
-          $user->last_micropub_response = $response;
+          $user->last_micropub_response = json_encode($response);
           $user->last_instagram_photo = $photo->id;
           $user->last_photo_date = date('Y-m-d H:i:s');
           $user->save();

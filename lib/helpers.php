@@ -123,7 +123,7 @@ function h_entry_from_photo(&$photo) {
     'published' => null,
     'location' => null,
     'place_name' => null,
-    'category' => array(),
+    'category' => '',
     'content' => '',
     'syndication' => ''
   );
