@@ -114,17 +114,41 @@ $app->get('/auth/start', function() use($app) {
     $authorizationURL = false;
   }
 
-  $html = render('auth_start', array(
-    'title' => 'Sign In',
-    'me' => $me,
-    'authorizing' => $me,
-    'meParts' => parse_url($me),
-    'tokenEndpoint' => $tokenEndpoint,
-    'micropubEndpoint' => $micropubEndpoint,
-    'authorizationEndpoint' => $authorizationEndpoint,
-    'authorizationURL' => $authorizationURL
-  ));
-  $app->response()->body($html);
+  // If the user has already signed in before and has a micropub access token, skip 
+  // the debugging screens and redirect immediately to the auth endpoint.
+  // This will still generate a new access token when they finish logging in.
+  $user = ORM::for_table('users')->where('url', $me)->find_one();
+  if($user && $user->micropub_access_token && !array_key_exists('restart', $params)) {
+    $app->redirect($authorizationURL, 301);
+
+    $user->micropub_endpoint = $micropubEndpoint;
+    $user->authorization_endpoint = $authorizationEndpoint;
+    $user->token_endpoint = $tokenEndpoint;
+    $user->save();
+
+  } else {
+
+    if(!$user)
+      $user = ORM::for_table('users')->create();
+    $user->url = $me;
+    $user->date_created = date('Y-m-d H:i:s');
+    $user->micropub_endpoint = $micropubEndpoint;
+    $user->authorization_endpoint = $authorizationEndpoint;
+    $user->token_endpoint = $tokenEndpoint;
+    $user->save();
+
+    $html = render('auth_start', array(
+      'title' => 'Sign In',
+      'me' => $me,
+      'authorizing' => $me,
+      'meParts' => parse_url($me),
+      'tokenEndpoint' => $tokenEndpoint,
+      'micropubEndpoint' => $micropubEndpoint,
+      'authorizationEndpoint' => $authorizationEndpoint,
+      'authorizationURL' => $authorizationURL
+    ));
+    $app->response()->body($html);
+  }
 });
 
 $app->get('/auth/callback', function() use($app) {
@@ -195,6 +219,8 @@ $app->get('/auth/callback', function() use($app) {
     $token = array('auth'=>false, 'response'=>false);
   }
 
+  $redirectToDashboardImmediately = false;
+
   // If a valid access token was returned, store the token info in the session and they are signed in
   if(k($token['auth'], array('me','access_token','scope'))) {
     $_SESSION['auth'] = $token['auth'];
@@ -204,6 +230,9 @@ $app->get('/auth/callback', function() use($app) {
     if($user) {
       // Already logged in, update the last login date
       $user->last_login = date('Y-m-d H:i:s');
+      // If they have logged in before and we already have an access token, then redirect to the dashboard now
+      if($user->micropub_access_token)
+        $redirectToDashboardImmediately = true;
     } else {
       // New user! Store the user in the database
       $user = ORM::for_table('users')->create();
@@ -219,23 +248,28 @@ $app->get('/auth/callback', function() use($app) {
 
   unset($_SESSION['auth_state']);
 
-  $html = render('auth_callback', array(
-    'title' => 'Sign In',
-    'me' => $me,
-    'authorizing' => $me,
-    'meParts' => parse_url($me),
-    'tokenEndpoint' => $tokenEndpoint,
-    'auth' => $token['auth'],
-    'response' => $token['response'],
-    'curl_error' => (array_key_exists('error', $token) ? $token['error'] : false)
-  ));
-  $app->response()->body($html);
+  if($redirectToDashboardImmediately) {
+    $app->redirect('/dashboard', 301);
+  } else {
+    $html = render('auth_callback', array(
+      'title' => 'Sign In',
+      'me' => $me,
+      'authorizing' => $me,
+      'meParts' => parse_url($me),
+      'tokenEndpoint' => $tokenEndpoint,
+      'auth' => $token['auth'],
+      'response' => $token['response'],
+      'curl_error' => (array_key_exists('error', $token) ? $token['error'] : false)
+    ));
+    $app->response()->body($html);
+  }
 });
 
 $app->get('/signout', function() use($app) {
   unset($_SESSION['auth']);
   unset($_SESSION['me']);
   unset($_SESSION['auth_state']);
+  unset($_SESSION['instagram']);
   $app->redirect('/', 301);
 });
 
