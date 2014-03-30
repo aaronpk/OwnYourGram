@@ -81,12 +81,23 @@ $app->get('/dashboard', function() use($app) {
         $photo_url = false;
       }
 
+      $test_response = '';
+      if($user->last_micropub_response) {
+        try {
+          if(@json_decode($user->last_micropub_response)) {
+            $d = json_decode($user->last_micropub_response);
+            $test_response = $d->response;
+          }
+        } catch(Exception $e) {
+        }
+      }
+
       $html = render('dashboard', array(
         'title' => 'Dashboard',
         'entry' => $entry,
         'photo_url' => $photo_url,
         'micropub_endpoint' => $user->micropub_endpoint,
-        'test_response' => $user->last_micropub_response
+        'test_response' => $test_response
       ));
       $app->response()->body($html);
     }
@@ -106,7 +117,7 @@ $app->post('/micropub/test', function() use($app) {
 
     #unlink($filename);
 
-    $user->last_micropub_response = $response;
+    $user->last_micropub_response = json_encode($r);
 
     // Check the response and look for a "Location" header containing the URL
     if($response && preg_match('/Location: (.+)/', $response, $match)) {
