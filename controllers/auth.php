@@ -269,7 +269,6 @@ $app->get('/signout', function() use($app) {
   unset($_SESSION['auth']);
   unset($_SESSION['me']);
   unset($_SESSION['auth_state']);
-  unset($_SESSION['instagram']);
   $app->redirect('/', 301);
 });
 
