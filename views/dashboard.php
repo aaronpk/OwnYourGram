@@ -64,6 +64,7 @@ $(function(){
       location: $("#photo_location").val(),
       place_name: $("#photo_place_name").val(),
       category: $("#photo_category").val(),
+      syndication: $("#photo_syndication").val()
     }, function(data){
       var response = JSON.parse(data);
       if(response.location != false) {
