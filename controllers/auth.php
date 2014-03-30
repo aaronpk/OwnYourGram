@@ -119,12 +119,13 @@ $app->get('/auth/start', function() use($app) {
   // This will still generate a new access token when they finish logging in.
   $user = ORM::for_table('users')->where('url', $me)->find_one();
   if($user && $user->micropub_access_token && !array_key_exists('restart', $params)) {
-    $app->redirect($authorizationURL, 301);
 
     $user->micropub_endpoint = $micropubEndpoint;
     $user->authorization_endpoint = $authorizationEndpoint;
     $user->token_endpoint = $tokenEndpoint;
     $user->save();
+
+    $app->redirect($authorizationURL, 301);
 
   } else {
 
