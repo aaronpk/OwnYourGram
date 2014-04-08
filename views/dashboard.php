@@ -47,7 +47,7 @@
       <?php if($this->test_response): ?>
         <h4>Last response from your Micropub endpoint</h4>
       <?php endif; ?>
-      <pre id="test_response" style="width: 100%; min-height: 240px;"><?= $this->test_response ?></pre>
+      <pre id="test_response" style="width: 100%; min-height: 240px;"><?= htmlspecialchars($this->test_response) ?></pre>
     </div>
   </div>
 <?php else: ?>
