@@ -43,7 +43,7 @@
     <p>You need to set your Micropub endpoint in a <code>&lt;link&gt;</code> tag on your home page or in an HTTP header.</p>
     <p>You will need to <a href="/creating-a-micropub-endpoint">create a Micropub endpoint</a> for your website which can create posts on your site.</p>
     <p><pre><code>&lt;link rel="micropub" href="https://<?= $this->meParts['host'] ?>/micropub"&gt;</code></pre></p>
-    <p><pre><code>Link: &lt;https://<?= $this->meParts['host'] ?>/micropub&gt;; rel="micropub_endpoint"</code></pre></p>
+    <p><pre><code>Link: &lt;https://<?= $this->meParts['host'] ?>/micropub&gt;; rel="micropub"</code></pre></p>
   <?php endif; ?>
 
 </div>
