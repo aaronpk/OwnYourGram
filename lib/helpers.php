@@ -77,7 +77,7 @@ function get_timezone($lat, $lng) {
 }
 
 function download_file($url) {
-  $filename = tempnam(dirname(__FILE__).'../tmp/', 'ig');
+  $filename = tempnam(dirname(__FILE__).'../tmp/', 'ig').'.jpg';
   $fp = fopen($filename, 'w+');
   $ch = curl_init();
   curl_setopt($ch, CURLOPT_URL, $url);
