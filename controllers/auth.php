@@ -73,8 +73,7 @@ $app->get('/signin', function() use($app) {
 });
 
 $app->get('/creating-a-token-endpoint', function() use($app) {
-  $html = render('creating-a-token-endpoint', array('title' => 'Creating a Token Endpoint'));
-  $app->response()->body($html);
+  $app->redirect('http://indiewebcamp.com/token-endpoint', 301);
 });
 $app->get('/creating-a-micropub-endpoint', function() use($app) {
   $html = render('creating-a-micropub-endpoint', array('title' => 'Creating a Micropub Endpoint'));
