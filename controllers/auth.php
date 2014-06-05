@@ -1,7 +1,7 @@
 <?php
 
 function buildRedirectURI() {
-  return 'http://' . $_SERVER['SERVER_NAME'] . '/auth/callback';
+  return 'https://' . $_SERVER['SERVER_NAME'] . '/auth/callback';
 }
 
 function clientID() {

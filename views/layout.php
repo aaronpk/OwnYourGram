@@ -65,7 +65,7 @@
         <form action="/auth/start" method="get" class="navbar-form navbar-right">
           <input type="text" name="me" placeholder="yourdomain.com" class="form-control" />
           <button type="submit" class="btn">Sign In</button>
-          <input type="hidden" name="redirect_uri" value="http://<?= $_SERVER['SERVER_NAME'] ?>/indieauth" />
+          <input type="hidden" name="redirect_uri" value="https://<?= $_SERVER['SERVER_NAME'] ?>/indieauth" />
         </form>
       <? } ?>
     </div>

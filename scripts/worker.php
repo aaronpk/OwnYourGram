@@ -72,7 +72,8 @@ function process_job(&$jobData) {
           print_r($entry);
           echo "\n";
           $response = micropub_post($user->micropub_endpoint, $entry, $filename, $user->micropub_access_token);
-          echo $response."\n";
+          print_r($response);
+          echo "\n";
           unlink($filename);
 
           // Store the request and response from the micropub endpoint in the DB so it can be displayed to the user
