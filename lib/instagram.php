@@ -1,6 +1,9 @@
 <?php
 namespace IG;
 
+class AccessTokenException extends \Exception {
+}
+
 function get_latest_photos(&$user, $since=false, $limit=1) {
   $params = array(
     'access_token' => $user->instagram_access_token
@@ -17,10 +20,17 @@ function get_latest_photos(&$user, $since=false, $limit=1) {
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
   $response = curl_exec($ch);
   $data = @json_decode($response);
-  if($data)
-    return $data->data;
-  else
+  if($data && is_object($data)) {
+    if(property_exists($data, 'data')) {
+      return $data->data;
+    } elseif(property_exists($data, 'meta') && property_exists($data->meta, 'error_message')) {
+      throw new AccessTokenException($data->meta->error_message);
+    } else {
+      return null;
+    }
+  } else {
     return null;
+  }
 }
 
 function get_photo(&$user, $media_id) {

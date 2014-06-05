@@ -73,12 +73,27 @@ $app->get('/dashboard', function() use($app) {
     } else {
 
       // Go fetch the latest Instagram photo and show it to them for testing the micropub endpoint
-      if($photos = IG\get_latest_photos($user)) {
-        $entry = h_entry_from_photo($photos[0]);
-        $photo_url = $photos[0]->images->standard_resolution->url;
-      } else {
-        $entry = false;
-        $photo_url = false;
+      try {
+        if($photos = IG\get_latest_photos($user)) {
+          $entry = h_entry_from_photo($photos[0]);
+          $photo_url = $photos[0]->images->standard_resolution->url;
+        } else {
+          $entry = false;
+          $photo_url = false;
+        }
+      } catch(IG\AccessTokenException $e) {
+        $user->instagram_access_token = '';
+        $user->instagram_response = '';
+        $user->save();
+        $app->redirect('/auth/instagram-start');
+      } catch(Exception $e) {
+        $html = render('auth_error', array(
+          'title' => 'Error',
+          'error' => 'Error',
+          'errorDescription' => $e->getMessage()
+        ));
+        $app->response()->body($html);
+        return;
       }
 
       $test_response = '';

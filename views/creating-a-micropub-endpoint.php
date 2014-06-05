@@ -7,7 +7,7 @@ it is ready to make requests to create posts.
 ### The Request
 
 This is not intended to be a comprehensive guide to Micropub, so we will use the example 
-of the "OwnYourGram" app creating a photo post at the Micropub endpoint.
+of the "OwnYourGram" app creating a photo post at the Micropub endpoint. 
 
 The request to create a photo will be sent with as multipart form-encoded 
 so that the actual photo data is sent along with the request. Most web frameworks
