@@ -6,6 +6,24 @@ Work in progress. Do not use!
 https://ownyourgram.com
 
 
+### Configuring the Instagram Webhook
+
+http://instagram.com/developer/realtime/
+
+After deploying the site, create the subscription to receive a callback post when
+any user who has authorized the application posts a new photo.
+
+```
+curl -F 'client_id=x' \
+     -F 'client_secret=x' \
+     -F 'object=user' \
+     -F 'aspect=media' \
+     -F 'verify_token=1234567890' \
+     -F 'callback_url=http://ownyourgram.com/instagram/callback' \
+     https://api.instagram.com/v1/subscriptions/
+```
+
+
 
 ### Contributing
 
