@@ -48,6 +48,12 @@ $app->get('/auth/instagram-callback', function() use($app) {
       $token = json_decode($response);
 
       if(property_exists($token, 'access_token')) {
+        // Remove the Instagram account info from a past user account if it already exists
+        ORM::for_table('users')->where('instagram_user_id', $token->user->id)->find_result_set()
+          ->set('instagram_user_id','')
+          ->set('instagram_access_token','')
+          ->save();
+
         // Update the user record with the instagram access token
         $user = ORM::for_table('users')->find_one($_SESSION['user_id']);
         $user->instagram_access_token = $token->access_token;
