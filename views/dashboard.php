@@ -27,7 +27,7 @@
           <input type="text" id="photo_category" value="<?= $this->entry['category'] ?>" class="form-control">
         </div>
         <div class="form-group">
-          <label for="photo_url">URL (sent as a file named <code>photo</code>)</label>
+          <label for="photo_url">Photo URL (sent as a file named <code>photo</code>)</label>
           <input type="text" id="photo_url" value="<?= $this->photo_url ?>" class="form-control">
         </div>
         <div class="form-group">

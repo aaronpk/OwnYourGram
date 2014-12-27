@@ -76,8 +76,8 @@ function get_timezone($lat, $lng) {
   return null;
 }
 
-function download_file($url) {
-  $filename = tempnam(dirname(__FILE__).'../tmp/', 'ig').'.jpg';
+function download_file($url, $ext='jpg') {
+  $filename = tempnam(dirname(__FILE__).'../tmp/', 'ig').'.'.$ext;
   $fp = fopen($filename, 'w+');
   $ch = curl_init();
   curl_setopt($ch, CURLOPT_URL, $url);
@@ -89,14 +89,8 @@ function download_file($url) {
   return $filename;  
 }
 
-function micropub_post($endpoint, $params, $filename, $access_token) {
-  $ch = curl_init();
-  curl_setopt($ch, CURLOPT_URL, $endpoint);
-  curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-    'Authorization: Bearer ' . $access_token
-  ));
-  curl_setopt($ch, CURLOPT_POST, true);
-  curl_setopt($ch, CURLOPT_POSTFIELDS, array(
+function micropub_post($endpoint, $access_token, $params, $filename, $video_filename=false) {
+  $postfields = array(
     'h' => 'entry',
     'published' => $params['published'],
     'location' => $params['location'],
@@ -105,7 +99,19 @@ function micropub_post($endpoint, $params, $filename, $access_token) {
     'content' => (substr($params['content'],0,1) == '@' ? ' ' : '') . $params['content'],
     'syndication' => $params['syndication'],
     'photo' => '@'.$filename
+  );
+
+  if($video_filename) {
+    $postfields['video'] = '@'.$video_filename;
+  }
+
+  $ch = curl_init();
+  curl_setopt($ch, CURLOPT_URL, $endpoint);
+  curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+    'Authorization: Bearer ' . $access_token
   ));
+  curl_setopt($ch, CURLOPT_POST, true);
+  curl_setopt($ch, CURLOPT_POSTFIELDS, $postfields);
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
   curl_setopt($ch, CURLOPT_HEADER, true);
   $response = curl_exec($ch);

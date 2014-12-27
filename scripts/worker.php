@@ -67,14 +67,24 @@ function process_job(&$jobData) {
           echo "Downloading photo...\n";
           $filename = download_file($photo_url);
 
+          if($photo->videos) {
+            $video_url = $photo->videos->standard_resolution->url;
+            echo "Downloading video...\n";
+            $video_filename = download_file($video_url,'mp4');
+          } else {
+            $video_filename = false;
+          }
+
           // Send the photo to the micropub endpoint
-          echo "Sending photo to micropub endpoint: ".$user->micropub_endpoint."\n";
+          echo "Sending photo" . ($video_filename ? " and video" : "") . " to micropub endpoint: ".$user->micropub_endpoint."\n";
           print_r($entry);
           echo "\n";
-          $response = micropub_post($user->micropub_endpoint, $entry, $filename, $user->micropub_access_token);
+          $response = micropub_post($user->micropub_endpoint, $user->micropub_access_token, $entry, $filename, $video_filename);
           print_r($response);
           echo "\n";
           unlink($filename);
+          if($video_filename)
+            unlink($video_filename);
 
           // Store the request and response from the micropub endpoint in the DB so it can be displayed to the user
           $user->last_micropub_response = json_encode($response);

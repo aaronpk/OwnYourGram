@@ -133,7 +133,7 @@ $app->post('/micropub/test', function() use($app) {
     $filename = download_file($params['url']);
 
     // Now send to the micropub endpoint
-    $r = micropub_post($user->micropub_endpoint, $params, $filename, $user->micropub_access_token);
+    $r = micropub_post($user->micropub_endpoint, $user->micropub_access_token, $params, $filename);
     $response = $r['response'];
 
     #unlink($filename);
