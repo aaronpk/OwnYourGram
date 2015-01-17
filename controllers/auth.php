@@ -1,7 +1,7 @@
 <?php
 
 function buildRedirectURI() {
-  return 'https://' . $_SERVER['SERVER_NAME'] . '/auth/callback';
+  return (Config::$ssl ? 'https' : 'http') . '://' . $_SERVER['SERVER_NAME'] . '/auth/callback';
 }
 
 function clientID() {
