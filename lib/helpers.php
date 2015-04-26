@@ -98,7 +98,8 @@ function micropub_post($endpoint, $access_token, $params, $filename, $video_file
     'category' => $params['category'],
     'content' => (substr($params['content'],0,1) == '@' ? ' ' : '') . $params['content'],
     'syndication' => $params['syndication'],
-    'photo' => '@'.$filename
+    'photo' => '@'.$filename,
+    'access_token' => $access_token
   );
 
   if($video_filename) {
