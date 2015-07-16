@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "0943734e4b5a185374b5144944d35e0d",
+    "hash": "8f25a54e2d998569c1f54473406a8fb5",
     "packages": [
         {
             "name": "indieauth/client",
@@ -278,16 +278,16 @@
         },
         {
             "name": "p3k/multipart",
-            "version": "0.1.0",
+            "version": "0.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aaronpk/php-multipart-encoder.git",
-                "reference": "67dff2950438ce9dfbbf275434433d268e94914e"
+                "reference": "f5400011b20046cebbdfed686d051fb2aa600a14"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aaronpk/php-multipart-encoder/zipball/67dff2950438ce9dfbbf275434433d268e94914e",
-                "reference": "67dff2950438ce9dfbbf275434433d268e94914e",
+                "url": "https://api.github.com/repos/aaronpk/php-multipart-encoder/zipball/f5400011b20046cebbdfed686d051fb2aa600a14",
+                "reference": "f5400011b20046cebbdfed686d051fb2aa600a14",
                 "shasum": ""
             },
             "require": {
@@ -310,7 +310,7 @@
                 }
             ],
             "description": "Multipart Encoding Library",
-            "time": "2015-07-16 05:42:39"
+            "time": "2015-07-16 19:28:02"
         },
         {
             "name": "pda/pheanstalk",
@@ -318,26 +318,29 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/pda/pheanstalk.git",
-                "reference": "56c44c947cf44a85c8d639209361da5f67b6fbff"
+                "reference": "e677fe978ab568801de42a599f19b398b6d7a31b"
             },
             "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/pda/pheanstalk/zipball/e677fe978ab568801de42a599f19b398b6d7a31b",
-                "reference": "56c44c947cf44a85c8d639209361da5f67b6fbff",
+                "reference": "e677fe978ab568801de42a599f19b398b6d7a31b",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.0"
             },
+            "require-dev": {
+                "phpunit/phpunit": "~4.0"
+            },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.x-dev"
+                    "dev-master": "3.0-dev"
                 }
             },
             "autoload": {
-                "psr-0": {
-                    "Pheanstalk": "classes/"
+                "psr-4": {
+                    "Pheanstalk\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -357,7 +360,7 @@
             "keywords": [
                 "beanstalkd"
             ],
-            "time": "2014-01-20 02:42:16"
+            "time": "2015-06-26 01:03:20"
         },
         {
             "name": "saltybeagle/savant3",
