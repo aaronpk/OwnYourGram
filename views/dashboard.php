@@ -35,7 +35,7 @@ endif;
           <input type="text" id="photo_place_name" value="<?= $this->entry['place_name'] ?>" class="form-control">
         </div>
         <?php
-        if($this->user->send_category_as_array):
+        if($this->user->send_category_as_array == 1):
           foreach($this->entry['category'] as $i=>$category):
             ?>
               <div class="form-group">
