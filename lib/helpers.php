@@ -89,30 +89,36 @@ function download_file($url, $ext='jpg') {
   return $filename;  
 }
 
-function micropub_post($endpoint, $access_token, $params, $filename, $video_filename=false) {
+function micropub_post($endpoint, $access_token, $params, $photo_filename, $video_filename=false) {
+
   $postfields = array(
     'h' => 'entry',
     'published' => $params['published'],
     'location' => $params['location'],
     'place_name' => $params['place_name'],
     'category' => $params['category'],
-    'content' => (substr($params['content'],0,1) == '@' ? ' ' : '') . $params['content'],
+    'content' => $params['content'],
     'syndication' => $params['syndication'],
-    'photo' => '@'.$filename,
     'access_token' => $access_token
   );
 
+  $multipart = new p3k\Multipart();
+
+  $multipart->addArray($postfields);
+  $multipart->addFile('photo', $photo_filename, 'image/jpeg');
+
   if($video_filename) {
-    $postfields['video'] = '@'.$video_filename;
+    $multipart->addFile('video', $video_filename, 'video/mp4');
   }
 
   $ch = curl_init();
   curl_setopt($ch, CURLOPT_URL, $endpoint);
   curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-    'Authorization: Bearer ' . $access_token
+    'Authorization: Bearer ' . $access_token,
+    'Content-Type: ' . $multipart->contentType()
   ));
   curl_setopt($ch, CURLOPT_POST, true);
-  curl_setopt($ch, CURLOPT_POSTFIELDS, $postfields);
+  curl_setopt($ch, CURLOPT_POSTFIELDS, $multipart->data());
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
   curl_setopt($ch, CURLOPT_HEADER, true);
   $response = curl_exec($ch);
@@ -125,12 +131,12 @@ function micropub_post($endpoint, $access_token, $params, $filename, $video_file
 }
 
 // Given an Instagram photo object, return an h-entry array with all the necessary keys
-function h_entry_from_photo(&$photo) {
+function h_entry_from_photo(&$user, &$photo) {
   $entry = array(
     'published' => null,
     'location' => null,
     'place_name' => null,
-    'category' => '',
+    'category' => array(),
     'content' => '',
     'syndication' => ''
   );
@@ -152,8 +158,31 @@ function h_entry_from_photo(&$photo) {
   if($photo->location && k($photo->location, 'name'))
     $entry['place_name'] = k($photo->location, 'name');
 
+  // Add the regular tags to the category array
   if($photo->tags)
-    $entry['category'] = implode(',', $photo->tags);
+    $entry['category'] = array_merge($entry['category'], $photo->tags);
+
+  // Add person-tags to the category array
+  if($photo->users_in_photo) {
+    foreach($photo->users_in_photo as $tag) {
+      // Fetch the user's website
+      if($profile = IG\get_profile($user, $tag->user->id)) {
+        if($profile->website)
+          $entry['category'][] = $profile->website;
+        else
+          $entry['category'][] = 'https://instagram.com/' . $profile->username;
+        // $entry['category'][] = [
+        //   'type' => ['h-card'],
+        //   'properties' => [
+        //     'name' => [$profile->full_name],
+        //     'url' => [$profile->website],
+        //     'photo' => [$profile->profile_picture]
+        //   ],
+        //   'value' => $profile->website
+        // ];
+      }
+    }
+  }
 
   if($photo->caption)
     $entry['content'] = $photo->caption->text;

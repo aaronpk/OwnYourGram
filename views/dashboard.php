@@ -1,3 +1,15 @@
+<?php
+if($this->user->send_category_as_array != 1):
+?>
+  <div class="alert alert-warning" id="array_notice">
+    <b>Upcoming change!</b>
+    The Micropub spec now requires values be sent as arrays instead of as comma-separated lists. When
+    you are ready to receive the category property as an array, click the button below to switch.
+    <p><button class="btn btn-default" id="micropub_array">Upgrade me!</button></p>
+  </div>
+<?php
+endif;
+?>
 
 <?php if($this->entry): ?>
   <div class="row">
@@ -22,10 +34,25 @@
           <label for="photo_place_name">Place Name (<code>place_name</code>)</label>
           <input type="text" id="photo_place_name" value="<?= $this->entry['place_name'] ?>" class="form-control">
         </div>
-        <div class="form-group">
-          <label for="photo_category">Category (<code>category</code>)</label>
-          <input type="text" id="photo_category" value="<?= $this->entry['category'] ?>" class="form-control">
-        </div>
+        <?php
+        if($this->user->send_category_as_array):
+          foreach($this->entry['category'] as $i=>$category):
+            ?>
+              <div class="form-group">
+                <label for="photo_category">Category (<code>category[]</code>)</label>
+                <input type="text" value="<?= $category ?>" class="form-control photo_category">
+              </div>
+            <?php
+          endforeach;
+        else:
+        ?>
+          <div class="form-group">
+            <label for="photo_category">Category (<code>category</code>)</label>
+            <input type="text" value="<?= implode(',',$this->entry['category']) ?>" class="form-control photo_category">
+          </div>
+        <?php
+        endif;
+        ?>
         <div class="form-group">
           <label for="photo_url">Photo URL (sent as a file named <code>photo</code>)</label>
           <input type="text" id="photo_url" value="<?= $this->photo_url ?>" class="form-control">
@@ -57,13 +84,19 @@
 <script>
 $(function(){
   $("#btn_test_post").click(function(){
+
+    var categories = [];
+    $(".photo_category").each(function(){
+      categories.push($(this).val());
+    });
+
     $.post("/micropub/test", {
       content: $("#photo_content").val(),
       url: $("#photo_url").val(),
       published: $("#photo_published").val(),
       location: $("#photo_location").val(),
       place_name: $("#photo_place_name").val(),
-      category: $("#photo_category").val(),
+      category: categories,
       syndication: $("#photo_syndication").val()
     }, function(data){
       var response = JSON.parse(data);
@@ -76,6 +109,15 @@ $(function(){
       }
       $("#test_response").html(response.response);
     })
+  });
+
+  $("#micropub_array").click(function(){
+    $.post("/prefs/array", {
+      upgrade: "yes"
+    }, function(data) {
+      $("#array_notice").hide();
+      window.location = window.location;
+    });
   });
 });
 </script>

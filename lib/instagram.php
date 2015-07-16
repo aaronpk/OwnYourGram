@@ -33,6 +33,29 @@ function get_latest_photos(&$user, $since=false, $limit=1) {
   }
 }
 
+function get_profile(&$user, $instagram_user_id) {
+  $params = array(
+    'access_token' => $user->instagram_access_token
+  );
+
+  $ch = curl_init();
+  curl_setopt($ch, CURLOPT_URL, 'https://api.instagram.com/v1/users/'.$instagram_user_id.'?'.http_build_query($params));
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  $response = curl_exec($ch);
+  $data = @json_decode($response);
+  if($data && is_object($data)) {
+    if(property_exists($data, 'data')) {
+      return $data->data;
+    } elseif(property_exists($data, 'meta') && property_exists($data->meta, 'error_message')) {
+      throw new AccessTokenException($data->meta->error_message);
+    } else {
+      return null;
+    }
+  } else {
+    return null;
+  }  
+}
+
 function get_photo(&$user, $media_id) {
   $params = array(
     'access_token' => $user->instagram_access_token

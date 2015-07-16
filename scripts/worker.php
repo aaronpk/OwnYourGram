@@ -58,16 +58,15 @@ function process_job(&$jobData) {
         $media_id = $job->data->media_id;
 
         if($photo = IG\get_photo($user, $media_id)) {
-          #print_r($photo);
 
-          $entry = h_entry_from_photo($photo);
+          $entry = h_entry_from_photo($user, $photo);
           $photo_url = $photo->images->standard_resolution->url;
 
           // Download the photo to a temp folder
           echo "Downloading photo...\n";
           $filename = download_file($photo_url);
 
-          if($photo->videos) {
+          if(property_exists($photo, 'videos')) {
             $video_url = $photo->videos->standard_resolution->url;
             echo "Downloading video...\n";
             $video_filename = download_file($video_url,'mp4');
@@ -77,6 +76,14 @@ function process_job(&$jobData) {
 
           // Send the photo to the micropub endpoint
           echo "Sending photo" . ($video_filename ? " and video" : "") . " to micropub endpoint: ".$user->micropub_endpoint."\n";
+
+          // Collapse category to a comma-separated list if they haven't upgraded yet
+          if($user->send_category_as_array != 1) {
+            if($entry['category'] && is_array($entry['category']) && count($entry['category'])) {
+              $entry['category'] = implode(',', $entry['category']);
+            }
+          }
+
           print_r($entry);
           echo "\n";
           $response = micropub_post($user->micropub_endpoint, $user->micropub_access_token, $entry, $filename, $video_filename);

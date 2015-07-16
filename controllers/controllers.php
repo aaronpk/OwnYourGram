@@ -81,7 +81,7 @@ $app->get('/dashboard', function() use($app) {
       // Go fetch the latest Instagram photo and show it to them for testing the micropub endpoint
       try {
         if($photos = IG\get_latest_photos($user)) {
-          $entry = h_entry_from_photo($photos[0]);
+          $entry = h_entry_from_photo($user, $photos[0]);
           $photo_url = $photos[0]->images->standard_resolution->url;
         } else {
           $entry = false;
@@ -118,10 +118,22 @@ $app->get('/dashboard', function() use($app) {
         'entry' => $entry,
         'photo_url' => $photo_url,
         'micropub_endpoint' => $user->micropub_endpoint,
-        'test_response' => $test_response
+        'test_response' => $test_response,
+        'user' => $user
       ));
       $app->response()->body($html);
     }
+  }
+});
+
+$app->post('/prefs/array', function() use($app) {
+  if($user=require_login($app)) {
+    $user->send_category_as_array = 1;
+    $user->save();
+
+    $app->response()->body(json_encode(array(
+      'result' => 'ok'
+    )));
   }
 });
 

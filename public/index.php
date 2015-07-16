@@ -8,7 +8,7 @@ require 'lib/markdown.php';
 require 'lib/instagram.php';
 
 // Configure the Savant plugin
-\Slim\Extras\Views\Savant::$savantDirectory = 'vendor/albertofem/savant3/src';
+\Slim\Extras\Views\Savant::$savantDirectory = 'vendor/saltybeagle/savant3';
 \Slim\Extras\Views\Savant::$savantOptions = array('template_path' => 'views');
 
 // Create a new app object with the Savant view renderer
