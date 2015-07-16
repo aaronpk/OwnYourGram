@@ -141,6 +141,11 @@ $app->post('/micropub/test', function() use($app) {
   if($user=require_login($app)) {
     $params = $app->request()->params();
 
+    if($user->send_category_as_array != 1) {
+      if(is_array($params['category']))
+        $params['category'] = implode(',', $params['category']);
+    }
+
     // Download the file to a temp folder
     $filename = download_file($params['url']);
 
