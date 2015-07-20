@@ -36,6 +36,14 @@ endif;
         </div>
         <?php
         if($this->user->send_category_as_array == 1):
+          if(count($this->entry['category']) == 0):
+            ?>
+              <div class="form-group">
+                <label for="photo_category">Category (<code>category[]</code>)</label>
+                <input type="text" class="form-control photo_category">
+              </div>
+            <?php
+          endif;
           foreach($this->entry['category'] as $i=>$category):
             ?>
               <div class="form-group">

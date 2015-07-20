@@ -102,6 +102,9 @@ function micropub_post($endpoint, $access_token, $params, $photo_filename, $vide
     'access_token' => $access_token
   );
 
+  if(k($params, 'category'))
+    $postfields = $params['category'];
+
   $multipart = new p3k\Multipart();
 
   $multipart->addArray($postfields);
