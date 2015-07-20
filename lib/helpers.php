@@ -56,7 +56,7 @@ function bs()
   static $pheanstalk;
   if(!isset($pheanstalk))
   {
-    $pheanstalk = new Pheanstalk_Pheanstalk(Config::$beanstalkServer, Config::$beanstalkPort);
+    $pheanstalk = new Pheanstalk\Pheanstalk(Config::$beanstalkServer, Config::$beanstalkPort);
   }
   return $pheanstalk;
 }
