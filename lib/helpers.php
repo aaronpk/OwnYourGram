@@ -96,7 +96,7 @@ function micropub_post($endpoint, $access_token, $params, $photo_filename, $vide
     'published' => $params['published'],
     'location' => $params['location'],
     'place_name' => $params['place_name'],
-    'category' => $params['category'],
+    'category' => isset($params['category']) ? $params['category'] : [],
     'content' => $params['content'],
     'syndication' => $params['syndication'],
     'access_token' => $access_token
