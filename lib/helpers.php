@@ -113,7 +113,7 @@ function micropub_post($endpoint, $access_token, $params, $photo_filename=false,
 
   $multipart = new p3k\Multipart();
 
-  $multipart->addArray($postfields);
+  $multipart->addArray(array_filter($postfields));
 
   if($photo_filename)
     $multipart->addFile('photo', $photo_filename, 'image/jpeg');
