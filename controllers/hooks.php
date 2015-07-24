@@ -39,8 +39,10 @@ $app->get('/instagram/callback', function() use($app) {
 $app->post('/mailgun', function() use($app) {
   $params = $app->request()->params();
 
+file_put_contents('/web/sites/ownyourgram.com/last.txt', json_encode($params));
+
   // Find the user for this email
-  if(!preg_match('/([^ <>]+)@ownyourgram\.com/', $params['to'], $match)) {
+  if(!preg_match('/([^ <>]+)@ownyourgram\.com/', $params['To'], $match)) {
     $app->response()->body('invalid recipient');
     return;
   }
@@ -56,15 +58,17 @@ $app->post('/mailgun', function() use($app) {
     return;
   }
 
-  $data = array();
+  $data = array(
+    'published' => (k($params, 'Date') ? date('c', strtotime(k($params, 'Date'))) : date('c'))
+  );
 
-  if(k($params, 'subject'))
-    $data['name'] = k($params, 'subject');
+  if(k($params, 'Subject'))
+    $data['name'] = k($params, 'Subject');
 
   $data['content'] = k($params, 'body-plain');
 
   // Set tags for any hashtags used in the body
-  if(preg_match_all('/#([^ ]+)/', $text, $matches)) {
+  if(preg_match_all('/#([^ ]+)/', $data['content'], $matches)) {
     $tags = array();
     foreach($matches[1] as $m)
       $tags[] = $m;
