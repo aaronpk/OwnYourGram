@@ -40,7 +40,7 @@ $app->post('/mailgun', function() use($app) {
   $params = $app->request()->params();
 
   // Find the user for this email
-  if(!preg_match('/(.+)@ownyourgram\.com/', $params['to'], $match)) {
+  if(!preg_match('/([^ <>]+)@ownyourgram\.com/', $params['to'], $match)) {
     $app->response()->body('invalid recipient');
     return;
   }
