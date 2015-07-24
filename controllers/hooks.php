@@ -56,6 +56,19 @@ $app->post('/mailgun', function() use($app) {
     return;
   }
 
+  /*
+  ob_start();
+  print_r($params);
+  print_r($_POST);
+  print_r($_FILES);
+  foreach($_FILES as $f) {
+    echo "=-=-=-=-=\n";
+    echo file_get_contents($f['tmp_name'])."\n";
+  }
+  $debug = ob_get_clean();
+  file_put_contents('last.txt', $debug);
+  */
+
   $data = array(
     'published' => (k($params, 'Date') ? date('c', strtotime(k($params, 'Date'))) : date('c'))
   );
@@ -63,22 +76,8 @@ $app->post('/mailgun', function() use($app) {
   if(k($params, 'Subject'))
     $data['name'] = k($params, 'Subject');
 
-  if(k($params['body-plain'])
+  if(k($params, 'body-plain'))
     $data['content'] = k($params, 'body-plain');
-
-  // Set tags for any hashtags used in the body
-  if(preg_match_all('/#([^ ]+)/', $data['content'], $matches)) {
-    $tags = array();
-    foreach($matches[1] as $m)
-      $tags[] = $m;
-    if($tags) {
-      if($user->send_category_as_array != 1) {
-        $data['category'] = $tags;
-      } else {
-        $data['category'] = implode(',', $tags);
-      }
-    }
-  }
 
   // Handle attachments
   $filename = false;
@@ -90,10 +89,24 @@ $app->post('/mailgun', function() use($app) {
     }
 
     // Sometimes MMSs are sent with a txt file attached instead of in the body
-    if(preg_match('/text\/plain/', $file['type'])) {
+    if($file['type'] == 'text/plain') {
       $content = trim(file_get_contents($file['tmp_name']));
       if($content) {
         $data['content'] = $content;
+      }
+    }
+  }
+
+  // Set tags for any hashtags used in the body
+  if(k($data,'content') && preg_match_all('/#([^ ]+)/', $data['content'], $matches)) {
+    $tags = array();
+    foreach($matches[1] as $m)
+      $tags[] = $m;
+    if($tags) {
+      if($user->send_category_as_array != 1) {
+        $data['category'] = $tags;
+      } else {
+        $data['category'] = implode(',', $tags);
       }
     }
   }

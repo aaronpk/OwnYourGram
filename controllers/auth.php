@@ -249,7 +249,7 @@ $app->get('/auth/callback', function() use($app) {
   unset($_SESSION['auth_state']);
 
   if($redirectToDashboardImmediately) {
-    $app->redirect('/dashboard', 301);
+    $app->redirect('/instagram', 301);
   } else {
     $html = render('auth_callback', array(
       'title' => 'Sign In',
