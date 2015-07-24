@@ -93,17 +93,20 @@ function micropub_post($endpoint, $access_token, $params, $photo_filename=false,
 
   $postfields = array(
     'h' => 'entry',
-    'published' => $params['published'],
-    'location' => $params['location'],
-    'place_name' => $params['place_name'],
-    'category' => $params['category'],
     'content' => $params['content'],
-    'syndication' => $params['syndication'],
     'access_token' => $access_token
   );
 
   if(k($params, 'category'))
     $postfields = $params['category'];
+  if(k($params, 'place_name'))
+    $postfields['place_name'] = $params['place_name'];
+  if(k($params, 'location'))
+    $postfields['location'] = $params['location'];
+  if(k($params, 'published'))
+    $postfields['published'] = $params['published'];
+  if(k($params, 'syndication'))
+    $postfields['syndication'] = $params['syndication'];
 
   $multipart = new p3k\Multipart();
 
