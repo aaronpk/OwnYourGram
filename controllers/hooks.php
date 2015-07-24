@@ -39,8 +39,6 @@ $app->get('/instagram/callback', function() use($app) {
 $app->post('/mailgun', function() use($app) {
   $params = $app->request()->params();
 
-file_put_contents('/web/sites/ownyourgram.com/last.txt', json_encode($params));
-
   // Find the user for this email
   if(!preg_match('/([^ <>]+)@ownyourgram\.com/', $params['To'], $match)) {
     $app->response()->body('invalid recipient');
@@ -65,7 +63,8 @@ file_put_contents('/web/sites/ownyourgram.com/last.txt', json_encode($params));
   if(k($params, 'Subject'))
     $data['name'] = k($params, 'Subject');
 
-  $data['content'] = k($params, 'body-plain');
+  if(k($params['body-plain'])
+    $data['content'] = k($params, 'body-plain');
 
   // Set tags for any hashtags used in the body
   if(preg_match_all('/#([^ ]+)/', $data['content'], $matches)) {
@@ -81,11 +80,21 @@ file_put_contents('/web/sites/ownyourgram.com/last.txt', json_encode($params));
     }
   }
 
-  // Find if there's a photo in the email
+  // Handle attachments
   $filename = false;
+
   foreach($_FILES as $file) {
+    // If a photo was included, set the filename to the downloaded file
     if(preg_match('/image/', $file['type'])) {
       $filename = $file['tmp_name'];
+    }
+
+    // Sometimes MMSs are sent with a txt file attached instead of in the body
+    if(preg_match('/text\/plain/', $file['type'])) {
+      $content = trim(file_get_contents($file['tmp_name']));
+      if($content) {
+        $data['content'] = $content;
+      }
     }
   }
 
