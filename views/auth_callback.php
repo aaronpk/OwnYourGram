@@ -24,7 +24,9 @@
         <h3>Success!</h3>
 
         <p>All required values were found! You are now signed in.</p>
-        <p><a href="/dashboard" class="btn btn-primary">Continue</a></p>
+        <p><a href="/instagram" class="btn btn-primary">Connect Instagram</a></p>
+        <p>or</p>
+        <p><a href="/email" class="btn btn-default">Post by Email</a></p>
 
       <?php else: ?>
 

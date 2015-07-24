@@ -44,7 +44,8 @@
     <div class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <? if(session('me')) { ?>
-          <li><a href="/dashboard">Dashboard</a></li>
+          <li><a href="/instagram">Instagram</a></li>
+          <li><a href="/email">Post-by-Email</a></li>
         <? } ?>
         <!-- <li><a href="/about">About</a></li> -->
         <!-- <li><a href="/contact">Contact</a></li> -->

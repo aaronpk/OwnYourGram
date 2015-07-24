@@ -89,7 +89,7 @@ function download_file($url, $ext='jpg') {
   return $filename;  
 }
 
-function micropub_post($endpoint, $access_token, $params, $photo_filename, $video_filename=false) {
+function micropub_post($endpoint, $access_token, $params, $photo_filename=false, $video_filename=false) {
 
   $postfields = array(
     'h' => 'entry',
@@ -108,11 +108,12 @@ function micropub_post($endpoint, $access_token, $params, $photo_filename, $vide
   $multipart = new p3k\Multipart();
 
   $multipart->addArray($postfields);
-  $multipart->addFile('photo', $photo_filename, 'image/jpeg');
 
-  if($video_filename) {
+  if($photo_filename)
+    $multipart->addFile('photo', $photo_filename, 'image/jpeg');
+
+  if($video_filename)
     $multipart->addFile('video', $video_filename, 'video/mp4');
-  }
 
   $ch = curl_init();
   curl_setopt($ch, CURLOPT_URL, $endpoint);

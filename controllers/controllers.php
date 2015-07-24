@@ -65,12 +65,12 @@ $app->get('/auth/instagram-callback', function() use($app) {
       }
     }
 
-    $app->redirect('/dashboard');
+    $app->redirect('/instagram');
   }
 });
 
 
-$app->get('/dashboard', function() use($app) {
+$app->get('/instagram', function() use($app) {
   if($user=require_login($app)) {
 
     // If the user hasn't connected their Instagram account yet, redirect to the page to auth instagram
@@ -113,8 +113,8 @@ $app->get('/dashboard', function() use($app) {
         }
       }
 
-      $html = render('dashboard', array(
-        'title' => 'Dashboard',
+      $html = render('instagram', array(
+        'title' => 'Instagram',
         'entry' => $entry,
         'photo_url' => $photo_url,
         'micropub_endpoint' => $user->micropub_endpoint,
@@ -123,6 +123,36 @@ $app->get('/dashboard', function() use($app) {
       ));
       $app->response()->body($html);
     }
+  }
+});
+
+$app->get('/email', function() use($app) {
+  if($user=require_login($app)) {
+
+    $test_response = '';
+    if($user->last_micropub_response) {
+      try {
+        if(@json_decode($user->last_micropub_response)) {
+          $d = json_decode($user->last_micropub_response);
+          $test_response = $d->response;
+        }
+      } catch(Exception $e) {
+      }
+    }
+
+    if(!$user->email_username) {
+      $host = parse_url($user->url, PHP_URL_HOST);
+      $user->email_username = $host . '.' . rand(100000,999999);
+      $user->save();
+    }
+
+    $html = render('email', array(
+      'title' => 'Post-by-Email',
+      'micropub_endpoint' => $user->micropub_endpoint,
+      'test_response' => $test_response,
+      'user' => $user
+    ));
+    $app->response()->body($html);    
   }
 });
 
@@ -176,41 +206,3 @@ $app->post('/micropub/test', function() use($app) {
     )));
   }
 });
-
-$app->post('/instagram/callback', function() use($app) {
-  // Will be something like this
-  /*
-  [
-    {
-        "subscription_id": "1",
-        "object": "user",
-        "object_id": "1234",
-        "changed_aspect": "media",
-        "time": 1297286541
-    },
-    {
-        "subscription_id": "2",
-        "object": "tag",
-        "object_id": "nofilter",
-        "changed_aspect": "media",
-        "time": 1297286541
-    },
-    ...
-  ]
-  */
-
-  // Queue a job to process this request
-  bs()->putInTube(Config::$hostname.'-worker', $app->request()->getBody());
-});
-
-// Respond to the callback challenge from Instagram
-// http://instagram.com/developer/realtime/
-$app->get('/instagram/callback', function() use($app) {
-  $params = $app->request()->params();
-  if(array_key_exists('hub_challenge', $params))
-    $app->response()->body($params['hub_challenge']);
-  else
-    $app->response()->body('error');
-});
-
-
