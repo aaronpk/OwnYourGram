@@ -56,7 +56,6 @@ $app->post('/mailgun', function() use($app) {
     return;
   }
 
-  /*
   ob_start();
   print_r($params);
   print_r($_POST);
@@ -67,17 +66,16 @@ $app->post('/mailgun', function() use($app) {
   }
   $debug = ob_get_clean();
   file_put_contents('last.txt', $debug);
-  */
 
   $data = array(
     'published' => (k($params, 'Date') ? date('c', strtotime(k($params, 'Date'))) : date('c'))
   );
 
   if(k($params, 'Subject'))
-    $data['name'] = k($params, 'Subject');
+    $data['name'] = trim(k($params, 'Subject'));
 
   if(k($params, 'body-plain'))
-    $data['content'] = k($params, 'body-plain');
+    $data['content'] = trim(k($params, 'body-plain'));
 
   // Handle attachments
   $filename = false;
@@ -101,7 +99,7 @@ $app->post('/mailgun', function() use($app) {
   if(k($data,'content') && preg_match_all('/#([^ ]+)/', $data['content'], $matches)) {
     $tags = array();
     foreach($matches[1] as $m)
-      $tags[] = $m;
+      $tags[] = trim($m);
     if($tags) {
       if($user->send_category_as_array != 1) {
         $data['category'] = $tags;
