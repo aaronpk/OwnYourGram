@@ -109,7 +109,7 @@ function micropub_post($endpoint, $access_token, $params, $photo_filename=false,
   if(k($params, 'syndication'))
     $postfields['syndication'] = $params['syndication'];
   if(k($params, 'name'))
-    $postfields['syndication'] = $params['name'];
+    $postfields['name'] = $params['name'];
 
   $multipart = new p3k\Multipart();
 
