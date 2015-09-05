@@ -16,9 +16,8 @@ $app->get('/', function($format='html') use($app) {
   $total_photos = ORM::for_table('users')
     ->sum('photo_count');
 
-  // TODO: replace the last_micropub_response check with photo_count > 0 after it fills up
   $total_users = ORM::for_table('users')
-    ->where('micropub_success', 1)
+    ->where_gt('photo_count', 0)
     ->where_not_null('last_micropub_response')
     ->count();
 
