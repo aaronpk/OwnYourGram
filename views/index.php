@@ -16,6 +16,14 @@
   <div class="row top-users">
     <h3>Top users this week</h3>
     <?php
+    if(count($this->users) == 0):
+    ?>
+
+    <p>Nobody yet! The stats reset every Sunday.</p>
+
+    <?php
+    endif;
+
     foreach($this->users as $user):
     ?>
       <div class="col-xs-6 col-md-3">
