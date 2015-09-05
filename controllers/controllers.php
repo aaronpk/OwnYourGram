@@ -191,6 +191,8 @@ $app->post('/micropub/test', function() use($app) {
     if($response && preg_match('/Location: (.+)/', $response, $match)) {
       $location = $match[1];
       $user->micropub_success = 1;
+      $user->last_micropub_url = $location;
+      $user->photo_count = $user->photo_count + 1;
     } else {
       $location = false;
     }

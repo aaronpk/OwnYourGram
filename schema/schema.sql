@@ -18,6 +18,9 @@ CREATE TABLE `users` (
   `send_category_as_array` tinyint(4) NOT NULL DEFAULT '1',
   `email_username` varchar(100) DEFAULT NULL,
   `photo_count` int(11) NOT NULL DEFAULT '0',
+  `last_micropub_url` varchar(255) DEFAULT NULL,
+  `last_instagram_img_url` varchar(255) DEFAULT NULL,
+  `ig_public` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
