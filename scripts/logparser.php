@@ -26,7 +26,7 @@ foreach($entries as $entry) {
         echo "Found photo: $micropub_location\n";
 
         $user->last_micropub_url = $micropub_location;
-//        $user->photo_count = $user->photo_count + 1;
+        $user->photo_count = $user->photo_count + 1;
 
         if(preg_match('/\[published\] => (.+)/', $entry, $match)) {
           $published = strtotime($match[1]);
