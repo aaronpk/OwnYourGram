@@ -101,10 +101,11 @@ function process_job(&$jobData) {
           $user->last_instagram_photo = $photo->id;
           $user->last_photo_date = date('Y-m-d H:i:s');
 
-          if($response && preg_match('/Location: (.+)/', $response, $match)) {
+          if($response && preg_match('/Location: (.+)/', $response['response'], $match)) {
             $user->last_micropub_url = $match[1];
             $user->last_instagram_img_url = $photo_url;
             $user->photo_count = $user->photo_count + 1;
+            $user->photo_count_this_week = $user->photo_count_this_week + 1;
           } else {
             // Their micropub endpoint didn't return a location, notify them there's a problem somehow
           }

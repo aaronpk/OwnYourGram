@@ -51,6 +51,10 @@ function k($a, $k, $default=null) {
   }
 }
 
+function friendly_url($url) {
+  return preg_replace(['/https?:\/\//','/\/$/'],'',$url);
+}
+
 function bs()
 {
   static $pheanstalk;

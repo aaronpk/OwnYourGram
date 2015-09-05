@@ -318,12 +318,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/pda/pheanstalk.git",
-                "reference": "e677fe978ab568801de42a599f19b398b6d7a31b"
+                "reference": "ba8c8b1c3265d4a925864bfffe04c806c3364803"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pda/pheanstalk/zipball/e677fe978ab568801de42a599f19b398b6d7a31b",
-                "reference": "e677fe978ab568801de42a599f19b398b6d7a31b",
+                "url": "https://api.github.com/repos/pda/pheanstalk/zipball/ba8c8b1c3265d4a925864bfffe04c806c3364803",
+                "reference": "ba8c8b1c3265d4a925864bfffe04c806c3364803",
                 "shasum": ""
             },
             "require": {
@@ -335,7 +335,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.0-dev"
+                    "dev-master": "3.1-dev"
                 }
             },
             "autoload": {
@@ -360,7 +360,7 @@
             "keywords": [
                 "beanstalkd"
             ],
-            "time": "2015-06-26 01:03:20"
+            "time": "2015-09-01 22:39:31"
         },
         {
             "name": "saltybeagle/savant3",

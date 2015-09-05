@@ -89,7 +89,7 @@ function get_photo(&$user, $media_id) {
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
   $response = curl_exec($ch);
   $data = @json_decode($response);
-  if($data)
+  if($data && property_exists($data, 'data'))
     return $data->data;
   else
     return null;

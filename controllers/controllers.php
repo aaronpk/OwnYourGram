@@ -12,11 +12,38 @@ function require_login(&$app) {
 $app->get('/', function($format='html') use($app) {
   $res = $app->response();
 
+  // Total number of photos
+  $total_photos = ORM::for_table('users')
+    ->sum('photo_count');
+
+  // TODO: replace the last_micropub_response check with photo_count > 0 after it fills up
+  $total_users = ORM::for_table('users')
+    ->where('micropub_success', 1)
+    ->where_not_null('last_micropub_response')
+    ->count();
+
+  // Find the top ranked users this week
+  $date = new DateTime();
+  while($date->format('D') != 'Sun') {
+    $date->modify('-1 day');
+  }
+
+  $users = ORM::for_table('users')
+    ->where('ig_public', 1)
+    ->where('micropub_success', 1)
+    ->where_not_null('last_instagram_img_url')
+    ->where_gte('last_photo_date', $date->format('Y-m-d'))
+    ->where_gt('photo_count_this_week', 0)
+    ->order_by_desc('photo_count_this_week')
+    ->find_many();
 
   ob_start();
   render('index', array(
     'title' => 'OwnYourGram',
-    'meta' => ''
+    'meta' => '',
+    'users' => $users,
+    'total_photos' => $total_photos,
+    'total_users' => $total_users
   ));
   $html = ob_get_clean();
   $res->body($html);
