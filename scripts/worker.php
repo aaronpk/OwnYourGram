@@ -97,6 +97,7 @@ function process_job(&$jobData) {
           $user->last_micropub_response = json_encode($response);
           $user->last_instagram_photo = $photo->id;
           $user->last_photo_date = date('Y-m-d H:i:s');
+          $user->photo_count = $user->photo_count + 1;
           $user->save();
 
           /*

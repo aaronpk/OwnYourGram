@@ -16,6 +16,8 @@ CREATE TABLE `users` (
   `token_endpoint` varchar(255) DEFAULT NULL,
   `authorization_endpoint` varchar(255) DEFAULT NULL,
   `send_category_as_array` tinyint(4) NOT NULL DEFAULT '1',
+  `email_username` varchar(100) DEFAULT NULL,
+  `photo_count` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
