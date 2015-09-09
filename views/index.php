@@ -10,7 +10,7 @@
   </div>
 
   <div class="alert alert-success">
-    <i><strong><?= $this->total_photos ?></strong> photos imported by <?= $this->total_users ?> users and counting!</i>
+    <i><strong><?= $this->total_photos ?></strong> grams owned by <?= $this->total_users ?> users on their own sites and counting!</i>
   </div>
 
   <div class="row top-users">
@@ -32,8 +32,8 @@
           <div class="caption">
             <p><a href="<?= $user->url ?>"><?= friendly_url($user->url) ?></a></p>
             <p>
-              <?= $user->photo_count_this_week ?> photos this week<br>
-              <?= $user->photo_count ?> photos imported<br>
+              <?= $user->photo_count_this_week ?> this week<br>
+              <?= $user->photo_count ?> total<br>
             </p>
           </div>
         </div>
