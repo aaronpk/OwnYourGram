@@ -45,7 +45,6 @@
       <ul class="nav navbar-nav">
         <? if(session('me')) { ?>
           <li><a href="/instagram">Instagram</a></li>
-          <li><a href="/email">Post-by-Email</a></li>
         <? } ?>
         <!-- <li><a href="/about">About</a></li> -->
         <!-- <li><a href="/contact">Contact</a></li> -->
@@ -81,7 +80,7 @@
 
   <div class="footer">
     <p class="credits">&copy; <?=date('Y')?> by <a href="http://aaronparecki.com">Aaron Parecki</a>.
-      This code is <a href="https://github.com/aaronpk/OwnYourGram">open source</a>. 
+      This code is <a href="https://github.com/aaronpk/OwnYourGram">open source</a>.
       Feel free to send a pull request, or <a href="https://github.com/aaronpk/OwnYourGram/issues">file an issue</a>.</p>
   </div>
 </div>
