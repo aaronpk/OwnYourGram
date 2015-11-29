@@ -41,6 +41,7 @@ function process_job(&$jobData) {
   }
 
   echo "===============================================\n";
+  echo date('Y-m-d H:i:s')."\n";
   echo "# Beginning job\n";
   print_r($data);
 
@@ -49,6 +50,7 @@ function process_job(&$jobData) {
     $user = ORM::for_table('users')->where('instagram_user_id', $job->object_id)->find_one();
 
     if($user) {
+      echo "User: ".$user->url."\n";
 
       if($user->micropub_success) {
         // Retrieve recent photos for the user after the time specified in the post
@@ -133,6 +135,8 @@ function process_job(&$jobData) {
           print_r($result);
           */
 
+        } else {
+          echo "Failed to get photo\n";
         }
       } else {
         echo "This user has not successfully completed a test micropub post yet\n";

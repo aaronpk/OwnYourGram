@@ -180,20 +180,24 @@ function h_entry_from_photo(&$user, &$photo) {
   if($photo->users_in_photo) {
     foreach($photo->users_in_photo as $tag) {
       // Fetch the user's website
-      if($profile = IG\get_profile($user, $tag->user->id)) {
-        if($profile->website)
-          $entry['category'][] = $profile->website;
-        else
-          $entry['category'][] = 'https://instagram.com/' . $profile->username;
-        // $entry['category'][] = [
-        //   'type' => ['h-card'],
-        //   'properties' => [
-        //     'name' => [$profile->full_name],
-        //     'url' => [$profile->website],
-        //     'photo' => [$profile->profile_picture]
-        //   ],
-        //   'value' => $profile->website
-        // ];
+      try {
+        if($profile = IG\get_profile($user, $tag->user->id)) {
+          if($profile->website)
+            $entry['category'][] = $profile->website;
+          else
+            $entry['category'][] = 'https://instagram.com/' . $profile->username;
+          // $entry['category'][] = [
+          //   'type' => ['h-card'],
+          //   'properties' => [
+          //     'name' => [$profile->full_name],
+          //     'url' => [$profile->website],
+          //     'photo' => [$profile->profile_picture]
+          //   ],
+          //   'value' => $profile->website
+          // ];
+        }
+      } catch(Exception $e) {
+        $entry['category'][] = 'https://instagram.com/' . $tag->user->username;
       }
     }
   }
