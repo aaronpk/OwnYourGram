@@ -6,7 +6,7 @@ https://ownyourgram.com
 
 ### Configuring the Instagram Webhook
 
-http://instagram.com/developer/realtime/
+https://www.instagram.com/developer/subscriptions/
 
 After deploying the site, create the subscription to receive a callback post when
 any user who has authorized the application posts a new photo.
