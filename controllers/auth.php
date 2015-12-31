@@ -262,7 +262,7 @@ $app->get('/auth/callback', function() use($app) {
   $redirectToDashboardImmediately = false;
 
   // If a valid access token was returned, store the token info in the session and they are signed in
-  if(k($token['auth'], array('me','access_token','scope'))) {
+  if($token['auth'] && k($token['auth'], array('me','access_token','scope'))) {
     $_SESSION['auth'] = $token['auth'];
     $_SESSION['me'] = $params['me'];
 
