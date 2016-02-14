@@ -43,22 +43,22 @@
     </div>
     <div class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-        <? if(session('me')) { ?>
+        <?php if(session('me')) { ?>
           <li><a href="/instagram">Instagram</a></li>
-        <? } ?>
+        <?php } ?>
         <!-- <li><a href="/about">About</a></li> -->
         <!-- <li><a href="/contact">Contact</a></li> -->
       </ul>
-      <? if(session('me')) { ?>
+      <?php if(session('me')) { ?>
         <ul class="nav navbar-nav navbar-right">
           <li><a href="/user?domain=<?= urlencode(session('me')) ?>"><?= session('me') ?></a></li>
           <li><a href="/signout">Sign Out</a></li>
         </ul>
-      <? } else if(property_exists($this, 'authorizing')) { ?>
+      <?php } else if(property_exists($this, 'authorizing')) { ?>
         <ul class="nav navbar-right">
           <li class="navbar-text"><?= $this->authorizing ?></li>
         </ul>
-      <? } else { ?>
+      <?php } else { ?>
         <ul class="nav navbar-right" style="font-size: 8pt;">
           <li><a href="https://indieauth.com/setup">What's This?</a></li>
         </ul>
@@ -67,7 +67,7 @@
           <button type="submit" class="btn">Sign In</button>
           <input type="hidden" name="redirect_uri" value="https://<?= $_SERVER['SERVER_NAME'] ?>/indieauth" />
         </form>
-      <? } ?>
+      <?php } ?>
     </div>
   </div>
 </div>
