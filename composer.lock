@@ -4,8 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "7fc5303f70b75affdfe6037eb8a4d8db",
-    "content-hash": "9d604fe6b37bde2e76baa6408c5fe751",
+    "hash": "c7af082e9b379c634c11ea3488cfec0d",
     "packages": [
         {
             "name": "barnabywalters/mf-cleaner",
