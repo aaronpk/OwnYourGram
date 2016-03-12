@@ -5,6 +5,7 @@
         "This file is @generated automatically"
     ],
     "hash": "c7af082e9b379c634c11ea3488cfec0d",
+    "content-hash": "6ac41c4c84fec946d2a86bd0a97e20d7",
     "packages": [
         {
             "name": "barnabywalters/mf-cleaner",
@@ -48,16 +49,16 @@
         },
         {
             "name": "indieauth/client",
-            "version": "0.1.11",
+            "version": "0.1.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/indieweb/indieauth-client-php.git",
-                "reference": "6504ed0d4714084e9955f639d6e5cf4e976f9038"
+                "reference": "d438bb03db15b4ccc6c63228be16de7870b6ab99"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/indieweb/indieauth-client-php/zipball/6504ed0d4714084e9955f639d6e5cf4e976f9038",
-                "reference": "6504ed0d4714084e9955f639d6e5cf4e976f9038",
+                "url": "https://api.github.com/repos/indieweb/indieauth-client-php/zipball/d438bb03db15b4ccc6c63228be16de7870b6ab99",
+                "reference": "d438bb03db15b4ccc6c63228be16de7870b6ab99",
                 "shasum": ""
             },
             "require": {
@@ -83,7 +84,7 @@
                 }
             ],
             "description": "IndieAuth Client Library",
-            "time": "2015-08-30 22:29:40"
+            "time": "2016-02-08 23:56:31"
         },
         {
             "name": "indieweb/date-formatter",
