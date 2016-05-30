@@ -80,6 +80,24 @@ function get_timezone($lat, $lng) {
   return null;
 }
 
+function get_instagram_profile($username) {
+  $ch = curl_init('https://www.instagram.com/'.$username.'/?__a=1');
+  curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+    'Accept-Language: en-US,en;q=0.8',
+    'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.110 Safari/537.36',
+  ]);
+  curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  $response = curl_exec($ch);
+  $profile = @json_decode($response);
+  if($profile) {
+    return $profile;
+  } else {
+    return null;
+  }
+}
+
 function download_file($url, $ext='jpg') {
   $filename = tempnam(dirname(__FILE__).'../tmp/', 'ig').'.'.$ext;
   $fp = fopen($filename, 'w+');

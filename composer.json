@@ -3,9 +3,7 @@
     "slim/slim": "2.2.*",
     "saltybeagle/savant3": "dev-master",
     "j4mie/idiorm": "1.4.*",
-    "mf2/mf2": "0.2.*",
-    "indieweb/mention-client": "0.*",
-    "indieweb/date-formatter": "0.1.*",
+    "mf2/mf2": "0.3.*",
     "indieauth/client": ">=0.1.11",
     "pda/pheanstalk": "dev-master",
     "p3k/multipart": "0.1.*"

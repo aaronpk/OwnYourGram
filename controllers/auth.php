@@ -259,7 +259,7 @@ $app->get('/auth/callback', function() use($app) {
     $token = array('auth'=>false, 'response'=>false);
   }
 
-  $redirectToDashboardImmediately = false;
+  $hasAlreadyLoggedInBefore = false;
 
   // If a valid access token was returned, store the token info in the session and they are signed in
   if($token['auth'] && k($token['auth'], array('me','access_token','scope'))) {
@@ -272,7 +272,7 @@ $app->get('/auth/callback', function() use($app) {
       $user->last_login = date('Y-m-d H:i:s');
       // If they have logged in before and we already have an access token, then redirect to the dashboard now
       if($user->micropub_access_token)
-        $redirectToDashboardImmediately = true;
+        $hasAlreadyLoggedInBefore = true;
     } else {
       // New user! Store the user in the database
       $user = ORM::for_table('users')->create();
@@ -288,8 +288,11 @@ $app->get('/auth/callback', function() use($app) {
 
   unset($_SESSION['auth_state']);
 
-  if($redirectToDashboardImmediately) {
-    $app->redirect('/instagram', 301);
+  if($hasAlreadyLoggedInBefore) {
+    if($user->instagram_username)
+      $app->redirect('/dashboard', 302);
+    else
+      $app->redirect('/instagram', 302);
   } else {
     $html = render('auth_callback', array(
       'title' => 'Sign In',

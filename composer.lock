@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "c7af082e9b379c634c11ea3488cfec0d",
-    "content-hash": "6ac41c4c84fec946d2a86bd0a97e20d7",
+    "hash": "fce08a1ca529de233c1cbbecf6d9e1c1",
+    "content-hash": "34510cf5b0d3f444b467533f1d1a15af",
     "packages": [
         {
             "name": "barnabywalters/mf-cleaner",
@@ -49,22 +49,22 @@
         },
         {
             "name": "indieauth/client",
-            "version": "0.1.13",
+            "version": "0.1.16",
             "source": {
                 "type": "git",
                 "url": "https://github.com/indieweb/indieauth-client-php.git",
-                "reference": "d438bb03db15b4ccc6c63228be16de7870b6ab99"
+                "reference": "81e425892c00afef1b6bf9fe16e771b4503bbb8a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/indieweb/indieauth-client-php/zipball/d438bb03db15b4ccc6c63228be16de7870b6ab99",
-                "reference": "d438bb03db15b4ccc6c63228be16de7870b6ab99",
+                "url": "https://api.github.com/repos/indieweb/indieauth-client-php/zipball/81e425892c00afef1b6bf9fe16e771b4503bbb8a",
+                "reference": "81e425892c00afef1b6bf9fe16e771b4503bbb8a",
                 "shasum": ""
             },
             "require": {
                 "barnabywalters/mf-cleaner": "0.*",
-                "indieweb/link-rel-parser": "0.1.1",
-                "mf2/mf2": "0.2.*",
+                "indieweb/link-rel-parser": "0.1.*",
+                "mf2/mf2": "~0.3",
                 "php": ">5.3.0"
             },
             "type": "library",
@@ -84,63 +84,20 @@
                 }
             ],
             "description": "IndieAuth Client Library",
-            "time": "2016-02-08 23:56:31"
-        },
-        {
-            "name": "indieweb/date-formatter",
-            "version": "0.1.6",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/indieweb/date-formatter-php.git",
-                "reference": "9c12e0fda95f4b3119fcaf271d141305870c4350"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/indieweb/date-formatter-php/zipball/9c12e0fda95f4b3119fcaf271d141305870c4350",
-                "reference": "9c12e0fda95f4b3119fcaf271d141305870c4350",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "IndieWeb": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "Aaron Parecki",
-                    "homepage": "http://aaronparecki.com"
-                }
-            ],
-            "description": "Render dates and date ranges in a human-readable format, including proper microformats-2 markup",
-            "homepage": "https://github.com/indieweb/date-formatter-php",
-            "keywords": [
-                "date",
-                "format",
-                "microformats",
-                "microformats2"
-            ],
-            "time": "2015-10-28 00:32:39"
+            "time": "2016-05-21 16:43:04"
         },
         {
             "name": "indieweb/link-rel-parser",
-            "version": "0.1.1",
+            "version": "0.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/indieweb/link-rel-parser-php.git",
-                "reference": "9e0e635fd301a8b1da7bc181f651f029c531dbb6"
+                "reference": "7127a92f32cecbf8166fb3b34130a59ea63e2041"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/indieweb/link-rel-parser-php/zipball/9e0e635fd301a8b1da7bc181f651f029c531dbb6",
-                "reference": "9e0e635fd301a8b1da7bc181f651f029c531dbb6",
+                "url": "https://api.github.com/repos/indieweb/link-rel-parser-php/zipball/7127a92f32cecbf8166fb3b34130a59ea63e2041",
+                "reference": "7127a92f32cecbf8166fb3b34130a59ea63e2041",
                 "shasum": ""
             },
             "require": {
@@ -173,46 +130,7 @@
                 "indieweb",
                 "microformats2"
             ],
-            "time": "2013-12-23 00:14:58"
-        },
-        {
-            "name": "indieweb/mention-client",
-            "version": "0.4.7",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/indieweb/mention-client-php.git",
-                "reference": "15271f4988c7bf661896fad188fdf0bf91877a7f"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/indieweb/mention-client-php/zipball/15271f4988c7bf661896fad188fdf0bf91877a7f",
-                "reference": "15271f4988c7bf661896fad188fdf0bf91877a7f",
-                "shasum": ""
-            },
-            "require": {
-                "mf2/mf2": "0.2.*",
-                "php": ">=5.3"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "IndieWeb": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "Aaron Parecki",
-                    "email": "aaron@parecki.com",
-                    "homepage": "http://aaronparecki.com/"
-                }
-            ],
-            "description": "Client library for sending webmention and pingback notifications",
-            "homepage": "https://github.com/indieweb/mention-client-php",
-            "time": "2015-04-03 11:21:06"
+            "time": "2016-04-13 17:48:59"
         },
         {
             "name": "j4mie/idiorm",
@@ -274,20 +192,20 @@
         },
         {
             "name": "mf2/mf2",
-            "version": "v0.2.12",
+            "version": "v0.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/indieweb/php-mf2.git",
-                "reference": "6701504876d6c9242eb310b35f41d40d9785ab4e"
+                "reference": "4fb2eb5365cbc0fd2e0c26ca748777d6c2539763"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/indieweb/php-mf2/zipball/6701504876d6c9242eb310b35f41d40d9785ab4e",
-                "reference": "6701504876d6c9242eb310b35f41d40d9785ab4e",
+                "url": "https://api.github.com/repos/indieweb/php-mf2/zipball/4fb2eb5365cbc0fd2e0c26ca748777d6c2539763",
+                "reference": "4fb2eb5365cbc0fd2e0c26ca748777d6c2539763",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.0"
+                "php": ">=5.4.0"
             },
             "require-dev": {
                 "phpunit/phpunit": "3.7.*"
@@ -307,7 +225,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "MIT"
+                "CC0"
             ],
             "authors": [
                 {
@@ -323,7 +241,7 @@
                 "parser",
                 "semantic"
             ],
-            "time": "2015-07-12 14:10:01"
+            "time": "2016-03-14 12:13:34"
         },
         {
             "name": "p3k/multipart",

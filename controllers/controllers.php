@@ -50,7 +50,7 @@ $app->get('/', function($format='html') use($app) {
 
 
 $app->get('/creating-a-token-endpoint', function() use($app) {
-  $app->redirect('http://indiewebcamp.com/token-endpoint', 301);
+  $app->redirect('https://indiewebcamp.com/token-endpoint', 302);
 });
 $app->get('/creating-a-micropub-endpoint', function() use($app) {
   $html = render('creating-a-micropub-endpoint', array('title' => 'Creating a Micropub Endpoint'));
@@ -60,62 +60,62 @@ $app->get('/creating-a-micropub-endpoint', function() use($app) {
 $app->get('/instagram', function() use($app) {
   if($user=require_login($app)) {
 
-    // If the user hasn't connected their Instagram account yet, redirect to the page to auth instagram
-    if($user->instagram_access_token == '') {
-      $app->redirect('/auth/instagram-start');
-    } else {
-
-      // Go fetch the latest Instagram photo and show it to them for testing the micropub endpoint
-      try {
-        if($photos = IG\get_latest_photos($user)) {
-          $entry = h_entry_from_photo($user, $photos[0]);
-          $photo_url = $photos[0]->images->standard_resolution->url;
-          if(property_exists($photos[0], 'videos'))
-            $video_url = $photos[0]->videos->standard_resolution->url;
-          else
-            $video_url = false;
-        } else {
-          $entry = false;
-          $photo_url = false;
-          $video_url = false;
-        }
-      } catch(IG\AccessTokenException $e) {
-        $user->instagram_access_token = '';
-        $user->instagram_response = '';
-        $user->save();
-        $app->redirect('/auth/instagram-start');
-      } catch(Exception $e) {
-        $html = render('auth_error', array(
-          'title' => 'Error',
-          'error' => 'Error',
-          'errorDescription' => $e->getMessage()
-        ));
-        $app->response()->body($html);
-        return;
-      }
-
-      $test_response = '';
-      if($user->last_micropub_response) {
-        try {
-          if(@json_decode($user->last_micropub_response)) {
-            $d = json_decode($user->last_micropub_response);
-            $test_response = $d->response;
-          }
-        } catch(Exception $e) {
+    // Check the user's home page to see if there is a rel=me link to an instagram profile
+    $instagram_username = false;
+    $homepage = Mf2\fetch($user->url);
+    if($homepage && array_key_exists('me', $homepage['rels'])) {
+      foreach($homepage['rels']['me'] as $rel) {
+        if(preg_match('/https?:\/\/(?:www\.)?instagram\.com\/([^\/]+)/', $rel, $match)) {
+          $instagram_username = $match[1];
         }
       }
-
-      $html = render('instagram', array(
-        'title' => 'Instagram',
-        'entry' => $entry,
-        'photo_url' => $photo_url,
-        'video_url' => $video_url,
-        'micropub_endpoint' => $user->micropub_endpoint,
-        'test_response' => $test_response,
-        'user' => $user
-      ));
-      $app->response()->body($html);
     }
+
+    $_SESSION['instagram_username'] = $instagram_username;
+
+    $html = render('instagram', array(
+      'title' => 'Instagram',
+      'user' => $user,
+      'instagram_username' => $instagram_username
+    ));
+    $app->response()->body($html);
+  }
+});
+
+$app->get('/instagram/verify', function() use($app) {
+  if($user=require_login($app)) {
+    if(!array_key_exists('instagram_username', $_SESSION)) {
+      $app->redirect('/instagram', 302);
+      return;
+    }
+
+    // Check the instagram account looking for the link back to the user's home page
+    $profile = get_instagram_profile($_SESSION['instagram_username']);
+
+    $success = false;
+
+    if($profile && property_exists($profile, 'user')) {
+      if($profile->user->external_url == $user->url
+        || strpos($profile->user->biography, $user->url) !== false) {
+        $success = true;
+      }
+    }
+
+    if($success) {
+      $user->instagram_username = $_SESSION['instagram_username'];
+    } else {
+      $user->instagram_username = null;
+    }
+    $user->save();
+
+    $html = render('instagram-verify', array(
+      'title' => 'Instagram',
+      'user' => $user,
+      'instagram_username' => $_SESSION['instagram_username'],
+      'success' => $success
+    ));
+    $app->response()->body($html);
+
   }
 });
 

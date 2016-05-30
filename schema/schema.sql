@@ -2,6 +2,7 @@ CREATE TABLE `users` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `url` varchar(255) DEFAULT NULL,
   `instagram_user_id` varchar(255) DEFAULT NULL,
+  `instagram_username` varchar(255) DEFAULT NULL,
   `instagram_access_token` varchar(255) DEFAULT NULL,
   `instagram_response` text,
   `micropub_endpoint` varchar(255) DEFAULT NULL,
