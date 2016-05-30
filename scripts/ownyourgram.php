@@ -61,9 +61,6 @@ function process_job(&$jobData) {
 
         if($photo = IG\get_photo($user, $media_id)) {
 
-          $public = IG\user_is_public($user);
-          $user->ig_public = ($public ? 1 : 0);
-
           $entry = h_entry_from_photo($user, $photo);
           $photo_url = $photo->images->standard_resolution->url;
 
@@ -113,27 +110,6 @@ function process_job(&$jobData) {
           }
 
           $user->save();
-
-          /*
-          // Add the link to the photo caption
-
-          $comment_text = '';
-
-          if($photo->caption && $photo->caption->id) {
-            $comment_id = $photo->caption->id;
-            $comment_text = $photo->caption->text;
-
-            // Now delete the comment (caption) if there is one
-            $result = IG\delete_comment($user, $media_id, $comment_id);
-            print_r($result);
-          }
-
-          // Re-add the caption with the citation 
-          $canonical = 'http://aaron.pk/xxxxx';
-          $comment_text .= ' ('.$canonical.')';
-          $result = IG\add_comment($user, $media_id, $comment_text);
-          print_r($result);
-          */
 
         } else {
           echo "Failed to get photo\n";

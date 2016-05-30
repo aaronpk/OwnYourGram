@@ -21,103 +21,9 @@ function build_url($parsed_url) {
   return "$scheme$user$pass$host$port$path$query$fragment";
 }
 
-// Input: Any URL or string like "aaronparecki.com"
-// Output: Normlized URL (default to http if no scheme, force "/" path)
-//         or return false if not a valid URL (has query string params, etc)
-function normalizeMeURL($url) {
-  $me = parse_url($url);
-
-  // parse_url returns just "path" for naked domains
-  if(count($me) == 1 && array_key_exists('path', $me)) {
-    $me['host'] = $me['path'];
-    unset($me['path']);
-  }
-
-  if(!array_key_exists('scheme', $me))
-    $me['scheme'] = 'http';
-
-  if(!array_key_exists('path', $me))
-    $me['path'] = '/';
-
-  // Invalid scheme
-  if(!in_array($me['scheme'], array('http','https')))
-    return false;
-
-  // Invalid path
-  // if($me['path'] != '/')
-  //   return false;
-
-  // query and fragment not allowed
-  if(array_key_exists('query', $me) || array_key_exists('fragment', $me))
-    return false;
-
-  return build_url($me);
-}
-
 $app->get('/signin', function() use($app) {
   $html = render('signin', array('title' => 'Sign In'));
   $app->response()->body($html);
-});
-
-
-$app->get('/auth/instagram', function() use($app) {
-  if(require_login($app)) {
-    $html = render('instagram-auth', array(
-      'title' => 'Connect Instagram'
-    ));
-    $app->response()->body($html);
-  }
-});
-
-$app->get('/auth/instagram-start', function() use($app) {
-  if(require_login($app)) {
-    $app->redirect('https://api.instagram.com/oauth/authorize/?client_id='.Config::$instagramClientID.'&redirect_uri='.Config::instagramRedirectURI().'&response_type=code&scope=comments');
-  }
-});
-
-$app->get('/auth/instagram-callback', function() use($app) {
-  if(require_login($app)) {
-
-    $params = $app->request()->params();
-
-    if(!array_key_exists('code', $params)) {
-      // Error authorizing
-      $app->redirect('/auth/instagram');
-    } else {
-      $ch = curl_init();
-      curl_setopt($ch, CURLOPT_URL, 'https://api.instagram.com/oauth/access_token');
-      curl_setopt($ch, CURLOPT_POST, true);
-      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-      curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array(
-        'client_id' => Config::$instagramClientID,
-        'client_secret' => Config::$instagramClientSecret,
-        'redirect_uri' => Config::instagramRedirectURI(),
-        'grant_type' => 'authorization_code',
-        'code' => $params['code']
-      )));
-      $response = curl_exec($ch);
-      $token = json_decode($response);
-
-      if(property_exists($token, 'access_token')) {
-        // Remove the Instagram account info from a past user account if it already exists
-        ORM::for_table('users')->where('instagram_user_id', $token->user->id)->find_result_set()
-          ->set('instagram_user_id','')
-          ->set('instagram_access_token','')
-          ->save();
-
-        // Update the user record with the instagram access token
-        $user = ORM::for_table('users')->find_one($_SESSION['user_id']);
-        $user->instagram_access_token = $token->access_token;
-        $user->instagram_user_id = $token->user->id;
-        $user->instagram_response = $response;
-        $user->save();
-      } else {
-        $app->redirect('/auth/instagram');
-      }
-    }
-
-    $app->redirect('/instagram');
-  }
 });
 
 $app->get('/auth/start', function() use($app) {
@@ -128,7 +34,7 @@ $app->get('/auth/start', function() use($app) {
   // the "me" parameter is user input, and may be in a couple of different forms:
   // aaronparecki.com http://aaronparecki.com http://aaronparecki.com/
   // Normlize the value now (move this into a function in IndieAuth\Client later)
-  if(!array_key_exists('me', $params) || !($me = normalizeMeURL($params['me']))) {
+  if(!array_key_exists('me', $params) || !($me = IndieAuth\Client::normalizeMeURL($params['me']))) {
     $html = render('auth_error', array(
       'title' => 'Sign In',
       'error' => 'Invalid "me" Parameter',
@@ -197,7 +103,7 @@ $app->get('/auth/callback', function() use($app) {
 
   // Double check there is a "me" parameter
   // Should only fail for really hacked up requests
-  if(!array_key_exists('me', $params) || !($me = normalizeMeURL($params['me']))) {
+  if(!array_key_exists('me', $params) || !($me = IndieAuth\Client::normalizeMeURL($params['me']))) {
     $html = render('auth_error', array(
       'title' => 'Auth Callback',
       'error' => 'Invalid "me" Parameter',

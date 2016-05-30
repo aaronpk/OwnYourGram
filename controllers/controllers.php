@@ -28,7 +28,6 @@ $app->get('/', function($format='html') use($app) {
   }
 
   $users = ORM::for_table('users')
-    ->where('ig_public', 1)
     ->where('micropub_success', 1)
     ->where_not_null('last_instagram_img_url')
     ->where_gte('last_photo_date', $date->format('Y-m-d'))
@@ -90,13 +89,13 @@ $app->get('/instagram/verify', function() use($app) {
     }
 
     // Check the instagram account looking for the link back to the user's home page
-    $profile = get_instagram_profile($_SESSION['instagram_username']);
+    $profile = IG\get_profile($_SESSION['instagram_username']);
 
     $success = false;
 
-    if($profile && property_exists($profile, 'user')) {
-      if($profile->user->external_url == $user->url
-        || strpos($profile->user->biography, $user->url) !== false) {
+    if($profile && array_key_exists('user', $profile)) {
+      if($profile['user']['external_url'] == $user->url
+        || strpos($profile['user']['biography'], $user->url) !== false) {
         $success = true;
       }
     }

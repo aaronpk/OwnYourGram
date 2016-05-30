@@ -1,7 +1,14 @@
 <?php
 namespace IG;
+use DOMDocument, DOMXPath;
+use Config;
 
-class AccessTokenException extends \Exception {
+function http_headers() {
+  return [
+    'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+    'Accept-Language: en-US,en;q=0.8',
+    'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.110 Safari/537.36',
+  ];
 }
 
 function get_latest_photos(&$user, $since=false, $limit=1) {
@@ -33,100 +40,126 @@ function get_latest_photos(&$user, $since=false, $limit=1) {
   }
 }
 
-function get_profile(&$user, $instagram_user_id) {
-  $params = array(
-    'access_token' => $user->instagram_access_token
-  );
+function get_photo($url, $ignoreCache=false) {
+  $cacheKey = Config::$hostname.'::photo::'.$url;
+  $cacheTime = 86400; # cache photos for 1 day
+
+  if(Config::$cacheIGRequests && !$ignoreCache) {
+    if($data = redis()->get($cacheKey)) {
+      return json_decode($data, true);
+    }
+  }
 
   $ch = curl_init();
-  curl_setopt($ch, CURLOPT_URL, 'https://api.instagram.com/v1/users/'.$instagram_user_id.'?'.http_build_query($params));
+  curl_setopt($ch, CURLOPT_URL, $url);
+  curl_setopt($ch, CURLOPT_HTTPHEADER, http_headers());
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
   $response = curl_exec($ch);
-  $data = @json_decode($response);
-  if($data && is_object($data)) {
-    if(property_exists($data, 'data')) {
-      return $data->data;
-    } elseif(property_exists($data, 'meta') && property_exists($data->meta, 'error_message')) {
-      throw new AccessTokenException($data->meta->error_message);
-    } else {
-      return null;
+
+  $data = extract_ig_data($response);
+
+  if($data && is_array($data) && array_key_exists('entry_data', $data)) {
+    if(is_array($data['entry_data']) && array_key_exists('PostPage', $data['entry_data'])) {
+      $post = $data['entry_data']['PostPage'];
+      if(is_array($post) && array_key_exists(0, $post) && array_key_exists('media', $post[0])) {
+        $media = $post[0]['media'];
+
+        if(Config::$cacheIGRequests)
+          redis()->setex($cacheKey, $cacheTime, json_encode($media));
+
+        return $media;
+      }
     }
+  }
+
+  return $null;
+}
+
+function get_profile($username, $ignoreCache=false) {
+  $cacheKey = Config::$hostname.'::profile::'.$username;
+  $cacheTime = 86400 * 7; # cache profiles for 7 days
+
+  if(Config::$cacheIGRequests && !$ignoreCache) {
+    if($data = redis()->get($cacheKey)) {
+      return json_decode($data, true);
+    }
+  }
+
+  $ch = curl_init('https://www.instagram.com/'.$username.'/?__a=1');
+  curl_setopt($ch, CURLOPT_HTTPHEADER, http_headers());
+  curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  $response = curl_exec($ch);
+  $profile = @json_decode($response, true);
+  if($profile) {
+    redis()->setex($cacheKey, $cacheTime, json_encode($profile));
+    return $profile;
   } else {
     return null;
-  }  
+  }
 }
 
-function user_is_public(&$user) {
-  $params = array(
-    'access_token' => $user->instagram_access_token
-  );
+function get_venue($id, $ignoreCache=false) {
+  $cacheKey = Config::$hostname.'::venue::'.$id;
+  $cacheTime = 86400 * 360; # cache venues for 360 days
 
-  $ch = curl_init();
-  curl_setopt($ch, CURLOPT_URL, 'https://api.instagram.com/v1/users/'.$user->instagram_user_id.'/relationship?'.http_build_query($params));
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-  $response = curl_exec($ch);
-  $data = @json_decode($response);
-  if($data && is_object($data)) {
-    if(property_exists($data, 'data') && property_exists($data->data, 'target_user_is_private')) {
-      return $data->data->target_user_is_private != 1;
-    } elseif(property_exists($data, 'meta') && property_exists($data->meta, 'error_message')) {
-      throw new AccessTokenException($data->meta->error_message);
-    } else {
-      return null;
+  if(Config::$cacheIGRequests && !$ignoreCache) {
+    if($data = redis()->get($cacheKey)) {
+      return json_decode($data, true);
     }
-  } else {
-    return null;
-  }  
-}
-
-function get_photo(&$user, $media_id) {
-  $params = array(
-    'access_token' => $user->instagram_access_token
-  );
+  }
 
   $ch = curl_init();
-  curl_setopt($ch, CURLOPT_URL, 'https://api.instagram.com/v1/media/'.$media_id.'?'.http_build_query($params));
+  curl_setopt($ch, CURLOPT_URL, 'https://www.instagram.com/explore/locations/'.$id.'/');
+  $headers = http_headers();
+  # need to set a referer, otherwise IG returns a blank page
+  $headers[] = 'Referer: https://www.instagram.com/'; 
+  curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
   $response = curl_exec($ch);
-  $data = @json_decode($response);
-  if($data && property_exists($data, 'data'))
-    return $data->data;
-  else
-    return null;
+
+  $data = extract_ig_data($response);
+
+  if($data && is_array($data) && array_key_exists('entry_data', $data)) {
+    if(is_array($data['entry_data']) && array_key_exists('LocationsPage', $data['entry_data'])) {
+      $data = $data['entry_data']['LocationsPage'];
+      if(is_array($data) && array_key_exists(0, $data) && array_key_exists('location', $data[0])) {
+        $location = $data[0]['location'];
+
+        # we don't need these and they're huge, so don't save them
+        unset($location['media']);
+        unset($location['top_posts']);
+
+        if(Config::$cacheIGRequests) {
+          redis()->setex($cacheKey, $cacheTime, json_encode($location));
+        }
+        
+        return $location;
+      }
+    }
+  }
+
+  return null;
 }
 
-function delete_comment(&$user, $media_id, $comment_id) {
-  $params = array(
-    'access_token' => $user->instagram_access_token
-  );
+function extract_ig_data($html) {
+  $doc = new DOMDocument();
+  @$doc->loadHTML($html);
 
-  $ch = curl_init();
-  curl_setopt($ch, CURLOPT_URL, 'https://api.instagram.com/v1/media/'.$media_id.'/comments/'.$comment_id.'?'.http_build_query($params));
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-  curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
-  $response = curl_exec($ch);
-  $data = @json_decode($response);
-  if($data)
-    return $data->data;
-  else
+  if(!$doc) {
     return null;
-}
+  }
 
-function add_comment(&$user, $media_id, $text) {
-  $params = array(
-    'access_token' => $user->instagram_access_token,
-    'text' => $text
-  );
+  $xpath = new DOMXPath($doc);
 
-  $ch = curl_init();
-  curl_setopt($ch, CURLOPT_URL, 'https://api.instagram.com/v1/media/'.$media_id.'/comments?'.http_build_query($params));
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-  curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
-  $response = curl_exec($ch);
-  $data = @json_decode($response);
-  if($data)
-    return $data->data;
-  else
-    return array('error'=>$response);
+  $data = null;
+
+  foreach($xpath->query('//script') as $script) {
+    if(preg_match('/window\._sharedData = ({.+});/', $script->textContent, $match)) {
+      $data = json_decode($match[1], true);
+    }
+  }
+
+  return $data;  
 }
 

@@ -3,6 +3,7 @@
     "slim/slim": "2.2.*",
     "saltybeagle/savant3": "dev-master",
     "j4mie/idiorm": "1.4.*",
+    "predis/predis": "~1.0",
     "mf2/mf2": "0.3.*",
     "indieauth/client": ">=0.1.11",
     "pda/pheanstalk": "dev-master",
