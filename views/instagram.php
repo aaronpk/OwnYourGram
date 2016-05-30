@@ -61,6 +61,12 @@ endif;
         <?php
         endif;
         ?>
+        <?php if($this->video_url): ?>
+	      <div class="form-group">
+	        <label for="video_url">Video URL (sent as a file named <code>video</code>)</label>
+	        <input type="text" id="video_url" value="<?= $this->video_url ?>" class="form-control">
+	      </div>
+	    <?php endif; ?>
         <div class="form-group">
           <label for="photo_url">Photo URL (sent as a file named <code>photo</code>)</label>
           <input type="text" id="photo_url" value="<?= $this->photo_url ?>" class="form-control">
@@ -101,6 +107,7 @@ $(function(){
     $.post("/micropub/test", {
       content: $("#photo_content").val(),
       url: $("#photo_url").val(),
+      video_url: $("#video_url").length ? $("#video_url").val() : '',
       published: $("#photo_published").val(),
       location: $("#photo_location").val(),
       place_name: $("#photo_place_name").val(),

@@ -70,9 +70,14 @@ $app->get('/instagram', function() use($app) {
         if($photos = IG\get_latest_photos($user)) {
           $entry = h_entry_from_photo($user, $photos[0]);
           $photo_url = $photos[0]->images->standard_resolution->url;
+          if(property_exists($photos[0], 'videos'))
+            $video_url = $photos[0]->videos->standard_resolution->url;
+          else
+            $video_url = false;
         } else {
           $entry = false;
           $photo_url = false;
+          $video_url = false;
         }
       } catch(IG\AccessTokenException $e) {
         $user->instagram_access_token = '';
@@ -104,6 +109,7 @@ $app->get('/instagram', function() use($app) {
         'title' => 'Instagram',
         'entry' => $entry,
         'photo_url' => $photo_url,
+        'video_url' => $video_url,
         'micropub_endpoint' => $user->micropub_endpoint,
         'test_response' => $test_response,
         'user' => $user
@@ -136,8 +142,13 @@ $app->post('/micropub/test', function() use($app) {
     // Download the file to a temp folder
     $filename = download_file($params['url']);
 
+	if($params['video_url'])
+	  $video_filename = download_file($params['video_url']);
+	else
+	  $video_filename = false;
+
     // Now send to the micropub endpoint
-    $r = micropub_post($user->micropub_endpoint, $user->micropub_access_token, $params, $filename);
+    $r = micropub_post($user->micropub_endpoint, $user->micropub_access_token, $params, $filename, $video_filename);
     $response = $r['response'];
 
     #unlink($filename);
