@@ -40,6 +40,37 @@ function get_latest_photos(&$user, $since=false, $limit=1) {
   }
 }
 
+function get_user_photos($username, $ignoreCache=false) {
+  $cacheKey = Config::$hostname.'::userfeed::'.$username;
+  $cacheTime = 60*15; # cache feeds for 15 minutes
+
+  if(Config::$cacheIGRequests && !$ignoreCache) {
+    if($data = redis()->get($cacheKey)) {
+      return json_decode($data, true);
+    }
+  }
+
+  $ch = curl_init();
+  curl_setopt($ch, CURLOPT_URL, 'https://www.instagram.com/'.$username.'/media/');
+  curl_setopt($ch, CURLOPT_HTTPHEADER, http_headers());
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  $response = curl_exec($ch);
+
+  $data = json_decode($response, true);
+
+  $items = [];
+  if($data) {
+    foreach($data['items'] as $item) {
+      $items[] = $item['link'];
+    }
+  }
+
+  return [
+    'username' => $username,
+    'items' => $items
+  ];
+}
+
 function get_photo($url, $ignoreCache=false) {
   $cacheKey = Config::$hostname.'::photo::'.$url;
   $cacheTime = 86400; # cache photos for 1 day

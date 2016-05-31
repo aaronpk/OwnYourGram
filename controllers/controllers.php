@@ -118,6 +118,20 @@ $app->get('/instagram/verify', function() use($app) {
   }
 });
 
+$app->get('/instagram/feed', function() use($app) {
+  // Create a proxy feed that Superfeedr pings.
+  // This feed should return only unchanging data from the user's instagram feed.
+  $params = $app->request()->params();
+
+  if(!array_key_exists('username', $params)) {
+    return 'no username';
+  }
+
+  $feed = IG\get_user_photos($params['username']);
+
+  $app->response()->body(json_encode($feed));
+});
+
 $app->post('/prefs/array', function() use($app) {
   if($user=require_login($app)) {
     $user->send_category_as_array = 1;
@@ -141,10 +155,10 @@ $app->post('/micropub/test', function() use($app) {
     // Download the file to a temp folder
     $filename = download_file($params['url']);
 
-	if($params['video_url'])
-	  $video_filename = download_file($params['video_url']);
-	else
-	  $video_filename = false;
+    if($params['video_url'])
+      $video_filename = download_file($params['video_url']);
+    else
+      $video_filename = false;
 
     // Now send to the micropub endpoint
     $r = micropub_post($user->micropub_endpoint, $user->micropub_access_token, $params, $filename, $video_filename);
