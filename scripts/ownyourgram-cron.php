@@ -39,6 +39,11 @@ foreach($users as $user) {
 
           $entry = h_entry_from_photo($url);
 
+          // Skip any photos from before the cron task was launched
+          if(strtotime($entry['published']) < strtotime('2016-05-31T14:00:00-0700')) {
+            continue;
+          }
+
           $photo->instagram_data = json_encode($entry);
           $photo->instagram_img = $entry['photo'];
           $photo->save();
@@ -73,6 +78,9 @@ foreach($users as $user) {
             $user->last_instagram_img_url = $url;
             $user->photo_count = $user->photo_count + 1;
             $user->photo_count_this_week = $user->photo_count_this_week + 1;
+
+            $photo->canonical_url = $match[1];
+            $photo->save();
             echo date('Y-m-d H:i:s ')."Posted to ".$match[1]."\n";
           } else {
             // Their micropub endpoint didn't return a location, notify them there's a problem somehow
@@ -80,7 +88,6 @@ foreach($users as $user) {
           }
 
           $user->save();
-
         }
 
       }
