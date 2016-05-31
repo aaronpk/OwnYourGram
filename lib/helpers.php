@@ -201,7 +201,7 @@ function h_entry_from_photo($url, $oldLocationFormat=true) {
     }
   }
 
-  if($photo['caption']) {
+  if(array_key_exists('caption', $photo) && $photo['caption']) {
     if(preg_match_all('/#([a-z0-9_-]+)/i', $photo['caption'], $matches)) {
       foreach($matches[1] as $match) {
         $entry['category'][] = $match;
@@ -238,6 +238,8 @@ function h_entry_from_photo($url, $oldLocationFormat=true) {
       }
     }
   }
+
+  $entry['photo'] = $photo['display_src'];
 
   return $entry;
 }
