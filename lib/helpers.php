@@ -239,7 +239,12 @@ function h_entry_from_photo($url, $oldLocationFormat=true) {
     }
   }
 
+  // Include the photo/video media URLs
   $entry['photo'] = $photo['display_src'];
+
+  if(array_key_exists('is_video', $photo) && $photo['is_video']) {
+    $entry['video'] = $photo['video_url'];
+  }
 
   return $entry;
 }
