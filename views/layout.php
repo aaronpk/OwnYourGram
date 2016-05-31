@@ -44,14 +44,15 @@
     <div class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <?php if(session('me')) { ?>
-          <li><a href="/instagram">Instagram</a></li>
+          <!-- <li><a href="/instagram">Instagram</a></li> -->
         <?php } ?>
         <!-- <li><a href="/about">About</a></li> -->
         <!-- <li><a href="/contact">Contact</a></li> -->
       </ul>
       <?php if(session('me')) { ?>
         <ul class="nav navbar-nav navbar-right">
-          <li><a href="/user?domain=<?= urlencode(session('me')) ?>"><?= session('me') ?></a></li>
+          <!-- <li><a href="/user?domain=<?= urlencode(session('me')) ?>"><?= session('me') ?></a></li> -->
+          <li><a><?= session('me') ?></a></li>
           <li><a href="/signout">Sign Out</a></li>
         </ul>
       <?php } else if(property_exists($this, 'authorizing')) { ?>

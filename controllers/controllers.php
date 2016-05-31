@@ -47,6 +47,16 @@ $app->get('/', function($format='html') use($app) {
   $res->body($html);
 });
 
+$app->get('/dashboard', function() use($app) {
+  if($user=require_login($app)) {
+    $html = render('dashboard', array(
+      'title' => 'OwnYourGram Dashboard',
+      'user' => $user
+    ));
+    $app->response()->body($html);
+  }
+});
+
 
 $app->get('/creating-a-token-endpoint', function() use($app) {
   $app->redirect('https://indiewebcamp.com/token-endpoint', 302);
