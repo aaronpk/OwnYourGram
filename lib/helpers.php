@@ -151,48 +151,78 @@ function micropub_post($endpoint, $access_token, $params, $photo_filename=false,
   );
 }
 
-// Given an Instagram photo object, return an h-entry array with all the necessary keys
-function h_entry_from_photo(&$user, &$photo) {
+// Given an Instagram photo object, return an h-entry array with all the necessary keys.
+// This method potentially makes additional HTTP requests to fetch venue and other user information.
+function h_entry_from_photo($url, $oldLocationFormat=true) {
   $entry = array(
     'published' => null,
     'location' => null,
-    'place_name' => null,
     'category' => array(),
     'content' => '',
     'syndication' => ''
   );
 
-  $entry['published'] = date('c', $photo->created_time);
+  if($oldLocationFormat)
+    $entry['place_name'] = null;
 
-  // Look up the timezone of the photo if location data is present
-  if(property_exists($photo, 'location') && $photo->location) {
-    if($tz = get_timezone($photo->location->latitude, $photo->location->longitude)) {
-      $d = DateTime::createFromFormat('U', $photo->created_time);
-      $d->setTimeZone($tz);
-      $entry['published'] = $d->format('c');
+  // First fetch the photo permalink
+  $photo = IG\get_photo($url);
+
+  $entry['published'] = date('c', $photo['date']);
+
+  // Add venue information if present
+  if(array_key_exists('location', $photo) && $photo['location']) {
+
+    if($oldLocationFormat) {
+      $entry['place_name'] = $photo['location']['name'];
+    } else {
+      $entry['location'] = [
+        'type' => ['h-card'],
+        'properties' => [
+          'name' => [$photo['location']['name']]
+        ]
+      ];
+    }
+
+    $venue = IG\get_venue($photo['location']['id']);
+    if($venue && array_key_exists('lat', $venue)) {
+      if($tz = get_timezone($venue['lat'], $venue['lng'])) {
+        $d = DateTime::createFromFormat('U', $photo['date']);
+        $d->setTimeZone($tz);
+        $entry['published'] = $d->format('c');
+
+        if(!$oldLocationFormat) {
+          $entry['location']['properties']['latitude'] = [$venue['lat']];
+          $entry['location']['properties']['longitude'] = [$venue['lng']];
+        } else {
+          $entry['location'] = 'geo:' . $venue['lat'] . ',' . $venue['lng'];
+        }
+      }
     }
   }
 
-  if($photo->location)
-    $entry['location'] = 'geo:' . $photo->location->latitude . ',' . $photo->location->longitude;
+  if($photo['caption']) {
+    if(preg_match_all('/#([a-z0-9_-]+)/i', $photo['caption'], $matches)) {
+      foreach($matches[1] as $match) {
+        $entry['category'][] = $match;
+      }
+    }
 
-  if($photo->location && k($photo->location, 'name'))
-    $entry['place_name'] = k($photo->location, 'name');
+    $entry['content'] = $photo['caption'];
+  }
 
-  // Add the regular tags to the category array
-  if($photo->tags)
-    $entry['category'] = array_merge($entry['category'], $photo->tags);
+  $entry['syndication'] = $url;
 
   // Add person-tags to the category array
-  if($photo->users_in_photo) {
-    foreach($photo->users_in_photo as $tag) {
-      // Fetch the user's website
+  if(array_key_exists('usertags', $photo) && $photo['usertags']['nodes']) {
+    foreach($photo['usertags']['nodes'] as $tag) {
+      // Fetch the user profile
       try {
-        if($profile = IG\get_profile($user, $tag->user->id)) {
-          if($profile->website)
-            $entry['category'][] = $profile->website;
+        if($profile = IG\get_profile($tag['user']['username'])) {
+          if($profile['external_url'])
+            $entry['category'][] = $profile['external_url'];
           else
-            $entry['category'][] = 'https://instagram.com/' . $profile->username;
+            $entry['category'][] = 'https://instagram.com/' . $tag['user']['username'];
           // $entry['category'][] = [
           //   'type' => ['h-card'],
           //   'properties' => [
@@ -204,15 +234,10 @@ function h_entry_from_photo(&$user, &$photo) {
           // ];
         }
       } catch(Exception $e) {
-        $entry['category'][] = 'https://instagram.com/' . $tag->user->username;
+        $entry['category'][] = 'https://instagram.com/' . $tag['user']['username'];
       }
     }
   }
-
-  if($photo->caption)
-    $entry['content'] = $photo->caption->text;
-
-  $entry['syndication'] = $photo->link;
 
   return $entry;
 }
