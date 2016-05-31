@@ -76,7 +76,7 @@ foreach($users as $user) {
 
           if($response && preg_match('/Location: (.+)/', $response['response'], $match)) {
             $user->last_micropub_url = $match[1];
-            $user->last_instagram_img_url = $url;
+            $user->last_instagram_img_url = $entry['photo'];
             $user->photo_count = $user->photo_count + 1;
             $user->photo_count_this_week = $user->photo_count_this_week + 1;
 
