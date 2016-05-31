@@ -91,9 +91,10 @@ function get_profile($username, $ignoreCache=false) {
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
   $response = curl_exec($ch);
   $profile = @json_decode($response, true);
-  if($profile) {
-    redis()->setex($cacheKey, $cacheTime, json_encode($profile));
-    return $profile;
+  if($profile && array_key_exists('user', $profile)) {
+    $user = $profile['user'];
+    redis()->setex($cacheKey, $cacheTime, json_encode($user));
+    return $user;
   } else {
     return null;
   }

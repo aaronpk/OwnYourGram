@@ -14,9 +14,5 @@ class Config {
   public static $dbName = 'ownyourgram';
   public static $dbUsername = 'ownyourgram';
   public static $dbPassword = '';
-
-  public static function instagramRedirectURI() {
-    return 'http'.(self::$ssl ? 's' : '').'://'.Config::$hostname.'/auth/instagram-callback';
-  }
 }
 

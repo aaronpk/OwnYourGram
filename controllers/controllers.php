@@ -93,9 +93,9 @@ $app->get('/instagram/verify', function() use($app) {
 
     $success = false;
 
-    if($profile && array_key_exists('user', $profile)) {
-      if($profile['user']['external_url'] == $user->url
-        || strpos($profile['user']['biography'], $user->url) !== false) {
+    if($profile) {
+      if($profile['external_url'] == $user->url
+        || strpos($profile['biography'], $user->url) !== false) {
         $success = true;
       }
     }
