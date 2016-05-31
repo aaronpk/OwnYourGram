@@ -58,16 +58,24 @@ function get_user_photos($username, $ignoreCache=false) {
 
   $data = json_decode($response, true);
 
+  $latest = 0;
+
   $items = [];
   if($data) {
     foreach($data['items'] as $item) {
-      $items[] = $item['link'];
+      $items[] = [
+        'url' => $item['link'],
+        'published' => date('Y-m-d H:i:s', $item['created_time'])
+      ];
+      if($item['created_time'] > $latest)
+        $latest = $item['created_time'];
     }
   }
 
   return [
     'username' => $username,
-    'items' => $items
+    'items' => $items,
+    'latest' => $latest,
   ];
 }
 

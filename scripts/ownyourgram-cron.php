@@ -24,7 +24,13 @@ foreach($users as $user) {
     $feed = IG\get_user_photos($user->instagram_username);
 
     if($feed) {
-      foreach($feed['items'] as $url) {
+      foreach($feed['items'] as $item) {
+        $url = $item['url'];
+
+        // Skip any photos from before the cron task was launched
+        if(strtotime($item['published']) < strtotime('2016-05-31T14:00:00-0700')) {
+          continue;
+        }
 
         // Check if this photo has already been imported
         $photo = ORM::for_table('photos')
@@ -38,11 +44,6 @@ foreach($users as $user) {
           $photo->instagram_url = $url;
 
           $entry = h_entry_from_photo($url);
-
-          // Skip any photos from before the cron task was launched
-          if(strtotime($entry['published']) < strtotime('2016-05-31T14:00:00-0700')) {
-            continue;
-          }
 
           $photo->instagram_data = json_encode($entry);
           $photo->instagram_img = $entry['photo'];
