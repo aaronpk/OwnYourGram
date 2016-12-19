@@ -147,7 +147,7 @@ $app->get('/instagram/verify', function() use($app) {
     }
 
     // Check the instagram account looking for the link back to the user's home page
-    $profile = IG\get_profile($_SESSION['instagram_username']);
+    $profile = IG\get_profile($_SESSION['instagram_username'], true);
 
     $success = false;
 
