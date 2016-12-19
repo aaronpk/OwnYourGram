@@ -41,7 +41,8 @@ $app->get('/', function($format='html') use($app) {
     'meta' => '',
     'users' => $users,
     'total_photos' => $total_photos,
-    'total_users' => $total_users
+    'total_users' => $total_users,
+    'signed_in' => isset($_SESSION['user_id'])
   ));
   $html = ob_get_clean();
   $res->body($html);
@@ -51,18 +52,65 @@ $app->get('/dashboard', function() use($app) {
   if($user=require_login($app)) {
     $html = render('dashboard', array(
       'title' => 'OwnYourGram Dashboard',
-      'user' => $user
+      'user' => $user,
     ));
     $app->response()->body($html);
   }
 });
 
+$app->get('/instagram/photos.json', function() use($app) {
+  if($user=require_login($app)) {
+    $feed = IG\get_user_photos($user->instagram_username);
+
+    $photos = [];
+
+    if($feed['items']) {
+      foreach(array_slice($feed['items'],0,4) as $item) {
+        $photo = ORM::for_table('photos')
+          ->where('user_id', $user->id)
+          ->where('instagram_url', $item['url'])
+          ->find_one();
+        if(!$photo) {
+          $photo = ORM::for_table('photos')->create();
+          $photo->user_id = $user->id;
+          $photo->instagram_url = $item['url'];
+
+          $entry = h_entry_from_photo($item['url']);
+
+          $photo->instagram_data = json_encode($entry);
+          $photo->instagram_img = $entry['photo'];
+          $photo->save();
+        } else {
+          $entry = json_decode($photo->instagram_data, true);
+        }
+
+        $photos[] = [
+          'instagram_url' => $photo->instagram_url,
+          'instagram_img' => $photo->instagram_img,
+          'video' => (isset($entry['video']) ? $entry['video'] : false),
+          'canonical_url' => $photo->canonical_url,
+          'id' => $photo->id,
+        ];
+
+      }
+    }
+
+    $app->response()->header('Content-Type', 'application/json');
+    $app->response()->body(json_encode(['items'=>$photos]));
+  }
+});
 
 $app->get('/creating-a-token-endpoint', function() use($app) {
-  $app->redirect('https://indiewebcamp.com/token-endpoint', 302);
+  $app->redirect('https://indieweb.org/token-endpoint', 302);
 });
 $app->get('/creating-a-micropub-endpoint', function() use($app) {
-  $html = render('creating-a-micropub-endpoint', array('title' => 'Creating a Micropub Endpoint'));
+  $app->redirect('https://indieweb.org/micropub-endpoint', 302);
+});
+
+$app->get('/docs', function() use($app) {
+  $html = render('docs', array(
+    'title' => 'OwnYourGram Documentation',
+  ));
   $app->response()->body($html);
 });
 
@@ -139,6 +187,7 @@ $app->get('/instagram/feed', function() use($app) {
 
   $feed = IG\get_user_photos($params['username']);
 
+  $app->response()->header('Content-Type', 'application/json');
   $app->response()->body(json_encode($feed));
 });
 
@@ -147,42 +196,50 @@ $app->post('/prefs/array', function() use($app) {
     $user->send_category_as_array = 1;
     $user->save();
 
+    $app->response()->header('Content-Type', 'application/json');
     $app->response()->body(json_encode(array(
       'result' => 'ok'
     )));
   }
 });
 
-$app->post('/micropub/test', function() use($app) {
+$app->post('/instagram/test.json', function() use($app) {
   if($user=require_login($app)) {
     $params = $app->request()->params();
 
-    if($user->send_category_as_array != 1) {
-      if(is_array($params['category']))
-        $params['category'] = implode(',', $params['category']);
-    }
+    $photo = ORM::for_table('photos')
+      ->where('user_id', $user->id)
+      ->where('id', $params['id'])
+      ->find_one();
+    if(!$photo)
+      $app->redirect('/');
+
+    $entry = json_decode($photo->instagram_data, true);
 
     // Download the file to a temp folder
-    $filename = download_file($params['url']);
+    $filename = download_file($entry['photo']);
 
-    if($params['video_url'])
-      $video_filename = download_file($params['video_url']);
-    else
+    if(isset($entry['video'])) {
+      $video_filename = download_file($entry['video']);
+    } else {
       $video_filename = false;
+    }
+
+    if($user->send_category_as_array != 1) {
+      if($entry['category'] && is_array($entry['category']) && count($entry['category'])) {
+        $entry['category'] = implode(',', $entry['category']);
+      }
+    }
 
     // Now send to the micropub endpoint
-    $r = micropub_post($user->micropub_endpoint, $user->micropub_access_token, $params, $filename, $video_filename);
-    $response = $r['response'];
+    $response = micropub_post($user->micropub_endpoint, $user->micropub_access_token, $entry, $filename, $video_filename);
 
-    #unlink($filename);
-
-    $user->last_micropub_response = json_encode($r);
+    $user->last_micropub_response = json_encode($response);
 
     // Check the response and look for a "Location" header containing the URL
-    if($response && preg_match('/Location: (.+)/', $response, $match)) {
-      $location = $match[1];
+    if($response && isset($response['headers']['Location']) && ($response['code'] == 201 || $response['code'] == 202)) {
       $user->micropub_success = 1;
-      $user->last_micropub_url = $location;
+      $user->last_micropub_url = $location = $response['headers']['Location'][0];
       $user->photo_count = $user->photo_count + 1;
     } else {
       $location = false;
@@ -190,12 +247,11 @@ $app->post('/micropub/test', function() use($app) {
 
     $user->save();
 
+    $app->response()->header('Content-Type', 'application/json');
     $app->response()->body(json_encode(array(
-      'response' => htmlspecialchars($response),
+      'response' => $response['response'],
       'location' => $location,
-      'error' => $r['error'],
-      'curlinfo' => $r['curlinfo'],
-      'filename' => $filename
+      'error' => $response['error'],
     )));
   }
 });

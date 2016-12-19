@@ -1,4 +1,6 @@
 <?php
+die("disabled");
+
 chdir(dirname(__FILE__).'/..');
 require 'vendor/autoload.php';
 require 'lib/Savant.php';

@@ -1,5 +1,7 @@
 <?php if($this->tokenEndpoint): ?>
 
+  <?php $debug = true; ?>
+
   <?php if(!$this->auth): ?>
 
     <h3>Bad response from token endpoint</h3>
@@ -21,10 +23,11 @@
       <!-- Check for all the required parts of the token -->
       <?php if(k($this->auth, array('me','access_token','scope'))): ?>
 
-        <h3>Success!</h3>
+        <h3>Great!</h3>
 
-        <p>All required values were found! You are now signed in.</p>
+        <p>You are signed in! Now we need to connect your Instagram account.</p>
         <p><a href="/instagram" class="btn btn-primary">Connect Instagram</a></p>
+        <?php $debug = false; ?>
 
       <?php else: ?>
 
@@ -48,14 +51,15 @@
     <?php endif; ?>
   <?php endif; ?>
 
+  <?php if($debug): ?>
+    <h3>Token endpoint response</h3>
 
-  <h3>Token endpoint response</h3>
-
-  <p>Below is the raw response from your token endpoint (<?= $this->tokenEndpoint ?>):</p>
-  <div class="bs-callout bs-callout-info pre">
-    <?= $this->curl_error ?>
-    <?= htmlspecialchars($this->response) ?>
-  </div>
+    <p>Below is the raw response from your token endpoint (<code><?= $this->tokenEndpoint ?></code>):</p>
+    <div class="bs-callout bs-callout-info pre">
+      <?= $this->curl_error ?>
+      <?= htmlspecialchars($this->response) ?>
+    </div>
+  <?php endif; ?>
 
 
 <?php else: ?>
