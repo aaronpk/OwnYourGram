@@ -12,12 +12,13 @@ echo date('Y-m-d H:i:s') . "\n";
 
 $users = ORM::for_table('users')
   ->where('micropub_success', 1)
-  ->where_not_null('instagram_username')
-  ->find_many();
-foreach($users as $user) {
+  ->where_not_null('instagram_username');
 
-  echo "---------------------------------\n";
-  echo $user->url . "\n";
+if(isset($argv[1]))
+  $users = $users->where('instagram_username',$argv[1]);
+
+$users = $users->find_many();
+foreach($users as $user) {
 
   try {
 
@@ -58,7 +59,7 @@ foreach($users as $user) {
             $video_filename = false;
           }
 
-          echo date('Y-m-d H:i:s ')."Sending ".($video_filename ? 'video' : 'photo')." ".$url." to micropub endpoint: ".$user->micropub_endpoint."\n";
+          echo date('Y-m-d H:i:s ')."[".$user->url."] Sending ".($video_filename ? 'video' : 'photo')." ".$url." to micropub endpoint: ".$user->micropub_endpoint."\n";
 
           // Collapse category to a comma-separated list if they haven't upgraded yet
           if($user->send_category_as_array != 1) {
@@ -93,11 +94,11 @@ foreach($users as $user) {
 
       }
     } else {
-      echo date('Y-m-d H:i:s ')."Error retrieving user's Instagram feed\n";
+      echo date('Y-m-d H:i:s ')."Error retrieving user's Instagram feed: ".$user->url."\n";
     }
 
   } catch(Exception $e) {
-    echo date('Y-m-d H:i:s ')."Error processing user\n";
+    echo date('Y-m-d H:i:s ')."Error processing user: ".$user->url."\n";
   }
 }
 
