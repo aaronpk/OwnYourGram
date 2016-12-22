@@ -49,7 +49,7 @@ endif;
     </table>
 
     <p style="font-size:0.9em; color: #999;">Note that OwnYourGram won't actually post anything to Twitter or Facebook, all this does is set the appropriate parameter in the Micropub request to indicate to your Micropub endpoint that the post should be syndicated. If you don't yet have this set up, you might want to try <a href="https://silo.pub">silo.pub</a> for an easy API for posting to Twitter, Facebook and others.</p>
-  </p>
+  </div>
 
   <h4>Syndication Endpoints</h4>
 
@@ -102,7 +102,6 @@ endif;
   });
 
   function handle_discovered_syndication_targets(data) {
-    console.log(data);
     if(data.targets) {
 
       $("#syndication-endpoints .list").html('');
