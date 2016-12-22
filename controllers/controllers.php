@@ -50,11 +50,89 @@ $app->get('/', function($format='html') use($app) {
 
 $app->get('/dashboard', function() use($app) {
   if($user=require_login($app)) {
+
+    $rules = ORM::for_table('syndication_rules')
+      ->where('user_id', $user->id)
+      ->find_many();
+
     $html = render('dashboard', array(
       'title' => 'OwnYourGram Dashboard',
       'user' => $user,
+      'rules' => $rules,
     ));
     $app->response()->body($html);
+  }
+});
+
+$app->get('/settings/syndication-targets.json', function() use($app) {
+  if($user=require_login($app)) {
+
+    $targets = json_decode($user->micropub_syndication_targets);
+
+    $app->response()->header('Content-Type', 'application/json');
+    $app->response()->body(json_encode([
+      'targets' => $targets
+    ]));
+  }
+});
+
+$app->post('/settings/syndication-targets.json', function() use($app) {
+  if($user=require_login($app)) {
+
+    $response = micropub_get($user->micropub_endpoint, $user->micropub_access_token, ['q'=>'syndicate-to']);
+
+    $targets = [];
+    $error = false;
+
+    if($response['data']) {
+      if(array_key_exists('syndicate-to', $response['data'])) {
+        $raw = $response['data']['syndicate-to'];
+
+        foreach($raw as $t) {
+          if(array_key_exists('name', $t) && array_key_exists('uid', $t)) {
+            $targets[] = $t;
+          }
+        }
+
+        $user->micropub_syndication_targets = json_encode($targets);
+        $user->save();
+      } else {
+        $error = 'Your endpoint did not return a "syndicate-to" property in the response';
+      }
+    } else {
+      $error = $response['error'];
+    }
+
+    $app->response()->header('Content-Type', 'application/json');
+    $app->response()->body(json_encode([
+      'targets' => $targets,
+      'error' => $error
+    ]));
+  }
+});
+
+$app->post('/settings/syndication-rules.json', function() use($app){
+  if($user=require_login($app)) {
+    $params = $app->request()->params();
+
+    if($params['action'] == 'create') {
+      $rule = ORM::for_table('syndication_rules')->create();
+      $rule->user_id = $user->id;
+      $rule->match = $params['keyword'];
+      $rule->syndicate_to = $params['target'];
+      $rule->syndicate_to_name = $params['target_name'];
+      $rule->save();
+    } elseif($params['action'] == 'delete') {
+      $rule = ORM::for_table('syndication_rules')
+        ->where('user_id', $user->id)
+        ->where('id', $params['id'])
+        ->delete_many();
+    }
+
+    $app->response()->header('Content-Type', 'application/json');
+    $app->response()->body(json_encode([
+      'result' => 'ok'
+    ]));
   }
 });
 

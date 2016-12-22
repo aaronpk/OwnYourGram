@@ -16,6 +16,122 @@ endif;
     <p><b>Your account is active and we're sending your Instagram photos to your site!</b></p>
     <p>Please note that due to changes in Instagram's API, we are unable to send your photos in realtime, so you may experience some delay between posting photos on Instagram and seeing them on your website.</p>
   </div>
+
+  <h3>Settings</h3>
+
+  <div id="automatic-syndication" class="hidden">
+    <h4>Automatic Syndication</h4>
+
+    <p>You can add rules that will match words in your Instagram post and tell your Micropub endpoint to syndicate your post to various destinations. You can use this to make rules like "syndicate my photos tagged #indieweb to Twitter". 
+
+    <table class="table">
+      <tr>
+        <td width="110"></td>
+        <td>Keyword</td>
+        <td>Syndication Target</td>
+      </tr>
+      <?php foreach($this->rules as $rule): ?>
+        <tr class="rule">
+          <td align="right"><a href="#" class="hidden delete" data-id="<?= $rule->id ?>">&times;</a></td>
+          <td><?= htmlspecialchars($rule->match); ?></td>
+          <td><?= htmlspecialchars($rule->syndicate_to_name); ?></td>
+        </tr>
+      <?php endforeach; ?>
+      <tr>
+        <td><input type="button" id="new-syndicate-to-btn" class="btn btn-success" value="Add Rule"></td>
+        <td><input type="text" id="new-syndicate-to-keyword" class="form-control"></td>
+        <td>
+          <select name="new-syndicate-to" id="new-syndicate-to" class="form-control">
+            <option value="">-- select an endpoint --</option>
+          </select>
+        </td>
+      </tr>
+    </table>
+
+    <p style="font-size:0.9em; color: #999;">Note that OwnYourGram won't actually post anything to Twitter or Facebook, all this does is set the appropriate parameter in the Micropub request to indicate to your Micropub endpoint that the post should be syndicated. If you don't yet have this set up, you might want to try <a href="https://silo.pub">silo.pub</a> for an easy API for posting to Twitter, Facebook and others.</p>
+  </p>
+
+  <h4>Syndication Endpoints</h4>
+
+  <a href="javascript:reload_syndication_endpoints()" class="btn btn-xs btn-default">Reload</a>
+
+  <div id="syndication-endpoints">
+    <div class="alert alert-warning hidden">
+      <b>No Syndication Targets</b>
+      <p>OwnYourGram didn't find any syndication targets at your Micropub endpoint. Learn more about <a href="https://www.w3.org/TR/micropub/#syndication-targets">Micropub syndication</a>.</p>
+      <p class="error hidden">Error: <span class="details"></span></p>
+    </div>
+    <ul class="list" style="margin-top: 1em;"></ul>
+  </div>
+
+  <script>
+  $(function(){
+    $.get("/settings/syndication-targets.json", function(data){
+      handle_discovered_syndication_targets(data);
+    });
+
+    $("#new-syndicate-to-btn").click(function(){
+      if($("#new-syndicate-to-keyword").val() != "" && $("#new-syndicate-to").val() != "") {
+        $.post("/settings/syndication-rules.json", {
+          action: 'create',
+          keyword: $("#new-syndicate-to-keyword").val(),
+          target: $("#new-syndicate-to").val(),
+          target_name: $("#new-syndicate-to :selected").text()
+        }, function(data){
+          window.location = window.location; // the lazy way
+        });
+      }
+      return false;
+    });
+
+    $("#automatic-syndication .rule").on("mouseover", function(){
+      $(this).find(".delete").removeClass("hidden");
+    });
+    $("#automatic-syndication .rule").on("mouseout", function(){
+      $(this).find(".delete").addClass("hidden");
+    });
+    $("#automatic-syndication .delete").click(function(){
+        $.post("/settings/syndication-rules.json", {
+          action: 'delete',
+          id: $(this).data('id')
+        }, function(data){
+          window.location = window.location; // the lazy way
+        });
+      return false;
+    });
+  });
+
+  function handle_discovered_syndication_targets(data) {
+    console.log(data);
+    if(data.targets) {
+
+      $("#syndication-endpoints .list").html('');
+      $("#new-syndicate-to").html('');
+      $("#new-syndicate-to").append('<option value="">-- select an endpoint --</option>');
+      for(var i in data.targets) {
+        $("#syndication-endpoints .list").append('<li>'+data.targets[i].name+'</li>');
+        $("#new-syndicate-to").append('<option value="'+data.targets[i].uid+'">'+data.targets[i].name+'</option>');
+      }
+
+      $("#automatic-syndication").removeClass("hidden");
+    } else {
+      if(data.error) {
+        $("#syndication-endpoints .details").text(data.error);
+        $("#syndication-endpoints .error").removeClass("hidden");
+      }
+      $("#syndication-endpoints .alert-warning").removeClass("hidden");
+      $("#automatic-syndication").addClass("hidden");
+    }
+  }
+
+  function reload_syndication_endpoints() {
+    $("#syndication-endpoints .list").html('');
+    $.post("/settings/syndication-targets.json", function(data){
+      handle_discovered_syndication_targets(data);
+    });
+  }
+  </script>
+
 <?php else: ?>
   <div class="bs-callout bs-callout-warning">
     <p>Alright, that's progress! We're almost ready to start sending your Instagram photos to your website.</p>

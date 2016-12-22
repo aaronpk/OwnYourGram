@@ -157,6 +157,35 @@ function micropub_post($endpoint, $access_token, $params, $photo_filename=false,
   );
 }
 
+function micropub_get($endpoint, $access_token, $params) {
+  $url = parse_url($endpoint);
+  if(!k($url, 'query')) {
+    $url['query'] = http_build_query($params);
+  } else {
+    $url['query'] .= '&' . http_build_query($params);
+  }
+  $endpoint = build_url($url);
+
+  $ch = curl_init();
+  curl_setopt($ch, CURLOPT_URL, $endpoint);
+  curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+    'Authorization: Bearer ' . $access_token,
+    'Accept: application/json'
+  ));
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  $response = curl_exec($ch);
+  $data = array();
+  if($response) {
+    $data = json_decode($response, true);
+  }
+  $error = curl_error($ch);
+  return array(
+    'data' => $data,
+    'error' => $error,
+    'curlinfo' => curl_getinfo($ch)
+  );
+}
+
 function parse_headers($headers) {
   $retVal = array();
   $fields = explode("\r\n", preg_replace('/\x0D\x0A[\x09\x20]+/', ' ', $headers));
@@ -275,5 +304,18 @@ function h_entry_from_photo($url, $oldLocationFormat=true) {
   }
 
   return $entry;
+}
+
+function build_url($parsed_url) {
+  $scheme   = isset($parsed_url['scheme']) ? $parsed_url['scheme'] . '://' : '';
+  $host     = isset($parsed_url['host']) ? $parsed_url['host'] : '';
+  $port     = isset($parsed_url['port']) ? ':' . $parsed_url['port'] : '';
+  $user     = isset($parsed_url['user']) ? $parsed_url['user'] : '';
+  $pass     = isset($parsed_url['pass']) ? ':' . $parsed_url['pass']  : '';
+  $pass     = ($user || $pass) ? "$pass@" : '';
+  $path     = isset($parsed_url['path']) ? $parsed_url['path'] : '';
+  $query    = isset($parsed_url['query']) ? '?' . $parsed_url['query'] : '';
+  $fragment = isset($parsed_url['fragment']) ? '#' . $parsed_url['fragment'] : '';
+  return "$scheme$user$pass$host$port$path$query$fragment";
 }
 
