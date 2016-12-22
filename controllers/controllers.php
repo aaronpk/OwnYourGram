@@ -53,6 +53,8 @@ $app->get('/dashboard', function() use($app) {
 
     $rules = ORM::for_table('syndication_rules')
       ->where('user_id', $user->id)
+      ->order_by_asc('syndicate_to_name')
+      ->order_by_asc('match')
       ->find_many();
 
     $html = render('dashboard', array(
