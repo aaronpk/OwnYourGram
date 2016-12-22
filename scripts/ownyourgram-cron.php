@@ -59,14 +59,25 @@ foreach($users as $user) {
             $video_filename = false;
           }
 
-          echo date('Y-m-d H:i:s ')."[".$user->url."] Sending ".($video_filename ? 'video' : 'photo')." ".$url." to micropub endpoint: ".$user->micropub_endpoint."\n";
-
           // Collapse category to a comma-separated list if they haven't upgraded yet
           if($user->send_category_as_array != 1) {
             if($entry['category'] && is_array($entry['category']) && count($entry['category'])) {
               $entry['category'] = implode(',', $entry['category']);
             }
           }
+
+          $rules = ORM::for_table('syndication_rules')->where('user_id', $user->id)->find_many();
+          $syndications = '';
+          foreach($rules as $rule) {
+            if(stripos($entry['content'], $rule->match) !== false) {
+              if(!isset($entry['mp-syndicate-to']))
+                $entry['mp-syndicate-to'] = [];
+              $entry['mp-syndicate-to'][] = $rule->syndicate_to;
+              $syndications .= ' +'.$rule->syndicate_to_name;
+            }
+          }
+
+          echo date('Y-m-d H:i:s ')."[".$user->url."] Sending ".($video_filename ? 'video' : 'photo')." ".$url." to micropub endpoint: ".$user->micropub_endpoint.$syndications."\n";
 
           $response = micropub_post($user->micropub_endpoint, $user->micropub_access_token, $entry, $filename, $video_filename);
           unlink($filename);

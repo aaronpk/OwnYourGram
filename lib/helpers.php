@@ -107,6 +107,8 @@ function micropub_post($endpoint, $access_token, $params, $photo_filename=false,
     'access_token' => $access_token
   );
 
+  if(k($params, 'name'))
+    $postfields['name'] = $params['name'];
   if(k($params, 'content'))
     $postfields['content'] = $params['content'];
   if(k($params, 'category'))
@@ -119,8 +121,8 @@ function micropub_post($endpoint, $access_token, $params, $photo_filename=false,
     $postfields['published'] = $params['published'];
   if(k($params, 'syndication'))
     $postfields['syndication'] = $params['syndication'];
-  if(k($params, 'name'))
-    $postfields['name'] = $params['name'];
+  if(k($params, 'mp-syndicate-to'))
+    $postfields['mp-syndicate-to'] = $params['mp-syndicate-to'];
 
   $multipart = new p3k\Multipart();
 
