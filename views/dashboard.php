@@ -56,7 +56,7 @@ endif;
   <a href="javascript:reload_syndication_endpoints()" class="btn btn-xs btn-default">Reload</a>
 
   <div id="syndication-endpoints">
-    <div class="alert alert-warning hidden">
+    <div class="alert alert-warning hidden" style="margin-top: 1em;">
       <b>No Syndication Targets</b>
       <p>OwnYourGram didn't find any syndication targets at your Micropub endpoint. Learn more about <a href="https://www.w3.org/TR/micropub/#syndication-targets">Micropub syndication</a>.</p>
       <p class="error hidden">Error: <span class="details"></span></p>
@@ -112,6 +112,7 @@ endif;
         $("#new-syndicate-to").append('<option value="'+data.targets[i].uid+'">'+data.targets[i].name+'</option>');
       }
 
+      $("#syndication-endpoints .alert-warning").addClass("hidden");
       $("#automatic-syndication").removeClass("hidden");
     } else {
       if(data.error) {
