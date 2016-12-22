@@ -69,7 +69,7 @@ foreach($users as $user) {
           $rules = ORM::for_table('syndication_rules')->where('user_id', $user->id)->find_many();
           $syndications = '';
           foreach($rules as $rule) {
-            if(stripos($entry['content'], $rule->match) !== false) {
+            if($rule->match == '*' || stripos($entry['content'], $rule->match) !== false) {
               if(!isset($entry['mp-syndicate-to']))
                 $entry['mp-syndicate-to'] = [];
               $entry['mp-syndicate-to'][] = $rule->syndicate_to;
