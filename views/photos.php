@@ -53,7 +53,9 @@ function load_photos() {
     }
     $("#instagram_photos_list .btn").click(function(){
       $("#instagram_photos_list .btn").addClass("disabled");
-      $("#loading").removeClass("hidden");
+      $("#instagram_photos_list .error").addClass("hidden");
+      $(this).text("Working...");
+      var btn = $(this);
 
       $.post("/instagram/test.json", {
         id: $(this).data("id")
@@ -64,9 +66,8 @@ function load_photos() {
         if(data.location) {
           load_photos();
         } else {
-          $("#test-success").addClass("hidden");
-          $("#test-error").removeClass("hidden");
-          $("#test-error pre").text(data.response);
+          btn.parent().find(".error").removeClass("hidden");
+          btn.text("Post");
         }
       });
       return false;
@@ -97,6 +98,7 @@ $(function(){
         <div class="caption"></div>
       </div>
       <div class="bottom">
+        <div class="error hidden alert alert-warning">There was an error posting the photo!</div>
         <a href="" class="btn btn-success">Post</a>
       </div>
     </div>
