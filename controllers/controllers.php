@@ -66,6 +66,16 @@ $app->get('/dashboard', function() use($app) {
   }
 });
 
+$app->get('/photos', function() use($app) {
+  if($user=require_login($app)) {
+    $html = render('photos', array(
+      'title' => 'Import Photos - OwnYourGram',
+      'user' => $user,
+    ));
+    $app->response()->body($html);
+  }
+});
+
 $app->get('/settings/syndication-targets.json', function() use($app) {
   if($user=require_login($app)) {
 
@@ -157,12 +167,24 @@ $app->post('/settings/instagram.json', function() use($app) {
 
 $app->get('/instagram/photos.json', function() use($app) {
   if($user=require_login($app)) {
-    $feed = IG\get_user_photos($user->instagram_username);
+    $params = $app->request()->params();
+
+    if(isset($params['force_refresh']))
+      $refresh = true;
+    else
+      $refresh = false;
+
+    if(isset($params['num']))
+      $num = $params['num'];
+    else
+      $num = 4;
+
+    $feed = IG\get_user_photos($user->instagram_username, $refresh);
 
     $photos = [];
 
     if($feed['items']) {
-      foreach(array_slice($feed['items'],0,4) as $item) {
+      foreach(array_slice($feed['items'],0,$num) as $item) {
         $photo = ORM::for_table('photos')
           ->where('user_id', $user->id)
           ->where('instagram_url', $item['url'])
@@ -187,6 +209,7 @@ $app->get('/instagram/photos.json', function() use($app) {
           'video' => (isset($entry['video']) ? $entry['video'] : false),
           'canonical_url' => $photo->canonical_url,
           'id' => $photo->id,
+          'data' => $entry,
         ];
 
       }
@@ -326,10 +349,13 @@ $app->post('/instagram/test.json', function() use($app) {
       $user->micropub_success = 1;
       $user->last_micropub_url = $location = $response['headers']['Location'][0];
       $user->photo_count = $user->photo_count + 1;
+      $photo->canonical_url = $location;
     } else {
       $location = false;
     }
 
+    $photo->processed = 1;
+    $photo->save();
     $user->save();
 
     $app->response()->header('Content-Type', 'application/json');

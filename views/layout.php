@@ -45,6 +45,7 @@
       <ul class="nav navbar-nav">
         <?php if(session('me')) { ?>
           <li><a href="/dashboard">Dashboard</a></li>
+          <li><a href="/photos">Photos</a></li>
         <?php } ?>
         <li><a href="/docs">Docs</a></li>
       </ul>
