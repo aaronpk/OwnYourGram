@@ -138,6 +138,23 @@ $app->post('/settings/syndication-rules.json', function() use($app){
   }
 });
 
+$app->post('/settings/instagram.json', function() use($app) {
+  if($user=require_login($app)) {
+    $params = $app->request()->params();
+
+    if(!isset($params['action'])) {
+      return;
+    }
+
+    if($params['action'] == 'disconnect') {
+      $user->instagram_user_id = '';
+      $user->instagram_username = '';
+      $user->instagram_access_token = '';
+      $user->save();
+    }
+  }
+});
+
 $app->get('/instagram/photos.json', function() use($app) {
   if($user=require_login($app)) {
     $feed = IG\get_user_photos($user->instagram_username);
@@ -239,6 +256,9 @@ $app->get('/instagram/verify', function() use($app) {
     }
 
     if($success) {
+      // Remove this username from a previous account
+      ORM::for_table('users')->raw_execute('UPDATE users SET instagram_username="" WHERE instagram_username=:u', ['u'=>$_SESSION['instagram_username']]);
+
       $user->instagram_username = $_SESSION['instagram_username'];
     } else {
       $user->instagram_username = null;
@@ -254,21 +274,6 @@ $app->get('/instagram/verify', function() use($app) {
     $app->response()->body($html);
 
   }
-});
-
-$app->get('/instagram/feed', function() use($app) {
-  // Create a proxy feed that Superfeedr pings.
-  // This feed should return only unchanging data from the user's instagram feed.
-  $params = $app->request()->params();
-
-  if(!array_key_exists('username', $params)) {
-    return 'no username';
-  }
-
-  $feed = IG\get_user_photos($params['username']);
-
-  $app->response()->header('Content-Type', 'application/json');
-  $app->response()->body(json_encode($feed));
 });
 
 $app->post('/prefs/array', function() use($app) {

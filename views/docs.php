@@ -16,7 +16,7 @@ The request will contain the following POST parameters:
 * `published` - An ISO8601 formatted date string for the date the photo was taken.
 * `category[]` - Each hashtag used in the photo caption will be sent as a `category[]` parameter. Additionally, if there are any people tagged in the photo, their Instagram profile URL or website URL will be included as categories. ([What is a person tag?](https://indieweb.org/person-tag))
 * `location` - A <a href="https://indieweb.org/geo_URI">Geo URI</a> including the latitude and longitude of the photo if included. (e.g. `geo:37.786971,-122.399677`)
-* `place_name` - If the location on Instagram has a name, the name will be included here. (Note: this property is deprecated and will be replaced by sending a full h-card in the future.)
+* `place_name` - If the location on Instagram has a name, the name will be included here. (Note: this property is deprecated and will be replaced by sending a full h-card in the `location` property in the future.)
 * `syndication` - The Instagram URL of your photo. You can use this to link to the Instagram copy of your photo, and to enable backfeed of comments and likes via <a href="https://brid.gy">Bridgy</a>.
 * `photo` - The photo will be sent in a parameter named "photo". There will only be one photo per request. For Instagram videos, this will be the thumbnail of the video.
 * `video` - For Instagram videos, the video file will be uploaded as well.

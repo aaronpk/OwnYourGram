@@ -19,7 +19,15 @@ endif;
 
   <h3>Settings</h3>
 
-  <div id="automatic-syndication" class="hidden">
+  <div class="panel">
+    <h4>Instagram</h4>
+
+    <p>You are logged in as <b><?= $this->user->url ?></b> and are connected to the Instagram username <b><a href="https://instagram.com/<?= $this->user->instagram_username ?>"><?= $this->user->instagram_username ?></a></b>.</p>
+
+    <a href="javascript:disconnect_instagram()" class="btn btn-xs btn-warning">Disconnect Instagram</a>
+  </div>
+
+  <div id="automatic-syndication" class="hidden panel">
     <h4>Automatic Syndication</h4>
 
     <p>You can add rules that will match words in your Instagram post and tell your Micropub endpoint to syndicate your post to various destinations. You can use this to make rules like "syndicate my photos tagged #indieweb to Twitter". 
@@ -51,17 +59,19 @@ endif;
     <p style="font-size:0.9em; color: #999;">Note that OwnYourGram won't actually post anything to Twitter or Facebook, all this does is set the appropriate parameter in the Micropub request to indicate to your Micropub endpoint that the post should be syndicated. If you don't yet have this set up, you might want to try <a href="https://silo.pub">silo.pub</a> for an easy API for posting to Twitter, Facebook and others.</p>
   </div>
 
-  <h4>Syndication Endpoints</h4>
+  <div class="panel">
+    <h4>Syndication Endpoints</h4>
 
-  <a href="javascript:reload_syndication_endpoints()" class="btn btn-xs btn-default">Reload</a>
+    <a href="javascript:reload_syndication_endpoints()" class="btn btn-xs btn-default">Reload</a>
 
-  <div id="syndication-endpoints">
-    <div class="alert alert-warning hidden" style="margin-top: 1em;">
-      <b>No Syndication Targets</b>
-      <p>OwnYourGram didn't find any syndication targets at your Micropub endpoint. Learn more about <a href="https://www.w3.org/TR/micropub/#syndication-targets">Micropub syndication</a>.</p>
-      <p class="error hidden">Error: <span class="details"></span></p>
+    <div id="syndication-endpoints">
+      <div class="alert alert-warning hidden" style="margin-top: 1em;">
+        <b>No Syndication Targets</b>
+        <p>OwnYourGram didn't find any syndication targets at your Micropub endpoint. Learn more about <a href="https://www.w3.org/TR/micropub/#syndication-targets">Micropub syndication</a>.</p>
+        <p class="error hidden">Error: <span class="details"></span></p>
+      </div>
+      <ul class="list" style="margin-top: 1em;"></ul>
     </div>
-    <ul class="list" style="margin-top: 1em;"></ul>
   </div>
 
   <script>
@@ -130,7 +140,25 @@ endif;
       handle_discovered_syndication_targets(data);
     });
   }
+
+  function disconnect_instagram() {
+    $.post("/settings/instagram.json", {
+      action: 'disconnect'
+    }, function(data){
+      window.location = window.location;
+    })
+    return false;
+  }
   </script>
+
+<?php elseif($this->user->micropub_success): ?>
+  <? /* they've already verified their micropub endpoint, but have been disconnected from instagram */ ?>
+
+  <div class="bs-callout bs-callout-warning">
+    <p>There is no Instagram account associated with your account.</p>
+  </div>
+
+  <a href="/instagram" class="btn btn-success">Connect Instagram</a>
 
 <?php else: ?>
   <div class="bs-callout bs-callout-warning">

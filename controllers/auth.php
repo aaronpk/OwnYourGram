@@ -182,7 +182,9 @@ $app->get('/auth/callback', function() use($app) {
   unset($_SESSION['auth_state']);
 
   if($hasAlreadyLoggedInBefore) {
-    if($user->instagram_username)
+    // If they have an active instagram username, or have already imported a photo, redirect to the dashboard.
+    // For people who disconnect an Instagram account, they will then be sent to the dashboard after logging in.
+    if($user->instagram_username || $user->micropub_success)
       $app->redirect('/dashboard', 302);
     else
       $app->redirect('/instagram', 302);
