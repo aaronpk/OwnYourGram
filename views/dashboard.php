@@ -172,6 +172,11 @@ endif;
   <p><a href="/docs">Read the documentation</a> on what fields OwnYourGram sends to your website.</p>
 
   <div id="instagram_photos"></div>
+  <div id="instagram_photos_error" class="hidden">
+    <div class="alert alert-warning">
+      We didn't find any photos in your Instagram profile. If your account is set to "private", OwnYourGram will not be able to import your photos. If you're sure you've posted photos and your account is public and are still seeing this message, you can <a href="https://github.com/aaronpk/OwnYourGram/issues">report an issue</a>.
+    </div>
+  </div>
   <div style="clear:both;"></div>
 
   <div id="loading" class="hidden"><span class="glyphicon glyphicon-refresh glyphicon-spin"></span></div>
@@ -196,6 +201,11 @@ endif;
   <script>
   $(function(){
     $.get("/instagram/photos.json", function(data){
+      if(data.items.length == 0) {
+        $("#instagram_photos_error").removeClass("hidden");
+        return;
+      }
+
       var template = $("#photo-template").html();
       for(var i in data.items) {
         var item = $(template).clone();
