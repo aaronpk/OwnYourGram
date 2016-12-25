@@ -33,16 +33,19 @@ foreach($users as $user) {
           continue;
         }
 
-        // Check if this photo has already been imported
         $photo = ORM::for_table('photos')
           ->where('user_id', $user->id)
           ->where('instagram_url', $url)
           ->find_one();
 
-        if(!$photo) {
-          $photo = ORM::for_table('photos')->create();
-          $photo->user_id = $user->id;
-          $photo->instagram_url = $url;
+        // Check if this photo has already been imported.
+        // The photo may already be in the DB, but not have been processed yet.
+        if(!$photo || !$photo->processed) {
+          if(!$photo) {
+            $photo = ORM::for_table('photos')->create();
+            $photo->user_id = $user->id;
+            $photo->instagram_url = $url;
+          }
 
           $entry = h_entry_from_photo($url);
 
@@ -93,12 +96,13 @@ foreach($users as $user) {
             $user->photo_count_this_week = $user->photo_count_this_week + 1;
 
             $photo->canonical_url = $match[1];
-            $photo->save();
             echo date('Y-m-d H:i:s ')."Posted to ".$match[1]."\n";
           } else {
             // Their micropub endpoint didn't return a location, notify them there's a problem somehow
             echo date('Y-m-d H:i:s ')."This user's endpoint did not return a location header\n";
           }
+          $photo->processed = 1;
+          $photo->save();
 
           $user->save();
         }

@@ -6,6 +6,7 @@ CREATE TABLE `users` (
   `instagram_access_token` varchar(255) DEFAULT NULL,
   `instagram_response` text,
   `micropub_endpoint` varchar(255) DEFAULT NULL,
+  `micropub_syndication_targets` text,
   `micropub_access_token` text,
   `micropub_response` text,
   `micropub_success` tinyint(4) DEFAULT '0',
@@ -33,5 +34,6 @@ CREATE TABLE `photos` (
   `instagram_img` varchar(512) DEFAULT NULL,
   `instagram_data` text,
   `canonical_url` varchar(255) DEFAULT NULL,
+  'processed' tinyint(4) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
