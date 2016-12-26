@@ -30,6 +30,7 @@ $app->get('/', function($format='html') use($app) {
       FROM users
       JOIN photos ON users.id = photos.user_id
       WHERE photos.published > :date
+        AND photos.canonical_url != ""
       GROUP BY users.id
       ORDER BY num DESC', ['date' => $date->format('Y-m-d H:i:s')])
     ->find_many();

@@ -4,9 +4,15 @@ OwnYourGram
 https://ownyourgram.com
 
 
-### Contributing
+### Polling Tiers
 
-By submitting code to this project, you agree to irrevocably release it under the same license as this project.
+* 0 - account disabled. will only be re-enabled after the user signs in.
+* 1 - daily
+* 2 - every 6 hours
+* 3 - every hour
+* 4 - every 15 minutes
+
+Configure cron tasks at the specified intervals passing the tier number as a command line argument.
 
 
 ### License

@@ -1,6 +1,7 @@
 CREATE TABLE `users` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `url` varchar(255) DEFAULT NULL,
+  `tier` TINYINT(4) NOT NULL DEFAULT 2,
   `instagram_user_id` varchar(255) DEFAULT NULL,
   `instagram_username` varchar(255) DEFAULT NULL,
   `instagram_access_token` varchar(255) DEFAULT NULL,

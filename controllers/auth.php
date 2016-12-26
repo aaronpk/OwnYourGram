@@ -175,6 +175,12 @@ $app->get('/auth/callback', function() use($app) {
     $user->micropub_endpoint = $micropubEndpoint;
     $user->micropub_access_token = $token['auth']['access_token'];
     $user->micropub_response = $token['response'];
+
+    // If polling was disabled, enable it again at the lowest tier
+    if($user->tier == 0) {
+      $user->tier = 1;
+    }
+
     $user->save();
     $_SESSION['user_id'] = $user->id();
   }

@@ -2,27 +2,44 @@
 chdir(dirname(__FILE__).'/..');
 require 'vendor/autoload.php';
 
-echo "========================================\n";
-echo date('Y-m-d H:i:s') . "\n";
 
 $users = ORM::for_table('users')
   ->where('micropub_success', 1)
   ->where_not_null('instagram_username');
 
-if(isset($argv[1]))
-  $users = $users->where('instagram_username',$argv[1]);
+if(isset($argv[1])) {
+  if(is_numeric($argv[1])) {
+    $users = $users->where('tier',$argv[1]);
+  } else {
+    $users = $users->where('instagram_username',$argv[1]);
+  }
+}
 
 $users = $users->find_many();
+
+if(count($users)) {
+  echo "========================================\n";
+  echo date('Y-m-d H:i:s') . "\n";
+  echo "Processing " . (is_numeric($argv[1]) ? "Tier" : "User") . " " . $argv[1] . "\n";
+  echo count($users)." Users\n";
+}
+
 foreach($users as $user) {
 
   try {
 
+    log_msg("Beginning user", $user);
+
     $feed = IG\get_user_photos($user->instagram_username);
 
     if(!$feed) {
-      echo date('Y-m-d H:i:s ')."Error retrieving user's Instagram feed: ".$user->url."\n";
+      $user->tier = $user->tier - 1;
+      log_msg("Error retrieving user's Instagram feed. Demoting to ".$user->tier, $user);
+      $user->save();
       continue;
     }
+
+    $micropub_errors = 0;
 
     foreach($feed['items'] as $item) {
       $url = $item['url'];
@@ -80,7 +97,7 @@ foreach($users as $user) {
           }
         }
 
-        echo date('Y-m-d H:i:s ')."[".$user->url."] Sending ".($video_filename ? 'video' : 'photo')." ".$url." to micropub endpoint: ".$user->micropub_endpoint.$syndications."\n";
+        log_msg("Sending ".($video_filename ? 'video' : 'photo')." ".$url." to micropub endpoint: ".$user->micropub_endpoint.$syndications, $user);
 
         $response = micropub_post($user->micropub_endpoint, $user->micropub_access_token, $entry, $filename, $video_filename);
         unlink($filename);
@@ -90,16 +107,21 @@ foreach($users as $user) {
         $user->last_photo_date = date('Y-m-d H:i:s');
 
         if($response && isset($response['headers']['Location']) && ($response['code'] == 201 || $response['code'] == 202)) {
-          $user->last_micropub_url = $match[1];
+          $photo_url = $response['headers']['Location'][0];
+          $user->last_micropub_url = $photo_url;
           $user->last_instagram_img_url = $entry['photo'];
           $user->photo_count = $user->photo_count + 1;
           $user->photo_count_this_week = $user->photo_count_this_week + 1;
 
-          $photo->canonical_url = $match[1];
-          echo date('Y-m-d H:i:s ')."Posted to ".$match[1]."\n";
+          $photo->canonical_url = $photo_url;
+          log_msg("Posted to ".$photo_url, $user);
         } else {
           // Their micropub endpoint didn't return a location, notify them there's a problem somehow
-          echo date('Y-m-d H:i:s ')."This user's endpoint did not return a location header\n";
+          log_msg("There was an error posting this photo. Response code was: ".$response['code'], $user);
+          $micropub_errors++;
+          if($response['code'] == 403) {
+            break;
+          }
         }
         $photo->processed = 1;
         $photo->save();
@@ -109,10 +131,53 @@ foreach($users as $user) {
 
     }
 
+    // After importing this batch, look at the user's posting frequency and determine their polling tier.
+    if($micropub_errors > 0) {
+      // Micropub errors demote the user to a lower tier. 
+      // If they're already at the lowest tier, this will disable polling their account until they log back in.
+      $user->tier = $user->tier - 1;
+      log_msg("Encountered a Micropub error. Demoting to tier ".$user->tier, $user);
+      $user->save();
+    } else {
+      // Check how many photos they've taken in the last 14 days
+      $previous_tier = $user->tier;
+
+      $count = ORM::for_table('photos')
+        ->where('user_id', $user->id)
+        ->where_gt('published', date('Y-m-d H:i:s', strtotime('-14 days')))
+        ->count();
+      if($count >= 7) {
+        $user->tier = 4;
+      } elseif($count >= 4) {
+        $user->tier = 3;
+      } elseif($count >= 2) {
+        $user->tier = 2;
+      } else {
+        $user->tier = 1;
+      }
+
+      if($previous_tier != $user->tier) {
+        if($user->tier > $previous_tier)
+          $action = 'Upgrading';
+        else
+          $action = 'Demoting';
+        log_msg($action . ' user to tier ' . $user->tier, $user);
+        $user->save();
+      }
+    }
+
   } catch(Exception $e) {
-    echo date('Y-m-d H:i:s ')."Error processing user: ".$user->url."\n";
+    // Bump down a tier on errors
+    $user->tier = $user->tier - 1;
+    log_msg("There was an error processing this user. Demoting to tier ".$user->tier, $user);
+    $user->save();
   }
 }
 
-
+function log_msg($msg, $user) {
+  echo date('Y-m-d H:i:s ');
+  if($user)
+    echo '[' . $user->url . '] ';
+  echo $msg . "\n";
+}
 
