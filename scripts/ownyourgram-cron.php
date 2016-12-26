@@ -28,8 +28,6 @@ foreach($users as $user) {
 
   try {
 
-    log_msg("Beginning user", $user);
-
     $feed = IG\get_user_photos($user->instagram_username);
 
     if(!$feed) {
