@@ -20,8 +20,7 @@ $users = $users->find_many();
 if(count($users)) {
   echo "========================================\n";
   echo date('Y-m-d H:i:s') . "\n";
-  echo "Processing " . (is_numeric($argv[1]) ? "Tier" : "User") . " " . $argv[1] . "\n";
-  echo count($users)." Users\n";
+  echo "Processing " . (is_numeric($argv[1]) ? "Tier" : "User") . " " . $argv[1] . " (" . count($users) . " Users)\n";
 }
 
 foreach($users as $user) {
@@ -140,32 +139,31 @@ foreach($users as $user) {
       log_msg("Encountered a Micropub error. Demoting to tier ".$user->tier, $user);
       $user->save();
     } else {
-        // Check how many photos they've taken in the last 14 days
-        $previous_tier = $user->tier;
+      // Check how many photos they've taken in the last 14 days
+      $previous_tier = $user->tier;
 
-        $count = ORM::for_table('photos')
-          ->where('user_id', $user->id)
-          ->where_gt('published', date('Y-m-d H:i:s', strtotime('-14 days')))
-          ->count();
-        if($count >= 7) {
-          $new_tier = 4;
-        } elseif($count >= 4) {
-          $new_tier = 3;
-        } elseif($count >= 2) {
-          $new_tier = 2;
-        } else {
-          $new_tier = 1;
-        }
+      $count = ORM::for_table('photos')
+        ->where('user_id', $user->id)
+        ->where_gt('published', date('Y-m-d H:i:s', strtotime('-14 days')))
+        ->count();
+      if($count >= 7) {
+        $new_tier = 4;
+      } elseif($count >= 4) {
+        $new_tier = 3;
+      } elseif($count >= 2) {
+        $new_tier = 2;
+      } else {
+        $new_tier = 1;
+      }
 
-        if($new_tier > $previous_tier && $successful_photos > 0) {
-          log_msg('Upgrading user to tier ' . $new_tier, $user);
-          $user->tier = $new_tier;
-          $user->save();
-        } elseif($new_tier < $previous_tier)
-          log_msg('Demoting user to tier ' . $new_tier, $user);
-          $user->tier = $new_tier;
-          $user->save();
-        }
+      if($new_tier > $previous_tier && $successful_photos > 0) {
+        log_msg('Upgrading user to tier ' . $new_tier, $user);
+        $user->tier = $new_tier;
+        $user->save();
+      } elseif($new_tier < $previous_tier) {
+        log_msg('Demoting user to tier ' . $new_tier, $user);
+        $user->tier = $new_tier;
+        $user->save();
       }
     }
 
