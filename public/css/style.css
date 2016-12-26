@@ -55,6 +55,28 @@ body {
   }
 }
 
+.photo-list {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+.photo-list .photo {
+  width: 33%;
+}
+.photo-list .thumbnail {
+  margin: 4px;
+}
+@media (min-width: 992px) {
+  .photo-list .photo {
+    width: 25%;
+  }
+}
+@media (max-width: 580px) {
+  .photo-list .photo {
+    width: 50%;
+  }
+}
+
 /**
  * Bootstrap callouts
  */
