@@ -8,5 +8,14 @@
     "indieauth/client": ">=0.1.11",
     "pda/pheanstalk": "dev-master",
     "p3k/multipart": "0.1.*"
+  },
+  "autoload": {
+    "files": [
+      "lib/Savant.php",
+      "lib/config.php",
+      "lib/helpers.php",
+      "lib/markdown.php",
+      "lib/instagram.php"
+    ]
   }
 }

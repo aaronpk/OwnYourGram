@@ -1,11 +1,6 @@
 <?php
 chdir(dirname(__FILE__).'/..');
 require 'vendor/autoload.php';
-require 'lib/Savant.php';
-require 'lib/config.php';
-require 'lib/helpers.php';
-require 'lib/markdown.php';
-require 'lib/instagram.php';
 
 echo "========================================\n";
 echo date('Y-m-d H:i:s') . "\n";
