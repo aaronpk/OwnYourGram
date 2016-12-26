@@ -105,7 +105,8 @@ foreach($users as $user) {
         $user->last_instagram_photo = $photo->id;
         $user->last_photo_date = date('Y-m-d H:i:s');
 
-        if($response && isset($response['headers']['Location']) && ($response['code'] == 201 || $response['code'] == 202)) {
+        if($response && isset($response['headers']['Location']) 
+          && in_array($response['code'], [201,202,301,302])) {
           $photo_url = $response['headers']['Location'][0];
           $user->last_micropub_url = $photo_url;
           $user->last_instagram_img_url = $entry['photo'];
