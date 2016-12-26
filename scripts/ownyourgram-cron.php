@@ -46,6 +46,7 @@ foreach($users as $user) {
 
           $photo->instagram_data = json_encode($entry);
           $photo->instagram_img = $entry['photo'];
+          $photo->published = date('Y-m-d H:i:s', strtotime($entry['published']));
           $photo->save();
 
           // Post to the Micropub endpoint

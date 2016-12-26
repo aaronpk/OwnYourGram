@@ -32,6 +32,7 @@ CREATE TABLE `photos` (
   `user_id` int(11) unsigned NOT NULL,
   `instagram_url` varchar(255) DEFAULT NULL,
   `instagram_img` varchar(512) DEFAULT NULL,
+  `published` datetime DEFAULT NULL,
   `instagram_data` text,
   `canonical_url` varchar(255) DEFAULT NULL,
   'processed' tinyint(4) NOT NULL DEFAULT 0,

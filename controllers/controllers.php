@@ -198,6 +198,7 @@ $app->get('/instagram/photos.json', function() use($app) {
 
           $photo->instagram_data = json_encode($entry);
           $photo->instagram_img = $entry['photo'];
+          $photo->published = date('Y-m-d H:i:s', strtotime($entry['published']));
           $photo->save();
         } else {
           $entry = json_decode($photo->instagram_data, true);
