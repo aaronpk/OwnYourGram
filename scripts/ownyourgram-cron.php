@@ -89,7 +89,7 @@ foreach($users as $user) {
         $user->last_instagram_photo = $photo->id;
         $user->last_photo_date = date('Y-m-d H:i:s');
 
-        if($response && preg_match('/Location: (.+)/', $response['response'], $match)) {
+        if($response && isset($response['headers']['Location']) && ($response['code'] == 201 || $response['code'] == 202)) {
           $user->last_micropub_url = $match[1];
           $user->last_instagram_img_url = $entry['photo'];
           $user->photo_count = $user->photo_count + 1;
