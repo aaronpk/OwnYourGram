@@ -23,16 +23,15 @@ $app->get('/', function($format='html') use($app) {
 
   // Find the top ranked users this week
   $date = new DateTime();
-  while($date->format('D') != 'Sun') {
-    $date->modify('-1 day');
-  }
+  $date->modify('-7 days');
 
   $users = ORM::for_table('users')
-    ->where('micropub_success', 1)
-    ->where_not_null('last_instagram_img_url')
-    ->where_gte('last_photo_date', $date->format('Y-m-d'))
-    ->where_gt('photo_count_this_week', 0)
-    ->order_by_desc('photo_count_this_week')
+    ->raw_query('SELECT users.*, COUNT(1) AS num
+      FROM users
+      JOIN photos ON users.id = photos.user_id
+      WHERE photos.published > :date
+      GROUP BY users.id
+      ORDER BY num DESC', ['date' => $date->format('Y-m-d H:i:s')])
     ->find_many();
 
   ob_start();

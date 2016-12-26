@@ -36,7 +36,7 @@
           <div class="caption">
             <p><a href="<?= $user->url ?>"><?= friendly_url($user->url) ?></a></p>
             <p>
-              <?= $user->photo_count_this_week ?> this week<br>
+              <?= $user->num ?> this week<br>
               <?= $user->photo_count ?> total<br>
             </p>
           </div>
