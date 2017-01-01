@@ -35,7 +35,6 @@ $app->get('/', function($format='html') use($app) {
       ORDER BY num DESC', ['date' => $date->format('Y-m-d H:i:s')])
     ->find_many();
 
-  ob_start();
   render('index', array(
     'title' => 'OwnYourGram',
     'meta' => '',
@@ -44,8 +43,6 @@ $app->get('/', function($format='html') use($app) {
     'total_users' => $total_users,
     'signed_in' => isset($_SESSION['user_id'])
   ));
-  $html = ob_get_clean();
-  $res->body($html);
 });
 
 $app->get('/dashboard', function() use($app) {
@@ -57,22 +54,20 @@ $app->get('/dashboard', function() use($app) {
       ->order_by_asc('match')
       ->find_many();
 
-    $html = render('dashboard', array(
+    render('dashboard', array(
       'title' => 'OwnYourGram Dashboard',
       'user' => $user,
       'rules' => $rules,
     ));
-    $app->response()->body($html);
   }
 });
 
 $app->get('/photos', function() use($app) {
   if($user=require_login($app)) {
-    $html = render('photos', array(
+    render('photos', array(
       'title' => 'Import Photos - OwnYourGram',
       'user' => $user,
     ));
-    $app->response()->body($html);
   }
 });
 
@@ -162,6 +157,11 @@ $app->post('/settings/instagram.json', function() use($app) {
       $user->instagram_access_token = '';
       $user->save();
     }
+
+    $app->response()->header('Content-Type', 'application/json');
+    $app->response()->body(json_encode([
+      'result' => 'ok'
+    ]));
   }
 });
 
@@ -229,10 +229,9 @@ $app->get('/creating-a-micropub-endpoint', function() use($app) {
 });
 
 $app->get('/docs', function() use($app) {
-  $html = render('docs', array(
+  render('docs', array(
     'title' => 'OwnYourGram Documentation',
   ));
-  $app->response()->body($html);
 });
 
 $app->get('/instagram', function() use($app) {
@@ -251,12 +250,11 @@ $app->get('/instagram', function() use($app) {
 
     $_SESSION['instagram_username'] = $instagram_username;
 
-    $html = render('instagram', array(
+    render('instagram', array(
       'title' => 'Instagram',
       'user' => $user,
       'instagram_username' => $instagram_username
     ));
-    $app->response()->body($html);
   }
 });
 
@@ -289,14 +287,12 @@ $app->get('/instagram/verify', function() use($app) {
     }
     $user->save();
 
-    $html = render('instagram-verify', array(
+    render('instagram-verify', array(
       'title' => 'Instagram',
       'user' => $user,
       'instagram_username' => $_SESSION['instagram_username'],
       'success' => $success
     ));
-    $app->response()->body($html);
-
   }
 });
 

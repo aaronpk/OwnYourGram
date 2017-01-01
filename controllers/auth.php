@@ -9,8 +9,7 @@ function clientID() {
 }
 
 $app->get('/signin', function() use($app) {
-  $html = render('signin', array('title' => 'Sign In'));
-  $app->response()->body($html);
+  render('signin', array('title' => 'Sign In'));
 });
 
 $app->get('/auth/start', function() use($app) {
@@ -70,7 +69,7 @@ $app->get('/auth/start', function() use($app) {
     $user->token_endpoint = $tokenEndpoint;
     $user->save();
 
-    $html = render('auth_start', array(
+    render('auth_start', array(
       'title' => 'Sign In',
       'me' => $me,
       'authorizing' => $me,
@@ -80,7 +79,6 @@ $app->get('/auth/start', function() use($app) {
       'authorizationEndpoint' => $authorizationEndpoint,
       'authorizationURL' => $authorizationURL
     ));
-    $app->response()->body($html);
   }
 });
 
@@ -91,12 +89,11 @@ $app->get('/auth/callback', function() use($app) {
   // Double check there is a "me" parameter
   // Should only fail for really hacked up requests
   if(!array_key_exists('me', $params) || !($me = IndieAuth\Client::normalizeMeURL($params['me']))) {
-    $html = render('auth_error', array(
+    render('auth_error', array(
       'title' => 'Auth Callback',
       'error' => 'Invalid "me" Parameter',
       'errorDescription' => 'The ID you entered, <strong>' . $params['me'] . '</strong> is not valid.'
     ));
-    $app->response()->body($html);
     return;
   }
 
@@ -107,34 +104,31 @@ $app->get('/auth/callback', function() use($app) {
   }
 
   if(!array_key_exists('code', $params) || trim($params['code']) == '') {
-    $html = render('auth_error', array(
+    render('auth_error', array(
       'title' => 'Auth Callback',
       'error' => 'Missing authorization code',
       'errorDescription' => 'No authorization code was provided in the request.'
     ));
-    $app->response()->body($html);
     return;
   }
 
   // Verify the state came back and matches what we set in the session
   // Should only fail for malicious attempts, ok to show a not as nice error message
   if(!array_key_exists('state', $params)) {
-    $html = render('auth_error', array(
+    render('auth_error', array(
       'title' => 'Auth Callback',
       'error' => 'Missing state parameter',
       'errorDescription' => 'No state parameter was provided in the request. This shouldn\'t happen. It is possible this is a malicious authorization attempt.'
     ));
-    $app->response()->body($html);
     return;
   }
 
   if($params['state'] != $_SESSION['auth_state']) {
-    $html = render('auth_error', array(
+    render('auth_error', array(
       'title' => 'Auth Callback',
       'error' => 'Invalid state',
       'errorDescription' => 'The state parameter provided did not match the state provided at the start of authorization. This is most likely caused by a malicious authorization attempt.'
     ));
-    $app->response()->body($html);
     return;
   }
 
@@ -195,7 +189,7 @@ $app->get('/auth/callback', function() use($app) {
     else
       $app->redirect('/instagram', 302);
   } else {
-    $html = render('auth_callback', array(
+    render('auth_callback', array(
       'title' => 'Sign In',
       'me' => $me,
       'authorizing' => $me,
@@ -205,7 +199,6 @@ $app->get('/auth/callback', function() use($app) {
       'response' => $token['response'],
       'curl_error' => (array_key_exists('error', $token) ? $token['error'] : false)
     ));
-    $app->response()->body($html);
   }
 });
 
@@ -214,5 +207,5 @@ $app->get('/signout', function() use($app) {
   unset($_SESSION['me']);
   unset($_SESSION['auth_state']);
   unset($_SESSION['user_id']);
-  $app->redirect('/', 301);
+  $app->redirect('/', 302);
 });
