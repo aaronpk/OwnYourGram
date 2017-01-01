@@ -68,61 +68,121 @@ foreach($users as $user) {
         $photo->published = date('Y-m-d H:i:s', strtotime($entry['published']));
         $photo->save();
 
-        // Post to the Micropub endpoint
-        $filename = download_file($entry['photo']);
+        // Check the whitelist/blacklist
+        if($user->whitelist) {
+          // Default to not post unless something in the whitelist matches
+          $should_import = false;
 
-        if(isset($entry['video'])) {
-          $video_filename = download_file($entry['video']);
+          $whitelist_matched = false;
+          $blacklist_matched = false;
+
+          // If there is a whitelist, check that the caption contains one of the words
+          $whitelist_words = preg_split('/[ ]+/', $user->whitelist);
+          foreach($whitelist_words as $word) {
+            if(stripos($entry['content'], $word) !== false) {
+              $should_import = true;
+              $whitelist_matched = $word;
+            }
+          }
+
+          // If there is also a blacklist, check that now
+          $blacklist_words = preg_split('/[ ]+/', $user->blacklist);
+          foreach($blacklist_words as $word) {
+            if(stripos($entry['content'], $word) !== false) {
+              $should_import = false;
+              $blacklist_matched = $word;
+            }
+          }
+
+          if($whitelist_matched)
+            log_msg("Whitelist matched ".$whitelist_matched, $user);
+          if($blacklist_matched)
+            log_msg("Blacklist matched ".$blacklist_matched, $user);
+
+          log_msg("Whitelist: ".($should_import ? 'Import' : 'Do not import'), $user);
+
+        } elseif($user->blacklist) {
+          // Default to post unless something in the blacklist matches
+          $should_import = true;
+
+          $blacklist_matched = false;
+
+          $blacklist_words = preg_split('/[ ]+/', $user->blacklist);
+          foreach($blacklist_words as $word) {
+            if(stripos($entry['content'], $word) !== false) {
+              $should_import = false;
+              $blacklist_matched = $word;
+            }
+          }
+
+          if($blacklist_matched)
+            log_msg("Blacklist matched ".$blacklist_matched, $user);
+
+          log_msg("Blacklist: ".($should_import ? 'Import' : 'Do not import'), $user);
+
         } else {
-          $video_filename = false;
+          $should_import = true;
         }
 
-        // Collapse category to a comma-separated list if they haven't upgraded yet
-        if($user->send_category_as_array != 1) {
-          if($entry['category'] && is_array($entry['category']) && count($entry['category'])) {
-            $entry['category'] = implode(',', $entry['category']);
+        if($should_import) {
+          continue;
+          // Post to the Micropub endpoint
+          $filename = download_file($entry['photo']);
+
+          if(isset($entry['video'])) {
+            $video_filename = download_file($entry['video']);
+          } else {
+            $video_filename = false;
+          }
+
+          // Collapse category to a comma-separated list if they haven't upgraded yet
+          if($user->send_category_as_array != 1) {
+            if($entry['category'] && is_array($entry['category']) && count($entry['category'])) {
+              $entry['category'] = implode(',', $entry['category']);
+            }
+          }
+
+          $rules = ORM::for_table('syndication_rules')->where('user_id', $user->id)->find_many();
+          $syndications = '';
+          foreach($rules as $rule) {
+            if($rule->match == '*' || stripos($entry['content'], $rule->match) !== false) {
+              if(!isset($entry['mp-syndicate-to']))
+                $entry['mp-syndicate-to'] = [];
+              $entry['mp-syndicate-to'][] = $rule->syndicate_to;
+              $syndications .= ' +'.$rule->syndicate_to_name;
+            }
+          }
+
+          log_msg("Sending ".($video_filename ? 'video' : 'photo')." ".$url." to micropub endpoint: ".$user->micropub_endpoint.$syndications, $user);
+
+          $response = micropub_post($user->micropub_endpoint, $user->micropub_access_token, $entry, $filename, $video_filename);
+          unlink($filename);
+
+          $user->last_micropub_response = json_encode($response);
+          $user->last_instagram_photo = $photo->id;
+          $user->last_photo_date = date('Y-m-d H:i:s');
+
+          if($response && isset($response['headers']['Location']) 
+            && in_array($response['code'], [201,202,301,302])) {
+            $photo_url = $response['headers']['Location'][0];
+            $user->last_micropub_url = $photo_url;
+            $user->last_instagram_img_url = $entry['photo'];
+            $user->photo_count = $user->photo_count + 1;
+            $user->photo_count_this_week = $user->photo_count_this_week + 1;
+
+            $photo->canonical_url = $photo_url;
+            $successful_photos++;
+            log_msg("Posted to ".$photo_url, $user);
+          } else {
+            // Their micropub endpoint didn't return a location, notify them there's a problem somehow
+            log_msg("There was an error posting this photo. Response code was: ".$response['code'], $user);
+            $micropub_errors++;
+            if($response['code'] == 403) {
+              break;
+            }
           }
         }
 
-        $rules = ORM::for_table('syndication_rules')->where('user_id', $user->id)->find_many();
-        $syndications = '';
-        foreach($rules as $rule) {
-          if($rule->match == '*' || stripos($entry['content'], $rule->match) !== false) {
-            if(!isset($entry['mp-syndicate-to']))
-              $entry['mp-syndicate-to'] = [];
-            $entry['mp-syndicate-to'][] = $rule->syndicate_to;
-            $syndications .= ' +'.$rule->syndicate_to_name;
-          }
-        }
-
-        log_msg("Sending ".($video_filename ? 'video' : 'photo')." ".$url." to micropub endpoint: ".$user->micropub_endpoint.$syndications, $user);
-
-        $response = micropub_post($user->micropub_endpoint, $user->micropub_access_token, $entry, $filename, $video_filename);
-        unlink($filename);
-
-        $user->last_micropub_response = json_encode($response);
-        $user->last_instagram_photo = $photo->id;
-        $user->last_photo_date = date('Y-m-d H:i:s');
-
-        if($response && isset($response['headers']['Location']) 
-          && in_array($response['code'], [201,202,301,302])) {
-          $photo_url = $response['headers']['Location'][0];
-          $user->last_micropub_url = $photo_url;
-          $user->last_instagram_img_url = $entry['photo'];
-          $user->photo_count = $user->photo_count + 1;
-          $user->photo_count_this_week = $user->photo_count_this_week + 1;
-
-          $photo->canonical_url = $photo_url;
-          $successful_photos++;
-          log_msg("Posted to ".$photo_url, $user);
-        } else {
-          // Their micropub endpoint didn't return a location, notify them there's a problem somehow
-          log_msg("There was an error posting this photo. Response code was: ".$response['code'], $user);
-          $micropub_errors++;
-          if($response['code'] == 403) {
-            break;
-          }
-        }
         $photo->processed = 1;
         $photo->save();
 

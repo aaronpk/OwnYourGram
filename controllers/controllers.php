@@ -308,6 +308,24 @@ $app->post('/prefs/array', function() use($app) {
   }
 });
 
+$app->post('/prefs/save', function() use($app) {
+  if($user=require_login($app)) {
+    $params = $app->request()->params();
+
+    if(array_key_exists('blacklist', $params))
+      $user->blacklist = $params['blacklist'];
+    if(array_key_exists('whitelist', $params))
+      $user->whitelist = $params['whitelist'];
+
+    $user->save();
+
+    $app->response()->header('Content-Type', 'application/json');
+    $app->response()->body(json_encode(array(
+      'result' => 'ok'
+    )));
+  }
+});
+
 $app->post('/instagram/test.json', function() use($app) {
   if($user=require_login($app)) {
     $params = $app->request()->params();

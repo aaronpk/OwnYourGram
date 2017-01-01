@@ -55,6 +55,14 @@ body {
   }
 }
 
+form .check {
+  display: inline-block; 
+  vertical-align: middle; 
+  font-size: 26px;
+  padding: 0 8px;
+  color: #419641;
+}
+
 .photo-list {
   display: flex;
   flex-direction: row;

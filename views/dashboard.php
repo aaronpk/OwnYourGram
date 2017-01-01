@@ -27,6 +27,25 @@ endif;
     <a href="javascript:disconnect_instagram()" class="btn btn-xs btn-warning">Disconnect Instagram</a>
   </div>
 
+  <div class="panel container-fluid">
+    <form class="row">
+      <div class="col-md-6 whitelist">
+        <h4>Whitelist</h4>
+        <p>Import photos <b>only if</b> the photo caption has one of the keywords listed here.</p>
+        <textarea class="form-control" id="whitelist-keywords" placeholder="space-separated keywords"><?= htmlspecialchars($this->user->whitelist) ?></textarea>
+        <input type="button" class="btn btn-primary" value="Save" id="whitelist-save" style="margin-top:4px;">
+        <div class="hidden check">&check;</div>
+      </div>
+      <div class="col-md-6 blacklist">
+        <h4>Blacklist</h4>
+        <p>Prevent importing photos that contain any of the keywords listed here.</p>
+        <textarea class="form-control" id="blacklist-keywords" placeholder="space-separated keywords"><?= htmlspecialchars($this->user->blacklist) ?></textarea>
+        <input type="button" class="btn btn-primary" value="Save" id="blacklist-save" style="margin-top:4px;">
+        <div class="hidden check">&check;</div>
+      </div>
+    </form>
+  </div>
+
   <div id="automatic-syndication" class="hidden panel">
     <h4>Automatic Syndication</h4>
 
@@ -46,7 +65,7 @@ endif;
         </tr>
       <?php endforeach; ?>
       <tr>
-        <td><input type="button" id="new-syndicate-to-btn" class="btn btn-success" value="Add Rule"></td>
+        <td><input type="button" id="new-syndicate-to-btn" class="btn btn-primary" value="Add Rule"></td>
         <td><input type="text" id="new-syndicate-to-keyword" class="form-control"></td>
         <td>
           <select name="new-syndicate-to" id="new-syndicate-to" class="form-control">
@@ -88,7 +107,7 @@ endif;
           target: $("#new-syndicate-to").val(),
           target_name: $("#new-syndicate-to :selected").text()
         }, function(data){
-          window.location = window.location; // the lazy way
+          window.location.reload();
         });
       }
       return false;
@@ -101,14 +120,41 @@ endif;
       $(this).find(".delete").addClass("hidden");
     });
     $("#automatic-syndication .delete").click(function(){
-        $.post("/settings/syndication-rules.json", {
-          action: 'delete',
-          id: $(this).data('id')
-        }, function(data){
-          window.location = window.location; // the lazy way
-        });
+      $.post("/settings/syndication-rules.json", {
+        action: 'delete',
+        id: $(this).data('id')
+      }, function(data){
+        window.location.reload();
+      });
       return false;
     });
+
+    $("#whitelist-save").click(function(){
+      $("#whitelist-save").addClass("disabled");
+      $.post("/prefs/save", {
+        whitelist: $("#whitelist-keywords").val()
+      }, function(data){
+        $("#whitelist-save").removeClass("disabled");
+        $(".whitelist .check").removeClass("hidden");
+        setTimeout(function(){
+          $(".whitelist .check").addClass("hidden");
+        }, 500);
+      });
+    });
+
+    $("#blacklist-save").click(function(){
+      $("#blacklist-save").addClass("disabled");
+      $.post("/prefs/save", {
+        blacklist: $("#blacklist-keywords").val()
+      }, function(data){
+        $("#blacklist-save").removeClass("disabled");
+        $(".blacklist .check").removeClass("hidden");
+        setTimeout(function(){
+          $(".blacklist .check").addClass("hidden");
+        }, 500);
+      });
+    });
+
   });
 
   function handle_discovered_syndication_targets(data) {
