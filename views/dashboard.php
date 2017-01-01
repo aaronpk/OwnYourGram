@@ -49,7 +49,7 @@ endif;
   <div id="automatic-syndication" class="hidden panel">
     <h4>Automatic Syndication</h4>
 
-    <p>You can add rules that will match words in your Instagram post and tell your Micropub endpoint to syndicate your post to various destinations. You can use this to make rules like "syndicate my photos tagged #indieweb to Twitter". 
+    <p>You can add rules that will match words in your Instagram post and tell your Micropub endpoint to syndicate your post to various destinations. You can use this to make rules like "syndicate my photos tagged #indieweb to Twitter". Enter <code>*</code> to match every photo.</p>
 
     <table class="table">
       <tr>
