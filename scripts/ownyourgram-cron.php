@@ -99,7 +99,7 @@ foreach($users as $user) {
           if($blacklist_matched)
             log_msg("Blacklist matched ".$blacklist_matched, $user);
 
-          log_msg("Whitelist: ".($should_import ? 'Import' : 'Do not import'), $user);
+          #log_msg("Whitelist: ".($should_import ? 'Import' : 'Do not import'), $user);
 
         } elseif($user->blacklist) {
           // Default to post unless something in the blacklist matches
@@ -118,14 +118,13 @@ foreach($users as $user) {
           if($blacklist_matched)
             log_msg("Blacklist matched ".$blacklist_matched, $user);
 
-          log_msg("Blacklist: ".($should_import ? 'Import' : 'Do not import'), $user);
+          #log_msg("Blacklist: ".($should_import ? 'Import' : 'Do not import'), $user);
 
         } else {
           $should_import = true;
         }
 
         if($should_import) {
-          continue;
           // Post to the Micropub endpoint
           $filename = download_file($entry['photo']);
 
