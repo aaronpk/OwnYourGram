@@ -61,7 +61,7 @@ foreach($users as $user) {
           $photo->instagram_url = $url;
         }
 
-        $entry = h_entry_from_photo($url);
+        $entry = h_entry_from_photo($url, $user->send_media_as == 'upload');
 
         $photo->instagram_data = json_encode($entry);
         $photo->instagram_img = $entry['photo'];

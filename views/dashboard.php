@@ -103,6 +103,8 @@ endif;
         <li><input type="radio" name="send_media_as" value="url" <?= $this->user->send_media_as == 'url' ? 'checked="checked"' : '' ?>> Instagram URLs (JSON request)</li>
       </ul>
 
+      <p>Note: Choosing the JSON option will also change the location property to send a named location as an h-card rather than a string <code>geo://</code> URI.
+
       <input type="button" class="btn btn-primary" value="Save" id="send-media-as-save" style="margin-top:4px;">
       <div class="hidden check">&check;</div>
     </form>

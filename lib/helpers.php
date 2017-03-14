@@ -111,12 +111,10 @@ function micropub_post($user, $params, $photo_filename=false, $video_filename=fa
     $properties['content'] = $params['content'];
   if(k($params, 'category'))
     $properties['category'] = $params['category'];
-  if(k($params, 'place_name'))
-    $properties['place_name'] = $params['place_name'];
-  if(k($params, 'location'))
-    $properties['location'] = $params['location'];
   if(k($params, 'published'))
     $properties['published'] = $params['published'];
+  if(k($params, 'location'))
+    $properties['location'] = $params['location'];
   if(k($params, 'syndication'))
     $properties['syndication'] = $params['syndication'];
   if(k($params, 'mp-syndicate-to'))
@@ -127,8 +125,12 @@ function micropub_post($user, $params, $photo_filename=false, $video_filename=fa
       'h' => 'entry',
       'access_token' => $access_token
     );
+
     foreach($properties as $k=>$v)
       $postfields[$k] = $v;
+
+    if(k($params, 'place_name'))
+      $postfields['place_name'] = $params['place_name'];
 
     $multipart = new p3k\Multipart();
 

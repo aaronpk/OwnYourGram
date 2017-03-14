@@ -194,7 +194,7 @@ $app->get('/instagram/photos.json', function() use($app) {
           $photo->user_id = $user->id;
           $photo->instagram_url = $item['url'];
 
-          $entry = h_entry_from_photo($item['url']);
+          $entry = h_entry_from_photo($item['url'], $user->send_media_as == 'upload');
 
           $photo->instagram_data = json_encode($entry);
           $photo->instagram_img = $entry['photo'];
