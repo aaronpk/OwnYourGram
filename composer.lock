@@ -4,7 +4,6 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "c8e1f247f040a531e7f39355c7c0f577",
     "content-hash": "7dbbebfbbfa26c41fc92d56265a99ff9",
     "packages": [
         {
@@ -45,20 +44,20 @@
                 }
             ],
             "description": "Cleans up microformats2 array structures",
-            "time": "2014-10-06 23:11:15"
+            "time": "2014-10-06T23:11:15+00:00"
         },
         {
             "name": "indieauth/client",
-            "version": "0.1.16",
+            "version": "0.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/indieweb/indieauth-client-php.git",
-                "reference": "81e425892c00afef1b6bf9fe16e771b4503bbb8a"
+                "reference": "4b9bd766a92b8abbe420f5889bf7ebac7678151d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/indieweb/indieauth-client-php/zipball/81e425892c00afef1b6bf9fe16e771b4503bbb8a",
-                "reference": "81e425892c00afef1b6bf9fe16e771b4503bbb8a",
+                "url": "https://api.github.com/repos/indieweb/indieauth-client-php/zipball/4b9bd766a92b8abbe420f5889bf7ebac7678151d",
+                "reference": "4b9bd766a92b8abbe420f5889bf7ebac7678151d",
                 "shasum": ""
             },
             "require": {
@@ -84,7 +83,7 @@
                 }
             ],
             "description": "IndieAuth Client Library",
-            "time": "2016-05-21 16:43:04"
+            "time": "2017-02-09T23:42:05+00:00"
         },
         {
             "name": "indieweb/link-rel-parser",
@@ -130,7 +129,7 @@
                 "indieweb",
                 "microformats2"
             ],
-            "time": "2016-04-13 17:48:59"
+            "time": "2016-04-13T17:48:59+00:00"
         },
         {
             "name": "j4mie/idiorm",
@@ -188,7 +187,7 @@
                 "orm",
                 "query builder"
             ],
-            "time": "2013-12-12 10:25:27"
+            "time": "2013-12-12T10:25:27+00:00"
         },
         {
             "name": "mf2/mf2",
@@ -241,7 +240,7 @@
                 "parser",
                 "semantic"
             ],
-            "time": "2016-03-14 12:13:34"
+            "time": "2016-03-14T12:13:34+00:00"
         },
         {
             "name": "p3k/multipart",
@@ -277,7 +276,7 @@
                 }
             ],
             "description": "Multipart Encoding Library",
-            "time": "2015-07-16 19:28:02"
+            "time": "2015-07-16T19:28:02+00:00"
         },
         {
             "name": "pda/pheanstalk",
@@ -377,7 +376,7 @@
                 "predis",
                 "redis"
             ],
-            "time": "2016-05-30 15:25:52"
+            "time": "2016-05-30T15:25:52+00:00"
         },
         {
             "name": "saltybeagle/savant3",
@@ -455,7 +454,7 @@
                 "rest",
                 "router"
             ],
-            "time": "2012-12-13 02:15:50"
+            "time": "2012-12-13T02:15:50+00:00"
         }
     ],
     "packages-dev": [],
