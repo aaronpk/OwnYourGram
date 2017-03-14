@@ -100,48 +100,76 @@ function download_file($url, $ext='jpg') {
   return $filename;  
 }
 
-function micropub_post($endpoint, $access_token, $params, $photo_filename=false, $video_filename=false) {
+function micropub_post($user, $params, $photo_filename=false, $video_filename=false) {
 
-  $postfields = array(
-    'h' => 'entry',
-    'access_token' => $access_token
-  );
+  $endpoint = $user->micropub_endpoint;
+  $access_token = $user->micropub_access_token;
 
   if(k($params, 'name'))
-    $postfields['name'] = $params['name'];
+    $properties['name'] = $params['name'];
   if(k($params, 'content'))
-    $postfields['content'] = $params['content'];
+    $properties['content'] = $params['content'];
   if(k($params, 'category'))
-    $postfields['category'] = $params['category'];
+    $properties['category'] = $params['category'];
   if(k($params, 'place_name'))
-    $postfields['place_name'] = $params['place_name'];
+    $properties['place_name'] = $params['place_name'];
   if(k($params, 'location'))
-    $postfields['location'] = $params['location'];
+    $properties['location'] = $params['location'];
   if(k($params, 'published'))
-    $postfields['published'] = $params['published'];
+    $properties['published'] = $params['published'];
   if(k($params, 'syndication'))
-    $postfields['syndication'] = $params['syndication'];
+    $properties['syndication'] = $params['syndication'];
   if(k($params, 'mp-syndicate-to'))
-    $postfields['mp-syndicate-to'] = $params['mp-syndicate-to'];
+    $properties['mp-syndicate-to'] = $params['mp-syndicate-to'];
 
-  $multipart = new p3k\Multipart();
+  if($user->send_media_as == 'upload') {
+    $postfields = array(
+      'h' => 'entry',
+      'access_token' => $access_token
+    );
+    foreach($properties as $k=>$v)
+      $postfields[$k] = $v;
 
-  $multipart->addArray($postfields);
+    $multipart = new p3k\Multipart();
 
-  if($photo_filename)
-    $multipart->addFile('photo', $photo_filename, 'image/jpeg');
+    $multipart->addArray($postfields);
 
-  if($video_filename)
-    $multipart->addFile('video', $video_filename, 'video/mp4');
+    if($photo_filename)
+      $multipart->addFile('photo', $photo_filename, 'image/jpeg');
+
+    if($video_filename)
+      $multipart->addFile('video', $video_filename, 'video/mp4');
+
+    $body = $multipart->data();
+    $content_type = $multipart->contentType();
+  } else {
+    $content_type = 'application/json';
+
+    if($photo_filename)
+      $properties['photo'] = $photo_filename;
+
+    if($video_filename)
+      $properties['video'] = $video_filename;
+
+    foreach($properties as $k=>$v) {
+      if(!is_array($v) || !array_key_exists(0, $v))
+        $properties[$k] = [$v];
+    }
+
+    $body = json_encode([
+      'type' => ['h-entry'],
+      'properties' => $properties
+    ]);
+  }
 
   $ch = curl_init();
   curl_setopt($ch, CURLOPT_URL, $endpoint);
   curl_setopt($ch, CURLOPT_HTTPHEADER, array(
     'Authorization: Bearer ' . $access_token,
-    'Content-Type: ' . $multipart->contentType()
+    'Content-Type: ' . $content_type
   ));
   curl_setopt($ch, CURLOPT_POST, true);
-  curl_setopt($ch, CURLOPT_POSTFIELDS, $multipart->data());
+  curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
   curl_setopt($ch, CURLOPT_HEADER, true);
   $response = curl_exec($ch);

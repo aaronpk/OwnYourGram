@@ -27,6 +27,7 @@ CREATE TABLE `users` (
   `ig_public` tinyint(4) NOT NULL DEFAULT '0',
   `whitelist` text DEFAULT NULL,
   `blacklist` text DEFAULT NULL,
+  `send_media_as` varchar(20) NOT NULL DEFAULT 'upload',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

@@ -126,12 +126,17 @@ foreach($users as $user) {
 
         if($should_import) {
           // Post to the Micropub endpoint
-          $filename = download_file($entry['photo']);
+          if($user->send_media_as == 'upload') {
+            $filename = download_file($entry['photo']);
 
-          if(isset($entry['video'])) {
-            $video_filename = download_file($entry['video']);
+            if(isset($entry['video'])) {
+              $video_filename = download_file($entry['video']);
+            } else {
+              $video_filename = false;
+            }
           } else {
-            $video_filename = false;
+            $filename = $entry['photo'];
+            $video_filename = isset($entry['video']) ? $entry['video'] : false;
           }
 
           // Collapse category to a comma-separated list if they haven't upgraded yet
@@ -154,7 +159,7 @@ foreach($users as $user) {
 
           log_msg("Sending ".($video_filename ? 'video' : 'photo')." ".$url." to micropub endpoint: ".$user->micropub_endpoint.$syndications, $user);
 
-          $response = micropub_post($user->micropub_endpoint, $user->micropub_access_token, $entry, $filename, $video_filename);
+          $response = micropub_post($user, $entry, $filename, $video_filename);
           unlink($filename);
 
           $user->last_micropub_response = json_encode($response);

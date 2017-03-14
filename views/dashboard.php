@@ -93,6 +93,21 @@ endif;
     </div>
   </div>
 
+  <div id="send-media-as" class="panel">
+    <h4>Settings</h4>
+
+    <form>
+      Send photo and videos as
+      <ul>
+        <li><input type="radio" name="send_media_as" value="upload" <?= $this->user->send_media_as == 'upload' ? 'checked="checked"' : '' ?>> Multipart Upload</li>
+        <li><input type="radio" name="send_media_as" value="url" <?= $this->user->send_media_as == 'url' ? 'checked="checked"' : '' ?>> Instagram URLs (JSON request)</li>
+      </ul>
+
+      <input type="button" class="btn btn-primary" value="Save" id="send-media-as-save" style="margin-top:4px;">
+      <div class="hidden check">&check;</div>
+    </form>
+  </div>
+
   <script>
   $(function(){
     $.get("/settings/syndication-targets.json", function(data){
@@ -151,6 +166,19 @@ endif;
         $(".blacklist .check").removeClass("hidden");
         setTimeout(function(){
           $(".blacklist .check").addClass("hidden");
+        }, 500);
+      });
+    });
+
+    $("#send-media-as-save").click(function(){
+      $("#blacklist-save").addClass("disabled");
+      $.post("/prefs/save", {
+        send_media_as: $("input[name=send_media_as]:checked").val()
+      }, function(data){
+        $("#send-media-as-save").removeClass("disabled");
+        $("#send-media-as .check").removeClass("hidden");
+        setTimeout(function(){
+          $("#send-media-as .check").addClass("hidden");
         }, 500);
       });
     });

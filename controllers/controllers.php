@@ -316,6 +316,8 @@ $app->post('/prefs/save', function() use($app) {
       $user->blacklist = $params['blacklist'];
     if(array_key_exists('whitelist', $params))
       $user->whitelist = $params['whitelist'];
+    if(array_key_exists('send_media_as', $params))
+      $user->send_media_as = $params['send_media_as'];
 
     $user->save();
 
@@ -339,13 +341,17 @@ $app->post('/instagram/test.json', function() use($app) {
 
     $entry = json_decode($photo->instagram_data, true);
 
-    // Download the file to a temp folder
-    $filename = download_file($entry['photo']);
+    if($user->send_media_as == 'upload') {
+      $filename = download_file($entry['photo']);
 
-    if(isset($entry['video'])) {
-      $video_filename = download_file($entry['video']);
+      if(isset($entry['video'])) {
+        $video_filename = download_file($entry['video']);
+      } else {
+        $video_filename = false;
+      }
     } else {
-      $video_filename = false;
+      $filename = $entry['photo'];
+      $video_filename = isset($entry['video']) ? $entry['video'] : false;
     }
 
     if($user->send_category_as_array != 1) {
@@ -355,7 +361,7 @@ $app->post('/instagram/test.json', function() use($app) {
     }
 
     // Now send to the micropub endpoint
-    $response = micropub_post($user->micropub_endpoint, $user->micropub_access_token, $entry, $filename, $video_filename);
+    $response = micropub_post($user, $entry, $filename, $video_filename);
 
     $user->last_micropub_response = json_encode($response);
 
