@@ -39,7 +39,7 @@ $app->get('/auth/start', function() use($app) {
     $state = IndieAuth\Client::generateStateParameter();
     $_SESSION['auth_state'] = $state;
 
-    $scope = 'post';
+    $scope = 'create';
     $authorizationURL = IndieAuth\Client::buildAuthorizationURL($authorizationEndpoint, $me, buildRedirectURI(), clientID(), $state, $scope);
   } else {
     $authorizationURL = false;
