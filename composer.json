@@ -5,7 +5,7 @@
     "j4mie/idiorm": "1.4.*",
     "predis/predis": "~1.0",
     "mf2/mf2": "0.3.*",
-    "indieauth/client": ">=0.1.11",
+    "indieauth/client": ">=0.2.0",
     "pda/pheanstalk": "dev-master",
     "p3k/multipart": "0.1.*"
   },
