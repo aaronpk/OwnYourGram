@@ -100,18 +100,22 @@ function get_photo($url, $ignoreCache=false) {
   if($data && is_array($data) && array_key_exists('entry_data', $data)) {
     if(is_array($data['entry_data']) && array_key_exists('PostPage', $data['entry_data'])) {
       $post = $data['entry_data']['PostPage'];
-      if(is_array($post) && array_key_exists(0, $post) && array_key_exists('media', $post[0])) {
+
+      if(isset($post[0]['graphql']['shortcode_media']))
+        $media = $post[0]['graphql']['shortcode_media'];
+      elseif(isset($post[0]['media']))
         $media = $post[0]['media'];
+      else
+        return null;
 
-        if(Config::$cacheIGRequests)
-          redis()->setex($cacheKey, $cacheTime, json_encode($media));
+      if(Config::$cacheIGRequests)
+        redis()->setex($cacheKey, $cacheTime, json_encode($media));
 
-        return $media;
-      }
+      return $media;
     }
   }
 
-  return $null;
+  return null;
 }
 
 function get_profile($username, $ignoreCache=false) {

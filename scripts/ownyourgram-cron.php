@@ -63,6 +63,11 @@ foreach($users as $user) {
 
         $entry = h_entry_from_photo($url, $user->send_media_as == 'upload');
 
+        if(!$entry) {
+          echo "ERROR: Could not parse photo: $url\n";
+          continue;
+        }
+
         $photo->instagram_data = json_encode($entry);
         $photo->instagram_img = $entry['photo'];
         $photo->published = date('Y-m-d H:i:s', strtotime($entry['published']));
