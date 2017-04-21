@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "18ffff39286e2b5701b62fbf18a4d8e8",
+    "content-hash": "dcc4835778ae597a631bcf2c6527d46b",
     "packages": [
         {
             "name": "barnabywalters/mf-cleaner",
@@ -277,6 +277,48 @@
             ],
             "description": "Multipart Encoding Library",
             "time": "2015-07-16T19:28:02+00:00"
+        },
+        {
+            "name": "p3k/timezone",
+            "version": "0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/aaronpk/p3k-timezone.git",
+                "reference": "68d3490d896f98cf0727dc937f0bb6b045050c83"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/aaronpk/p3k-timezone/zipball/68d3490d896f98cf0727dc937f0bb6b045050c83",
+                "reference": "68d3490d896f98cf0727dc937f0bb6b045050c83",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/p3k/Timezone.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Aaron Parecki",
+                    "homepage": "https://aaronparecki.com"
+                }
+            ],
+            "description": "Find the timezone of a given location",
+            "homepage": "https://github.com/aaronpk/p3k-timezone",
+            "keywords": [
+                "date",
+                "p3k",
+                "timezone"
+            ],
+            "time": "2017-01-12T17:30:08+00:00"
         },
         {
             "name": "pda/pheanstalk",

@@ -7,7 +7,8 @@
     "mf2/mf2": "0.3.*",
     "indieauth/client": ">=0.2.0",
     "pda/pheanstalk": "dev-master",
-    "p3k/multipart": "0.1.*"
+    "p3k/multipart": "0.1.*",
+    "p3k/timezone": "^0.1.0"
   },
   "autoload": {
     "files": [

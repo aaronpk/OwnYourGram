@@ -73,18 +73,12 @@ function bs()
 }
 
 function get_timezone($lat, $lng) {
-  try {
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, 'http://atlas.p3k.io/api/timezone?latitude='.$lat.'&longitude='.$lng);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    $response = curl_exec($ch);
-    $tz = @json_decode($response);
-    if($tz)
-      return new DateTimeZone($tz->timezone);
-  } catch(Exception $e) {
+  $timezone = p3k\Timezone::timezone_for_location($lat, $lng);
+  if($timezone) {
+    return new DateTimeZone($timezone);
+  } else {
     return null;
   }
-  return null;
 }
 
 function download_file($url, $ext='jpg') {
