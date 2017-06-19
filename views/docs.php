@@ -1,5 +1,23 @@
 <?php ob_start() ?>
-## OwnYourGram Documentation
+## OwnYourGram
+
+### Importing from Instagram
+
+OwnYourGram does not use the Instagram API, but instead will poll your account to find your photos. Because it has to poll, OwnYourGram has several polling tiers based on how often you post on Instagram.
+
+* every 15 minutes
+* every hour
+* every 6 hours
+* every 24 hours
+
+If you have posted 7 or more photos in the last 14 days, you will be in the highest polling tier, so your account will be checked every 15 minutes. If you have posted 4-6 photos in the last 14 days, your account will be checked every hour. If you've posted 2-3 photos, your account will be checked every 6 hours, and if you've posted 0-1 photos then your account will be checked only every 24 hours.
+
+Every time your account is checked, your polling tier is recalculated. This means if you suddenly post a bunch of photos, you'll start in the highest tier again.
+
+If OwnYourGram encounters any Micropub errors when posting the photo to your site, your account is demoted by one tier.
+
+
+## Micropub
 
 OwnYourGram will convert your Instagram photos and videos into a Micropub request, 
 and send them to your Micropub endpoint.
@@ -29,7 +47,7 @@ The request will also contain an access token in the HTTP `Authorization` header
 Authorization: Bearer XXXXXXXX
 </pre>
 
-## Micropub Documentation
+### Micropub Documentation
 
 To learn more about setting up a Micropub endpoint, refer to the documentation and tutorials below.
 
