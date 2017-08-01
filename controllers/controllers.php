@@ -345,7 +345,7 @@ $app->post('/instagram/test.json', function() use($app) {
       $filename = download_file($entry['photo']);
 
       if(isset($entry['video'])) {
-        $video_filename = download_file($entry['video']);
+        $video_filename = download_file($entry['video'],'mp4');
       } else {
         $video_filename = false;
       }
