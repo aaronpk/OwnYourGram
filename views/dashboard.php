@@ -24,7 +24,7 @@ endif;
 
     <p>You are logged in as <b><?= $this->user->url ?></b> and are connected to the Instagram username <b><a href="https://instagram.com/<?= $this->user->instagram_username ?>"><?= $this->user->instagram_username ?></a></b>.</p>
 
-    <a href="javascript:disconnect_instagram()" class="btn btn-xs btn-warning">Disconnect Instagram</a>
+    <a href="#" id="disconnect-instagram" class="btn btn-xs btn-warning">Disconnect Instagram</a>
   </div>
 
   <div class="panel container-fluid">
@@ -185,6 +185,15 @@ endif;
       });
     });
 
+    $("#disconnect-instagram").click(function(){
+      $.post("/settings/instagram.json", {
+        action: 'disconnect'
+      }, function(data){
+        window.location = window.location;
+      });
+      return false;
+    });
+
   });
 
   function handle_discovered_syndication_targets(data) {
@@ -215,15 +224,6 @@ endif;
     $.post("/settings/syndication-targets.json", function(data){
       handle_discovered_syndication_targets(data);
     });
-  }
-
-  function disconnect_instagram() {
-    $.post("/settings/instagram.json", {
-      action: 'disconnect'
-    }, function(data){
-      window.location = window.location;
-    })
-    return false;
   }
   </script>
 
