@@ -7,6 +7,19 @@ if($this->user->send_category_as_array != 1):
     you are ready to receive the category property as an array, click the button below to switch. <a href="https://www.w3.org/TR/micropub/#form-encoded-and-multipart-requests">More Info</a>
     <p><button class="btn btn-default" id="micropub_array">Upgrade me!</button></p>
   </div>
+
+  <script>
+  $(function(){
+    $("#micropub_array").click(function(){
+      $.post("/prefs/array", {
+        upgrade: "yes"
+      }, function(data) {
+        $("#array_notice").hide();
+        window.location = window.location;
+      });
+    });
+  });
+  </script>
 <?php
 endif;
 ?>
@@ -312,16 +325,6 @@ endif;
         return false;
       });
     });
-
-    $("#micropub_array").click(function(){
-      $.post("/prefs/array", {
-        upgrade: "yes"
-      }, function(data) {
-        $("#array_notice").hide();
-        window.location = window.location;
-      });
-    });
-
   });
   </script>
   <script id="photo-template" type="text/x-ownyourgram-template">
