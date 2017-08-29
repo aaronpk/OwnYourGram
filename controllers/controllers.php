@@ -360,6 +360,20 @@ $app->post('/instagram/test.json', function() use($app) {
       }
     }
 
+    // Build syndication links for post-again
+    if(isset($_POST['syndicate']) && $_POST['syndicate'] == 'true') {
+      $rules = ORM::for_table('syndication_rules')->where('user_id', $user->id)->find_many();
+      $syndications = '';
+      foreach($rules as $rule) {
+        if($rule->match == '*' || stripos($entry['content'], $rule->match) !== false) {
+          if(!isset($entry['mp-syndicate-to']))
+            $entry['mp-syndicate-to'] = [];
+          $entry['mp-syndicate-to'][] = $rule->syndicate_to;
+          $syndications .= ' +'.$rule->syndicate_to_name;
+        }
+      }
+    }
+
     // Now send to the micropub endpoint
     $response = micropub_post($user, $entry, $filename, $video_filename);
 
