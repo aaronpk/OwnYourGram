@@ -165,7 +165,8 @@ foreach($users as $user) {
           log_msg("Sending ".($video_filename ? 'video' : 'photo')." ".$url." to micropub endpoint: ".$user->micropub_endpoint.$syndications, $user);
 
           $response = micropub_post($user, $entry, $filename, $video_filename);
-          unlink($filename);
+          if(!preg_match('/^http/', $filename))
+            unlink($filename);
 
           $user->last_micropub_response = json_encode($response);
           $user->last_instagram_photo = $photo->id;
