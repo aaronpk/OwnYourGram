@@ -38,6 +38,7 @@ $app->get('/auth/start', function() use($app) {
     // Generate a "state" parameter for the request
     $state = IndieAuth\Client::generateStateParameter();
     $_SESSION['auth_state'] = $state;
+    $_SESSION['auth_me'] = $me;
 
     $scope = 'create';
     $authorizationURL = IndieAuth\Client::buildAuthorizationURL($authorizationEndpoint, $me, buildRedirectURI(), clientID(), $state, $scope);
@@ -86,20 +87,9 @@ $app->get('/auth/callback', function() use($app) {
   $req = $app->request();
   $params = $req->params();
 
-  // Double check there is a "me" parameter
-  // Should only fail for really hacked up requests
-  if(!array_key_exists('me', $params) || !($me = IndieAuth\Client::normalizeMeURL($params['me']))) {
-    render('auth_error', array(
-      'title' => 'Auth Callback',
-      'error' => 'Invalid "me" Parameter',
-      'errorDescription' => 'The ID you entered, <strong>' . $params['me'] . '</strong> is not valid.'
-    ));
-    return;
-  }
-
   // If there is no state in the session, start the login again
   if(!array_key_exists('auth_state', $_SESSION)) {
-    $app->redirect('/auth/start?me='.urlencode($params['me']));
+    $app->redirect('/auth/start?error=missing_session_state');
     return;
   }
 
@@ -135,12 +125,14 @@ $app->get('/auth/callback', function() use($app) {
   // Now the basic sanity checks have passed. Time to start providing more helpful messages when there is an error.
   // An authorization code is in the query string, and we want to exchange that for an access token at the token endpoint.
 
+  $me = $_SESSION['auth_me'];
+
   // Discover the endpoints
   $micropubEndpoint = IndieAuth\Client::discoverMicropubEndpoint($me);
   $tokenEndpoint = IndieAuth\Client::discoverTokenEndpoint($me);
 
   if($tokenEndpoint) {
-    $token = IndieAuth\Client::getAccessToken($tokenEndpoint, $params['code'], $params['me'], buildRedirectURI(), clientID(), $params['state'], true);
+    $token = IndieAuth\Client::getAccessToken($tokenEndpoint, $params['code'], $me, buildRedirectURI(), clientID(), $params['state'], true);
 
   } else {
     $token = array('auth'=>false, 'response'=>false);
@@ -151,7 +143,7 @@ $app->get('/auth/callback', function() use($app) {
   // If a valid access token was returned, store the token info in the session and they are signed in
   if($token['auth'] && k($token['auth'], array('me','access_token','scope'))) {
     $_SESSION['auth'] = $token['auth'];
-    $_SESSION['me'] = $params['me'];
+    $_SESSION['me'] = $token['auth']['me'];
 
     $user = ORM::for_table('users')->where('url', $me)->find_one();
     if($user) {
@@ -180,6 +172,7 @@ $app->get('/auth/callback', function() use($app) {
   }
 
   unset($_SESSION['auth_state']);
+  unset($_SESSION['auth_me']);
 
   if($hasAlreadyLoggedInBefore) {
     // If they have an active instagram username, or have already imported a photo, redirect to the dashboard.
