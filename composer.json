@@ -8,7 +8,9 @@
     "indieauth/client": ">=0.2.0",
     "pda/pheanstalk": "dev-master",
     "p3k/multipart": "0.1.*",
-    "p3k/timezone": "^0.1.0"
+    "p3k/timezone": "^0.1.0",
+    "p3k/xray": "1.*",
+    "monolog/monolog": "^1.23"
   },
   "autoload": {
     "files": [

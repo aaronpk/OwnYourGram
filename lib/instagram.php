@@ -2,6 +2,7 @@
 namespace IG;
 use DOMDocument, DOMXPath;
 use Config;
+use Logger;
 
 function http_headers() {
   return [
@@ -9,35 +10,6 @@ function http_headers() {
     'Accept-Language: en-US,en;q=0.8',
     'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.110 Safari/537.36',
   ];
-}
-
-function get_latest_photos(&$user, $since=false, $limit=1) {
-  $params = array(
-    'access_token' => $user->instagram_access_token
-  );
-
-  if($limit !== false)
-    $params['count'] = $limit;
-
-  if($since !== false)
-    $params['min_timestamp'] = $since;
-
-  $ch = curl_init();
-  curl_setopt($ch, CURLOPT_URL, 'https://api.instagram.com/v1/users/self/media/recent?'.http_build_query($params));
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-  $response = curl_exec($ch);
-  $data = @json_decode($response);
-  if($data && is_object($data)) {
-    if(property_exists($data, 'data')) {
-      return $data->data;
-    } elseif(property_exists($data, 'meta') && property_exists($data->meta, 'error_message')) {
-      throw new AccessTokenException($data->meta->error_message);
-    } else {
-      return null;
-    }
-  } else {
-    return null;
-  }
 }
 
 function get_user_photos($username, $ignoreCache=false) {
@@ -49,6 +21,8 @@ function get_user_photos($username, $ignoreCache=false) {
       return json_decode($data, true);
     }
   }
+
+  Logger::$log->info('Fetching user timeline', ['username'=>$username]);
 
   $ch = curl_init();
   curl_setopt($ch, CURLOPT_URL, 'https://www.instagram.com/'.$username.'/media/');
@@ -89,6 +63,8 @@ function get_photo($url, $ignoreCache=false) {
     }
   }
 
+  Logger::$log->info('Fetching Instagram photo', ['url'=>$url]);
+
   $ch = curl_init();
   curl_setopt($ch, CURLOPT_URL, $url);
   curl_setopt($ch, CURLOPT_HTTPHEADER, http_headers());
@@ -128,6 +104,8 @@ function get_profile($username, $ignoreCache=false) {
     }
   }
 
+  Logger::$log->info('Fetching Instagram profile', ['username'=>$username]);
+
   $ch = curl_init('https://www.instagram.com/'.$username.'/?__a=1');
   curl_setopt($ch, CURLOPT_HTTPHEADER, http_headers());
   curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
@@ -152,6 +130,8 @@ function get_venue($id, $ignoreCache=false) {
       return json_decode($data, true);
     }
   }
+
+  Logger::$log->info('Fetching Instagram venue', ['venue'=>$id]);
 
   $ch = curl_init();
   curl_setopt($ch, CURLOPT_URL, 'https://www.instagram.com/explore/locations/'.$id.'/');

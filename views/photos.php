@@ -14,12 +14,12 @@
 </div>
 
 <script>
-function load_photos() {
+function load_photos(force_refresh) {
   $("#loading").removeClass("hidden");
   $("#instagram_photos_list").html('');
 
   $.get("/instagram/photos.json", {
-    force_refresh: 1,
+    force_refresh: force_refresh?1:0,
     num: 20
   }, function(data){
     $("#loading").addClass("hidden");
@@ -76,10 +76,10 @@ function load_photos() {
 }
 
 $(function(){
-  load_photos();
+  load_photos(false);
 
   $("#reload_photos").click(function(){
-    load_photos();
+    load_photos(true);
     return false;
   });
 });

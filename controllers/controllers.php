@@ -169,7 +169,7 @@ $app->get('/instagram/photos.json', function() use($app) {
   if($user=require_login($app)) {
     $params = $app->request()->params();
 
-    if(isset($params['force_refresh']))
+    if(isset($params['force_refresh']) && $params['force_refresh'])
       $refresh = true;
     else
       $refresh = false;
