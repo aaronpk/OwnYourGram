@@ -46,11 +46,13 @@ function get_user_photos($username, $ignoreCache=false) {
     }
   }
 
-  return [
+  $response = [
     'username' => $username,
     'items' => $items,
     'latest' => $latest,
   ];
+  redis()->setex($cacheKey, $cacheTime, json_encode($response));
+  return $response;
 }
 
 function get_photo($url, $ignoreCache=false) {
