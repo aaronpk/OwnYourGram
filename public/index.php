@@ -11,17 +11,6 @@ $app = new \Slim\Slim(array(
   'view' => new \Slim\Extras\Views\Savant()
 ));
 
-class Logger {
-  public static $log;
-
-  public static function init() {
-    self::$log = new Monolog\Logger('name');
-    self::$log->pushHandler(new Monolog\Handler\StreamHandler('logs/ownyourgram.log', Monolog\Logger::INFO));
-  }
-}
-
-Logger::init();
-
 require 'controllers/auth.php';
 require 'controllers/controllers.php';
 

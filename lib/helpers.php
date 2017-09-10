@@ -4,6 +4,18 @@ ORM::configure('mysql:host=' . Config::$dbHost . ';dbname=' . Config::$dbName);
 ORM::configure('username', Config::$dbUsername);
 ORM::configure('password', Config::$dbPassword);
 
+class Logger {
+  public static $log;
+
+  public static function init() {
+    self::$log = new Monolog\Logger('name');
+    self::$log->pushHandler(new Monolog\Handler\StreamHandler(dirname(__FILE__).'/../logs/ownyourgram.log', Monolog\Logger::INFO));
+  }
+}
+
+Logger::init();
+
+
 function render($page, $data) {
   global $app;
   return $app->render('layout.php', array_merge($data, array('page' => $page)));
