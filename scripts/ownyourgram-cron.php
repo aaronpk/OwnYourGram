@@ -240,7 +240,7 @@ foreach($users as $user) {
   } catch(Exception $e) {
     // Bump down a tier on errors
     $user->tier = $user->tier - 1;
-    log_msg("There was an error processing this user. Demoting to tier ".$user->tier, $user);
+    log_msg("There was an error processing this user. Demoting to tier ".$user->tier." '".$e->getMessage()."'", $user);
     $user->save();
   }
 }
