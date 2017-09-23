@@ -18,7 +18,6 @@ CREATE TABLE `users` (
   `last_photo_date` datetime DEFAULT NULL,
   `token_endpoint` varchar(255) DEFAULT NULL,
   `authorization_endpoint` varchar(255) DEFAULT NULL,
-  `send_category_as_array` tinyint(4) NOT NULL DEFAULT '1',
   `email_username` varchar(100) DEFAULT NULL,
   `photo_count` int(11) NOT NULL DEFAULT '0',
   `photo_count_this_week` int(11) NOT NULL DEFAULT '0',

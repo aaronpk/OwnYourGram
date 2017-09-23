@@ -296,18 +296,6 @@ $app->get('/instagram/verify', function() use($app) {
   }
 });
 
-$app->post('/prefs/array', function() use($app) {
-  if($user=require_login($app)) {
-    $user->send_category_as_array = 1;
-    $user->save();
-
-    $app->response()->header('Content-Type', 'application/json');
-    $app->response()->body(json_encode(array(
-      'result' => 'ok'
-    )));
-  }
-});
-
 $app->post('/prefs/save', function() use($app) {
   if($user=require_login($app)) {
     $params = $app->request()->params();
@@ -352,12 +340,6 @@ $app->post('/instagram/test.json', function() use($app) {
     } else {
       $filename = $entry['photo'];
       $video_filename = isset($entry['video']) ? $entry['video'] : false;
-    }
-
-    if($user->send_category_as_array != 1) {
-      if($entry['category'] && is_array($entry['category']) && count($entry['category'])) {
-        $entry['category'] = implode(',', $entry['category']);
-      }
     }
 
     // Now send to the micropub endpoint

@@ -1,29 +1,3 @@
-<?php
-if($this->user->send_category_as_array != 1):
-?>
-  <div class="alert alert-warning" id="array_notice">
-    <b>Upcoming change!</b>
-    The Micropub spec now requires values be sent as arrays instead of as comma-separated lists. When
-    you are ready to receive the category property as an array, click the button below to switch. <a href="https://www.w3.org/TR/micropub/#form-encoded-and-multipart-requests">More Info</a>
-    <p><button class="btn btn-default" id="micropub_array">Upgrade me!</button></p>
-  </div>
-
-  <script>
-  $(function(){
-    $("#micropub_array").click(function(){
-      $.post("/prefs/array", {
-        upgrade: "yes"
-      }, function(data) {
-        $("#array_notice").hide();
-        window.location = window.location;
-      });
-    });
-  });
-  </script>
-<?php
-endif;
-?>
-
 <?php if($this->user->instagram_username && $this->user->micropub_success): ?>
   <div class="bs-callout bs-callout-success">
     <p><b>Your account is active and we're sending your Instagram photos to your site!</b></p>

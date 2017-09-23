@@ -144,13 +144,6 @@ foreach($users as $user) {
             $video_filename = isset($entry['video']) ? $entry['video'] : false;
           }
 
-          // Collapse category to a comma-separated list if they haven't upgraded yet
-          if($user->send_category_as_array != 1) {
-            if($entry['category'] && is_array($entry['category']) && count($entry['category'])) {
-              $entry['category'] = implode(',', $entry['category']);
-            }
-          }
-
           $rules = ORM::for_table('syndication_rules')->where('user_id', $user->id)->find_many();
           $syndications = '';
           foreach($rules as $rule) {
