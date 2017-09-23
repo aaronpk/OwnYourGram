@@ -66,29 +66,29 @@ endif;
 
     <table class="table">
       <tr>
-        <td width="110"></td>
         <td>Keyword</td>
         <td>Syndication Target</td>
+        <td width="110"></td>
       </tr>
       <?php foreach($this->rules as $rule): ?>
         <tr class="rule">
-          <td align="right"><a href="#" class="hidden delete" data-id="<?= $rule->id ?>">&times;</a></td>
           <td><?= htmlspecialchars($rule->match); ?></td>
           <td><?= htmlspecialchars($rule->syndicate_to_name); ?></td>
+          <td align="left"><a href="#" class="hidden delete" data-id="<?= $rule->id ?>">&times;</a></td>
         </tr>
       <?php endforeach; ?>
       <tr>
-        <td><input type="button" id="new-syndicate-to-btn" class="btn btn-primary" value="Add Rule"></td>
         <td><input type="text" id="new-syndicate-to-keyword" class="form-control"></td>
         <td>
           <select name="new-syndicate-to" id="new-syndicate-to" class="form-control">
             <option value="">-- select an endpoint --</option>
           </select>
         </td>
+        <td><input type="button" id="new-syndicate-to-btn" class="btn btn-primary" value="Add Rule"></td>
       </tr>
     </table>
 
-    <p style="font-size:0.9em; color: #999;">Note that OwnYourGram won't actually post anything to Twitter or Facebook, all this does is set the appropriate parameter in the Micropub request to indicate to your Micropub endpoint that the post should be syndicated. If you don't yet have this set up, you might want to try <a href="https://silo.pub">silo.pub</a> for an easy API for posting to Twitter, Facebook and others.</p>
+    <p style="font-size:0.9em; color: #999;">Note that OwnYourGram won't actually post anything to Twitter or Facebook for you. All this does is set the appropriate parameter in the Micropub request to indicate to your Micropub endpoint that the post should be syndicated. If you don't yet have this set up, you might want to try <a href="https://silo.pub">silo.pub</a> or <a href="https://www.brid.gy/publish">Bridgy Publish</a> for an easy way to post to Twitter, Facebook and others.</p>
   </div>
 
   <div class="panel">
