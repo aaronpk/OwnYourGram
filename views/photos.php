@@ -51,6 +51,11 @@ function load_photos(force_refresh) {
       }
       $("#instagram_photos_list").append(item);
     }
+
+    if(data.targets == null) {
+      $(".include-syndications-checkbox").addClass("hidden");
+    }
+
     $("#instagram_photos_list .btn").click(function(){
       $("#instagram_photos_list .btn").addClass("disabled");
       $("#instagram_photos_list .error").addClass("hidden");
@@ -101,7 +106,7 @@ $(function(){
       <div class="bottom">
         <div class="error hidden alert alert-warning">There was an error posting the photo!</div>
         <a href="" class="btn btn-success">Post</a>
-        <label class="checkbox-inline">
+        <label class="checkbox-inline include-syndications-checkbox">
           <input type="checkbox" class="" name="syndicate" value="1" checked>
           Send syndications
         </label>

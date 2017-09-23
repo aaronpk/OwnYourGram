@@ -216,8 +216,13 @@ $app->get('/instagram/photos.json', function() use($app) {
       }
     }
 
+    $targets = json_decode($user->micropub_syndication_targets);
+    
     $app->response()->header('Content-Type', 'application/json');
-    $app->response()->body(json_encode(['items'=>$photos]));
+    $app->response()->body(json_encode([
+      'items' => $photos,
+      'targets' => $targets
+    ]));
   }
 });
 
