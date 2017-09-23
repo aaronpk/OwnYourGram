@@ -260,89 +260,55 @@ function h_entry_from_photo($url, $oldLocationFormat=true) {
   if($oldLocationFormat)
     $entry['place_name'] = null;
 
-  // First fetch the photo permalink
-  $photo = IG\get_photo($url);
+  $xray = new p3k\XRay();
+  // Fetch the photo permalink, as well as associated profiles and locations
+  $data = $xray->parse($url);
 
-  if(!$photo) {
+  if(!$data || $data['code'] != 200) {
     return null;
   }
 
-  $entry['published'] = date('c', $photo['taken_at_timestamp']);
+  $photo = $data['data'];
+
+  $entry['published'] = $photo['published'];
 
   // Add venue information if present
-  if(array_key_exists('location', $photo) && $photo['location']) {
+  if(!empty($photo['location'])) {
+    $location = $photo['refs'][$photo['location'][0]];
 
     if($oldLocationFormat) {
-      $entry['place_name'] = $photo['location']['name'];
+      $entry['place_name'] = $location['name'];
+      if(!empty($location['latitude'])) {
+        $entry['location'] = 'geo:' . $location['latitude'] . ',' . $location['longitude'];
+      }
     } else {
       $entry['location'] = [
         'type' => ['h-card'],
         'properties' => [
-          'name' => [$photo['location']['name']]
+          'name' => [$location['name']]
         ]
       ];
-    }
-
-    $venue = IG\get_venue($photo['location']['id']);
-    if($venue && array_key_exists('lat', $venue)) {
-      if($tz = get_timezone($venue['lat'], $venue['lng'])) {
-        $d = DateTime::createFromFormat('U', $photo['taken_at_timestamp']);
-        $d->setTimeZone($tz);
-        $entry['published'] = $d->format('c');
-
-        if(!$oldLocationFormat) {
-          $entry['location']['properties']['latitude'] = [$venue['lat']];
-          $entry['location']['properties']['longitude'] = [$venue['lng']];
-        } else {
-          $entry['location'] = 'geo:' . $venue['lat'] . ',' . $venue['lng'];
-        }
+      if(!empty($location['latitude'])) {
+        $entry['location']['properties']['latitude'] = $location['latitude'];
+        $entry['location']['properties']['longitude'] = $location['longitude'];
       }
     }
   }
 
-  if(isset($photo['caption'])) {
-    $caption = $photo['caption'];
-  } elseif(isset($photo['edge_media_to_caption']['edges'][0]['node']['text'])) {
-    $caption = $photo['edge_media_to_caption']['edges'][0]['node']['text'];
-  } else {
-    $caption = false;
-  }
-
-  if($caption) {
-    if(preg_match_all('/#([a-z0-9_-]+)/i', $caption, $matches)) {
-      foreach($matches[1] as $match) {
-        $entry['category'][] = $match;
-      }
-    }
-
-    $entry['content'] = $caption;
-  }
+  if(isset($photo['content']))
+    $entry['content'] = $photo['content']['text'];
 
   $entry['syndication'] = $url;
 
-  // Add person-tags to the category array
-  if(isset($photo['edge_media_to_tagged_user']['edges'])) {
-    if(!isset($entry['category'])) $entry['category'] = [];
-
-    foreach($photo['edge_media_to_tagged_user']['edges'] as $edge) {
-      try {
-        $u = $edge['node']['user']['username'];
-        $profile = IG\get_profile($u);
-        if(isset($profile['external_url']) && $profile['external_url'])
-          $entry['category'][] = $profile['external_url'];
-        else
-          $entry['category'][] = 'https://instagram.com/' . $u;
-      } catch(Exception $e) {
-        $entry['category'][] = 'https://instagram.com/' . $u;
-      }
-    }
-  }
+  if(!empty($photo['category']))
+    $entry['category'] = $photo['category'];
 
   // Include the photo/video media URLs
-  $entry['photo'] = $photo['display_url'];
-
-  if(array_key_exists('is_video', $photo) && $photo['is_video']) {
-    $entry['video'] = $photo['video_url'];
+  if(!empty($photo['video'])) {
+    $entry['photo'] = $photo['photo'][0];
+    $entry['video'] = $photo['video'][0];
+  } else {
+    $entry['photo'] = $photo['photo'][0];
   }
 
   return $entry;

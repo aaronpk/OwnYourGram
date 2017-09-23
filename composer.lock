@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "813f5c8c8e808c40df70fabbc4e432a4",
+    "content-hash": "b1edf7135752321698c624dd03d1a7c8",
     "packages": [
         {
             "name": "barnabywalters/mf-cleaner",
@@ -340,23 +340,25 @@
         },
         {
             "name": "mf2/mf2",
-            "version": "v0.3.0",
+            "version": "v0.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/indieweb/php-mf2.git",
-                "reference": "4fb2eb5365cbc0fd2e0c26ca748777d6c2539763"
+                "reference": "dc0d90d4ee30864bcf37cd3a8fc8db94f9134cc4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/indieweb/php-mf2/zipball/4fb2eb5365cbc0fd2e0c26ca748777d6c2539763",
-                "reference": "4fb2eb5365cbc0fd2e0c26ca748777d6c2539763",
+                "url": "https://api.github.com/repos/indieweb/php-mf2/zipball/dc0d90d4ee30864bcf37cd3a8fc8db94f9134cc4",
+                "reference": "dc0d90d4ee30864bcf37cd3a8fc8db94f9134cc4",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.4.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "3.7.*"
+                "mf2/tests": "@dev",
+                "phpdocumentor/phpdocumentor": "v2.8.4",
+                "phpunit/phpunit": "4.8.*"
             },
             "suggest": {
                 "barnabywalters/mf-cleaner": "To more easily handle the canonical data php-mf2 gives you"
@@ -389,7 +391,7 @@
                 "parser",
                 "semantic"
             ],
-            "time": "2016-03-14T12:13:34+00:00"
+            "time": "2017-05-27T15:27:47+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -587,16 +589,16 @@
         },
         {
             "name": "p3k/xray",
-            "version": "v1.1.1",
+            "version": "v1.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aaronpk/XRay.git",
-                "reference": "3107efd92075df39327d1b2839e8f9697305cf17"
+                "reference": "a37ed3bbaeec5ddb51d6a6ae285c5ab608d31978"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aaronpk/XRay/zipball/3107efd92075df39327d1b2839e8f9697305cf17",
-                "reference": "3107efd92075df39327d1b2839e8f9697305cf17",
+                "url": "https://api.github.com/repos/aaronpk/XRay/zipball/a37ed3bbaeec5ddb51d6a6ae285c5ab608d31978",
+                "reference": "a37ed3bbaeec5ddb51d6a6ae285c5ab608d31978",
                 "shasum": ""
             },
             "require": {
@@ -604,7 +606,7 @@
                 "dg/twitter-php": "3.6.*",
                 "ezyang/htmlpurifier": "4.*",
                 "indieweb/link-rel-parser": "0.1.*",
-                "mf2/mf2": "~0.3",
+                "mf2/mf2": "^0.3.2",
                 "p3k/http": "0.1.*",
                 "p3k/timezone": "*"
             },
@@ -629,7 +631,7 @@
             ],
             "description": "X-Ray returns structured data from any URL",
             "homepage": "https://github.com/aaronpk/XRay",
-            "time": "2017-04-29T19:55:37+00:00"
+            "time": "2017-09-22T19:35:08+00:00"
         },
         {
             "name": "pda/pheanstalk",

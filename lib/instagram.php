@@ -55,47 +55,6 @@ function get_user_photos($username, $ignoreCache=false) {
   return $response;
 }
 
-function get_photo($url, $ignoreCache=false) {
-  $cacheKey = Config::$hostname.'::photo::'.$url;
-  $cacheTime = 86400; # cache photos for 1 day
-
-  if(Config::$cacheIGRequests && !$ignoreCache) {
-    if($data = redis()->get($cacheKey)) {
-      return json_decode($data, true);
-    }
-  }
-
-  Logger::$log->info('Fetching Instagram photo', ['url'=>$url]);
-
-  $ch = curl_init();
-  curl_setopt($ch, CURLOPT_URL, $url);
-  curl_setopt($ch, CURLOPT_HTTPHEADER, http_headers());
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-  $response = curl_exec($ch);
-
-  $data = extract_ig_data($response);
-
-  if($data && is_array($data) && array_key_exists('entry_data', $data)) {
-    if(is_array($data['entry_data']) && array_key_exists('PostPage', $data['entry_data'])) {
-      $post = $data['entry_data']['PostPage'];
-
-      if(isset($post[0]['graphql']['shortcode_media']))
-        $media = $post[0]['graphql']['shortcode_media'];
-      elseif(isset($post[0]['media']))
-        $media = $post[0]['media'];
-      else
-        return null;
-
-      if(Config::$cacheIGRequests)
-        redis()->setex($cacheKey, $cacheTime, json_encode($media));
-
-      return $media;
-    }
-  }
-
-  return null;
-}
-
 function get_profile($username, $ignoreCache=false) {
   $cacheKey = Config::$hostname.'::profile::'.$username;
   $cacheTime = 86400 * 7; # cache profiles for 7 days
@@ -121,51 +80,6 @@ function get_profile($username, $ignoreCache=false) {
   } else {
     return null;
   }
-}
-
-function get_venue($id, $ignoreCache=false) {
-  $cacheKey = Config::$hostname.'::venue::'.$id;
-  $cacheTime = 86400 * 360; # cache venues for 360 days
-
-  if(Config::$cacheIGRequests && !$ignoreCache) {
-    if($data = redis()->get($cacheKey)) {
-      return json_decode($data, true);
-    }
-  }
-
-  Logger::$log->info('Fetching Instagram venue', ['venue'=>$id]);
-
-  $ch = curl_init();
-  curl_setopt($ch, CURLOPT_URL, 'https://www.instagram.com/explore/locations/'.$id.'/');
-  $headers = http_headers();
-  # need to set a referer, otherwise IG returns a blank page
-  $headers[] = 'Referer: https://www.instagram.com/'; 
-  curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-  $response = curl_exec($ch);
-
-  $data = extract_ig_data($response);
-
-  if($data && is_array($data) && array_key_exists('entry_data', $data)) {
-    if(is_array($data['entry_data']) && array_key_exists('LocationsPage', $data['entry_data'])) {
-      $data = $data['entry_data']['LocationsPage'];
-      if(is_array($data) && array_key_exists(0, $data) && array_key_exists('location', $data[0])) {
-        $location = $data[0]['location'];
-
-        # we don't need these and they're huge, so don't save them
-        unset($location['media']);
-        unset($location['top_posts']);
-
-        if(Config::$cacheIGRequests) {
-          redis()->setex($cacheKey, $cacheTime, json_encode($location));
-        }
-        
-        return $location;
-      }
-    }
-  }
-
-  return null;
 }
 
 function extract_ig_data($html) {
