@@ -56,9 +56,10 @@ function load_photos(force_refresh) {
       $("#instagram_photos_list .error").addClass("hidden");
       $(this).text("Working...");
       var btn = $(this);
-
+      var sendSyndications = btn.siblings("label.checkbox-inline").find("input[type=checkbox]").prop('checked')
       $.post("/instagram/test.json", {
-        id: $(this).data("id")
+        id: $(this).data("id"),
+        syndicate: sendSyndications
       }, function(data){
         $("#instagram_photos_list .btn").removeClass("disabled");
         $("#loading").addClass("hidden");
@@ -100,6 +101,10 @@ $(function(){
       <div class="bottom">
         <div class="error hidden alert alert-warning">There was an error posting the photo!</div>
         <a href="" class="btn btn-success">Post</a>
+        <label class="checkbox-inline">
+          <input type="checkbox" class="" name="syndicate" value="1" checked>
+          Send syndications
+        </label>
       </div>
     </div>
   </div>
