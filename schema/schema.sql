@@ -39,6 +39,6 @@ CREATE TABLE `photos` (
   `published` datetime DEFAULT NULL,
   `instagram_data` text,
   `canonical_url` varchar(255) DEFAULT NULL,
-  'processed' tinyint(4) NOT NULL DEFAULT 0,
+  `processed` tinyint(4) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
