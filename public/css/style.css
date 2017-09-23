@@ -26,6 +26,11 @@ body {
   padding: 10px;
 }
 
+.note {
+  color: #555;
+  font-style: italic;
+}
+
 #loading {
   font-size: 30pt;
   text-align: center;

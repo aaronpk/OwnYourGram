@@ -142,11 +142,25 @@ function micropub_post($user, $params, $photo_filename=false, $video_filename=fa
 
     $multipart->addArray($postfields);
 
-    if($photo_filename)
-      $multipart->addFile('photo', $photo_filename, 'image/jpeg');
+    if($photo_filename) {
+      if(is_array($photo_filename)) {
+        foreach($photo_filename as $f) {
+          $multipart->addFile('photo[]', $f, 'image/jpeg');
+        }
+      } else {
+        $multipart->addFile('photo', $photo_filename, 'image/jpeg');
+      }
+    }
 
-    if($video_filename)
-      $multipart->addFile('video', $video_filename, 'video/mp4');
+    if($video_filename) {
+      if(is_array($video_filename)) {
+        foreach($video_filename as $f) {
+          $multipart->addFile('video[]', $f, 'video/mp4');
+        }
+      } else {
+        $multipart->addFile('video', $video_filename, 'video/mp4');
+      }
+    }
 
     $body = $multipart->data();
     $content_type = $multipart->contentType();
@@ -154,11 +168,12 @@ function micropub_post($user, $params, $photo_filename=false, $video_filename=fa
     $content_type = 'application/json';
 
     if($photo_filename)
-      $properties['photo'] = [$photo_filename];
+      $properties['photo'] = $photo_filename;
 
     if($video_filename)
-      $properties['video'] = [$video_filename];
+      $properties['video'] = $video_filename;
 
+    // Convert everything to an array
     foreach($properties as $k=>$v) {
       if(!is_array($v) || !array_key_exists(0, $v))
         $properties[$k] = [$v];
@@ -248,7 +263,7 @@ function parse_headers($headers) {
 
 // Given an Instagram photo object, return an h-entry array with all the necessary keys.
 // This method potentially makes additional HTTP requests to fetch venue and other user information.
-function h_entry_from_photo($url, $oldLocationFormat=true) {
+function h_entry_from_photo($url, $oldLocationFormat=true, $multiPhoto=false) {
   $entry = array(
     'published' => null,
     'location' => null,
@@ -308,7 +323,10 @@ function h_entry_from_photo($url, $oldLocationFormat=true) {
     $entry['photo'] = $photo['photo'][0];
     $entry['video'] = $photo['video'][0];
   } else {
-    $entry['photo'] = $photo['photo'][0];
+    if($multiPhoto)
+      $entry['photo'] = count($photo['photo']) > 1 ? $photo['photo'] : $photo['photo'][0];
+    else
+      $entry['photo'] = $photo['photo'][0];
   }
 
   return $entry;

@@ -61,7 +61,7 @@ foreach($users as $user) {
           $photo->instagram_url = $url;
         }
 
-        $entry = h_entry_from_photo($url, $user->send_media_as == 'upload');
+        $entry = h_entry_from_photo($url, $user->send_media_as == 'upload', $user->multi_photo);
 
         if(!$entry) {
           echo "ERROR: Could not parse photo: $url\n";
@@ -69,7 +69,12 @@ foreach($users as $user) {
         }
 
         $photo->instagram_data = json_encode($entry);
-        $photo->instagram_img = $entry['photo'];
+
+        if($user->multi_photo && is_array($entry['photo']))
+          $photo->instagram_img_list = json_encode($entry['photo']);
+        else
+          $photo->instagram_img = $entry['photo'];
+
         $photo->published = date('Y-m-d H:i:s', strtotime($entry['published']));
         $photo->save();
 
@@ -131,16 +136,24 @@ foreach($users as $user) {
 
         if($should_import) {
           // Post to the Micropub endpoint
-          if($user->send_media_as == 'upload') {
-            $filename = download_file($entry['photo']);
 
+          if($user->send_media_as == 'upload') {
+            if(is_array($entry['photo'])) {
+              $photo_filename = [];
+              foreach($entry['photo'] as $f) {
+                $photo_filename[] = download_file($f);
+              }
+            } else {
+              $photo_filename = download_file($entry['photo']);
+            }
+      
             if(isset($entry['video'])) {
               $video_filename = download_file($entry['video'],'mp4');
             } else {
               $video_filename = false;
             }
           } else {
-            $filename = $entry['photo'];
+            $photo_filename = $entry['photo']; // will be either a string or array already
             $video_filename = isset($entry['video']) ? $entry['video'] : false;
           }
 
@@ -157,9 +170,14 @@ foreach($users as $user) {
 
           log_msg("Sending ".($video_filename ? 'video' : 'photo')." ".$url." to micropub endpoint: ".$user->micropub_endpoint.$syndications, $user);
 
-          $response = micropub_post($user, $entry, $filename, $video_filename);
-          if(!preg_match('/^http/', $filename))
-            unlink($filename);
+          $response = micropub_post($user, $entry, $photo_filename, $video_filename);
+          if(!is_array($photo_filename))
+            $photo_filename = [$photo_filename];
+          foreach($photo_filename as $f) {
+            if(!preg_match('/^http/', $f)) {
+              unlink($f);
+            }
+          }
 
           $user->last_micropub_response = json_encode($response);
           $user->last_instagram_photo = $photo->id;
@@ -169,7 +187,7 @@ foreach($users as $user) {
             && in_array($response['code'], [201,202,301,302])) {
             $photo_url = $response['headers']['Location'][0];
             $user->last_micropub_url = $photo_url;
-            $user->last_instagram_img_url = $entry['photo'];
+            $user->last_instagram_img_url = is_array($entry['photo']) ? $entry['photo'][0] : $entry['photo'];
             $user->photo_count = $user->photo_count + 1;
             $user->photo_count_this_week = $user->photo_count_this_week + 1;
 

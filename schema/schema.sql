@@ -27,6 +27,7 @@ CREATE TABLE `users` (
   `whitelist` text DEFAULT NULL,
   `blacklist` text DEFAULT NULL,
   `send_media_as` varchar(20) NOT NULL DEFAULT 'upload',
+  `multi_photo` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -35,6 +36,7 @@ CREATE TABLE `photos` (
   `user_id` int(11) unsigned NOT NULL,
   `instagram_url` varchar(255) DEFAULT NULL,
   `instagram_img` varchar(512) DEFAULT NULL,
+  `instagram_img_list` text DEFAULT NULL,
   `published` datetime DEFAULT NULL,
   `instagram_data` text,
   `canonical_url` varchar(255) DEFAULT NULL,

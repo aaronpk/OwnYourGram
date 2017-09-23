@@ -84,15 +84,21 @@
     <h4>Settings</h4>
 
     <form>
-      Send photo and videos as
+      <p>Send photo and videos as:</p>
       <ul>
         <li><input type="radio" name="send_media_as" value="upload" <?= $this->user->send_media_as == 'upload' ? 'checked="checked"' : '' ?>> Multipart Upload</li>
         <li><input type="radio" name="send_media_as" value="url" <?= $this->user->send_media_as == 'url' ? 'checked="checked"' : '' ?>> Instagram URLs (JSON request)</li>
       </ul>
+      <p class="note">Note: Choosing the JSON option will also change the location property to send a named location as an h-card rather than a string <code>geo://</code> URI.</p>
 
-      <p>Note: Choosing the JSON option will also change the location property to send a named location as an h-card rather than a string <code>geo://</code> URI.
+      <p>For Instagram posts with multiple photos, send:</p>
+      <ul>
+        <li><input type="radio" name="send_multi" value="0" <?= $this->user->multi_photo == 0 ? 'checked="checked"' : '' ?>> only the first photo</li>
+        <li><input type="radio" name="send_multi" value="1" <?= $this->user->multi_photo == 1 ? 'checked="checked"' : '' ?>> all photos</li>
+      </ul>
+      <p class="note">Note: People tagged in the individual photos will be tagged in the main post rather than in each individual image. If any of the items in the Instagram post are videos, only the poster frame will be used.</p>
 
-      <input type="button" class="btn btn-primary" value="Save" id="send-media-as-save" style="margin-top:4px;">
+      <input type="button" class="btn btn-primary" value="Save" id="settings-save-button" style="margin-top:4px;">
       <div class="hidden check">&check;</div>
     </form>
   </div>
@@ -159,12 +165,13 @@
       });
     });
 
-    $("#send-media-as-save").click(function(){
+    $("#settings-save-button").click(function(){
       $("#blacklist-save").addClass("disabled");
       $.post("/prefs/save", {
-        send_media_as: $("input[name=send_media_as]:checked").val()
+        send_media_as: $("input[name=send_media_as]:checked").val(),
+        multi_photo: $("input[name=send_multi]:checked").val(),
       }, function(data){
-        $("#send-media-as-save").removeClass("disabled");
+        $("#settings-save-button").removeClass("disabled");
         $("#send-media-as .check").removeClass("hidden");
         setTimeout(function(){
           $("#send-media-as .check").addClass("hidden");

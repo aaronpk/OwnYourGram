@@ -34,7 +34,11 @@ function load_photos(force_refresh) {
     for(var i in data.items) {
       var item = $(template).clone();
       var photo = data.items[i];
-      $(item).find("img").attr("src",photo.instagram_img);
+      if(photo.instagram_img_list) {
+        $(item).find(".photo-img").addClass("multi").append('<img src="'+photo.instagram_img_list[0]+'">');
+      } else {
+        $(item).find(".photo-img").html('<img src="'+photo.instagram_img+'">');
+      }
       $(item).find(".btn").attr("data-id", photo.id);
       if(photo.data.content == "") {
         $(item).find(".caption").addClass("hidden");
@@ -93,8 +97,7 @@ $(function(){
 
 <script id="photo-template" type="text/x-ownyourgram-template">
   <div class="photo-row">
-    <div>
-      <img src="">
+    <div class="photo-img">
     </div>
     <div class="info">
       <div class="top">
@@ -124,13 +127,63 @@ $(function(){
   border-radius: 4px;
   padding: 4px;
   margin-bottom: 8px;
+  position: relative;
+  z-index: 0;
 }
+
+/* photo stacks */
+#instagram_photos_list .photo-img.multi {
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+  border: 6px solid #fff;
+}
+#instagram_photos_list .photo-img.multi img {
+  border-radius: 0;
+}
+#instagram_photos_list .photo-img.multi:before {
+  content: "";
+  height: 200px;
+  width: 200px;
+  background: #eff4de;
+  border: 6px solid #fff;
+	-webkit-box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+	-moz-box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+
+	position: absolute;
+	z-index: -1;
+	top: 0px;
+  left: -10px;
+	-webkit-transform: rotate(-5deg);
+	-moz-transform: rotate(-5deg);
+	-o-transform: rotate(-5deg);
+	-ms-transform: rotate(-5deg);
+  transform: rotate(-5deg);
+}
+#instagram_photos_list .photo-img.multi::after {
+	content: "";
+	height: 200px; width: 200px;
+	background: #768590;
+	border: 6px solid #fff;
+	position: absolute;
+	z-index: -1;
+	top: 19px;
+	left: 19px;
+	-webkit-box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+	-moz-box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+	box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+	-webkit-transform: rotate(6deg);
+	-moz-transform: rotate(6deg);
+	-o-transform: rotate(6deg);
+	-ms-transform: rotate(6deg);
+	transform: rotate(6deg);
+}
+
 #instagram_photos_list img {
   width: 200px;
   border-radius: 3px;
-  margin-right: 4px;
 }
 #instagram_photos_list .info {
+  margin-left: 6px;
   display: flex;
   flex-direction: column;
   width: 100%;

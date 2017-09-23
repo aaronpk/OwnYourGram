@@ -194,10 +194,15 @@ $app->get('/instagram/photos.json', function() use($app) {
           $photo->user_id = $user->id;
           $photo->instagram_url = $item['url'];
 
-          $entry = h_entry_from_photo($item['url'], $user->send_media_as == 'upload');
+          $entry = h_entry_from_photo($item['url'], $user->send_media_as == 'upload', $user->multi_photo);
 
           $photo->instagram_data = json_encode($entry);
-          $photo->instagram_img = $entry['photo'];
+
+          if($user->multi_photo && is_array($entry['photo']))
+            $photo->instagram_img_list = json_encode($entry['photo']);
+          else
+            $photo->instagram_img = $entry['photo'];
+
           $photo->published = date('Y-m-d H:i:s', strtotime($entry['published']));
           $photo->save();
         } else {
@@ -207,6 +212,7 @@ $app->get('/instagram/photos.json', function() use($app) {
         $photos[] = [
           'instagram_url' => $photo->instagram_url,
           'instagram_img' => $photo->instagram_img,
+          'instagram_img_list' => json_decode($photo->instagram_img_list),
           'video' => (isset($entry['video']) ? $entry['video'] : false),
           'canonical_url' => $photo->canonical_url,
           'id' => $photo->id,
@@ -311,8 +317,16 @@ $app->post('/prefs/save', function() use($app) {
       $user->whitelist = $params['whitelist'];
     if(array_key_exists('send_media_as', $params))
       $user->send_media_as = $params['send_media_as'];
+    if(array_key_exists('multi_photo', $params))
+      $user->multi_photo = $params['multi_photo'];
 
     $user->save();
+
+    // Delete any photos in the database that were not yet processed, since
+    // the cached data may need to be regenerated if they changed the micropub format
+    // or multi-photo setting.
+
+    ORM::for_table('photos')->raw_execute('DELETE FROM photos WHERE user_id = :u AND processed = 0', ['u'=>$user->id]);
 
     $app->response()->header('Content-Type', 'application/json');
     $app->response()->body(json_encode(array(
@@ -335,7 +349,14 @@ $app->post('/instagram/test.json', function() use($app) {
     $entry = json_decode($photo->instagram_data, true);
 
     if($user->send_media_as == 'upload') {
-      $filename = download_file($entry['photo']);
+      if(is_array($entry['photo'])) {
+        $photo_filename = [];
+        foreach($entry['photo'] as $f) {
+          $photo_filename[] = download_file($f);
+        }
+      } else {
+        $photo_filename = download_file($entry['photo']);
+      }
 
       if(isset($entry['video'])) {
         $video_filename = download_file($entry['video'],'mp4');
@@ -343,7 +364,7 @@ $app->post('/instagram/test.json', function() use($app) {
         $video_filename = false;
       }
     } else {
-      $filename = $entry['photo'];
+      $photo_filename = $entry['photo']; // will be either a string or array
       $video_filename = isset($entry['video']) ? $entry['video'] : false;
     }
 
@@ -362,7 +383,7 @@ $app->post('/instagram/test.json', function() use($app) {
     }
 
     // Now send to the micropub endpoint
-    $response = micropub_post($user, $entry, $filename, $video_filename);
+    $response = micropub_post($user, $entry, $photo_filename, $video_filename);
 
     $user->last_micropub_response = json_encode($response);
 
