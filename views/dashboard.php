@@ -268,6 +268,32 @@
     </div>
   </div>
 
+  <style>
+    #instagram_photos .photo-row {
+      margin-bottom: 8px;
+      z-index: 0;
+    }
+
+    #instagram_photos .p {
+      position: relative;
+      width: 212px;
+      margin: 0 auto;      
+    }
+
+    #instagram_photos img {
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+      width: 200px;
+      border-radius: 3px;
+    }
+    #instagram_photos .multi img {
+      box-shadow: none;
+    }
+    
+    #instagram_photos .btn {
+      margin-top: 10px;
+    }
+  </style>
+
   <script>
   $(function(){
     $.get("/instagram/photos.json", function(data){
@@ -279,7 +305,11 @@
       var template = $("#photo-template").html();
       for(var i in data.items) {
         var item = $(template).clone();
-        $(item).find("img").attr("src",data.items[i].instagram_img);
+        if(data.items[i].instagram_img_list) {
+          $(item).find(".photo-img").addClass("multi").append('<img src="'+data.items[i].instagram_img_list[0]+'">');
+        } else {
+          $(item).find(".photo-img").html('<img src="'+data.items[i].instagram_img+'">');
+        }
         $(item).find(".btn").attr("data-id", data.items[i].id);
         $("#instagram_photos").append(item);
       }
@@ -309,9 +339,10 @@
   });
   </script>
   <script id="photo-template" type="text/x-ownyourgram-template">
-    <div class="col-xs-6 col-md-3">
-      <div class="thumbnail">
-        <img src="">
+    <div class="col-xs-6 col-md-3 photo-row">
+      <div class="p">
+        <div class="photo-img">
+        </div>
         <div class="caption" style="text-align: center;">
           <a href="" class="btn btn-success">Post</a>
         </div>

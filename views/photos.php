@@ -131,53 +131,6 @@ $(function(){
   z-index: 0;
 }
 
-/* photo stacks */
-#instagram_photos_list .photo-img.multi {
-  box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
-  border: 6px solid #fff;
-}
-#instagram_photos_list .photo-img.multi img {
-  border-radius: 0;
-}
-#instagram_photos_list .photo-img.multi:before {
-  content: "";
-  height: 200px;
-  width: 200px;
-  background: #eff4de;
-  border: 6px solid #fff;
-	-webkit-box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
-	-moz-box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
-  box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
-
-	position: absolute;
-	z-index: -1;
-	top: 0px;
-  left: -10px;
-	-webkit-transform: rotate(-5deg);
-	-moz-transform: rotate(-5deg);
-	-o-transform: rotate(-5deg);
-	-ms-transform: rotate(-5deg);
-  transform: rotate(-5deg);
-}
-#instagram_photos_list .photo-img.multi::after {
-	content: "";
-	height: 200px; width: 200px;
-	background: #768590;
-	border: 6px solid #fff;
-	position: absolute;
-	z-index: -1;
-	top: 19px;
-	left: 19px;
-	-webkit-box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
-	-moz-box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
-	box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
-	-webkit-transform: rotate(6deg);
-	-moz-transform: rotate(6deg);
-	-o-transform: rotate(6deg);
-	-ms-transform: rotate(6deg);
-	transform: rotate(6deg);
-}
-
 #instagram_photos_list img {
   width: 200px;
   border-radius: 3px;
