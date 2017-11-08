@@ -51,7 +51,8 @@ function get_user_photos($username, $ignoreCache=false) {
     'items' => $items,
     'latest' => $latest,
   ];
-  redis()->setex($cacheKey, $cacheTime, json_encode($response));
+  if(count($items))
+    redis()->setex($cacheKey, $cacheTime, json_encode($response));
   return $response;
 }
 
