@@ -25,7 +25,7 @@ function get_user_photos($username, $ignoreCache=false) {
   Logger::$log->info('Fetching user timeline', ['username'=>$username]);
 
   $ch = curl_init();
-  curl_setopt($ch, CURLOPT_URL, 'https://www.instagram.com/'.$username.'/media/');
+  curl_setopt($ch, CURLOPT_URL, 'https://www.instagram.com/'.$username.'/?__a=1');
   curl_setopt($ch, CURLOPT_HTTPHEADER, http_headers());
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
   $response = curl_exec($ch);
@@ -36,13 +36,13 @@ function get_user_photos($username, $ignoreCache=false) {
 
   $items = [];
   if($data) {
-    foreach($data['items'] as $item) {
+    foreach($data['user']['media']['nodes'] as $item) {
       $items[] = [
-        'url' => $item['link'],
-        'published' => date('Y-m-d H:i:s', $item['created_time'])
+        'url' => 'https://www.instagram.com/p/'.$item['code'].'/',
+        'published' => date('Y-m-d H:i:s', $item['date'])
       ];
-      if($item['created_time'] > $latest)
-        $latest = $item['created_time'];
+      if($item['date'] > $latest)
+        $latest = $item['date'];
     }
   }
 
