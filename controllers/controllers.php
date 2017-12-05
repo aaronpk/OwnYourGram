@@ -48,6 +48,11 @@ $app->get('/', function($format='html') use($app) {
 $app->get('/dashboard', function() use($app) {
   if($user=require_login($app)) {
 
+    if(!$user->instagram_username) {
+      $app->redirect('/instagram', 302);
+      return;
+    }
+
     $rules = ORM::for_table('syndication_rules')
       ->where('user_id', $user->id)
       ->order_by_asc('syndicate_to_name')
@@ -287,7 +292,7 @@ $app->get('/instagram/verify', function() use($app) {
         $success = true;
       }
     }
-
+    
     if($success) {
       // Remove this username from a previous account
       ORM::for_table('users')->raw_execute('UPDATE users SET instagram_username="" WHERE instagram_username=:u', ['u'=>$_SESSION['instagram_username']]);
