@@ -14,10 +14,23 @@ https://ownyourgram.com
 
 Configure cron tasks at the specified intervals passing the tier number as a command line argument.
 
+```
+# every 15 minutes
+0,15,30,45 * * * * /usr/bin/php /web/sites/ownyourgram.com/scripts/ownyourgram-cron.php 4
+
+# every hour at 5 after the hour
+5 * * * * /usr/bin/php /web/sites/ownyourgram.com/scripts/ownyourgram-cron.php 3
+
+# every 6 hours at 10 after the hour
+10 0,6,12,18 * * * /usr/bin/php /web/sites/ownyourgram.com/scripts/ownyourgram-cron.php 2
+
+# every day at 1:10 UTC
+10 1 * * * /usr/bin/php /web/sites/ownyourgram.com/scripts/ownyourgram-cron.php 1
+```
 
 ### License
 
-Copyright 2013-2016 by Aaron Parecki
+Copyright 2013-2017 by Aaron Parecki
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
