@@ -28,6 +28,11 @@ Configure cron tasks at the specified intervals passing the tier number as a com
 10 1 * * * /usr/bin/php /web/sites/ownyourgram.com/scripts/ownyourgram-cron.php 1
 ```
 
+### Credits
+
+Camera icon by Gracelle Mesina from thenounproject.com 
+https://thenounproject.com/term/camera/62851
+
 ### License
 
 Copyright 2013-2017 by Aaron Parecki
