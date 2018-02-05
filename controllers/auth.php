@@ -154,10 +154,10 @@ $app->get('/auth/callback', function() use($app) {
       $user->url = $me;
       $user->date_created = date('Y-m-d H:i:s');
 
-      $q = micropub_get($micropubEndpoint, $token['auth']['access_token'], ['q'=>'config']);
-      if($q && $q['data'] && $q['data']['media-endpoint']) {
-        $user->send_media_as = 'url';
-      }
+      // $q = micropub_get($micropubEndpoint, $token['auth']['access_token'], ['q'=>'config']);
+      // if($q && $q['data'] && $q['data']['media-endpoint']) {
+      //   $user->send_media_as = 'url';
+      // }
 
     }
     $user->micropub_endpoint = $micropubEndpoint;
