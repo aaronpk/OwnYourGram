@@ -27,6 +27,9 @@ foreach($users as $user) {
 
   try {
 
+    $user->last_poll_date = date('Y-m-d H:i:s');
+    $user->save();
+
     $feed = IG\get_user_photos($user->instagram_username);
 
     if(!$feed) {

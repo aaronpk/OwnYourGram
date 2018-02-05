@@ -12,6 +12,7 @@ CREATE TABLE `users` (
   `micropub_response` text,
   `micropub_success` tinyint(4) DEFAULT '0',
   `date_created` datetime DEFAULT NULL,
+  `last_poll_date` datetime DEFAULT NULL,
   `last_login` datetime DEFAULT NULL,
   `last_micropub_response` text,
   `last_instagram_photo` varchar(255) DEFAULT NULL,

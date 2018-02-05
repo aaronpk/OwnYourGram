@@ -62,6 +62,29 @@ function polling_tier_description($tier) {
   }
 }
 
+function tier_to_seconds($tier) {
+  switch($tier) {
+    case 4: return 15 * 60;
+    case 3: return 60 * 60;
+    case 2: return 6 * 60 * 60;
+    case 1: return 24 * 60 * 60;
+  }
+}
+
+function time_until_next_poll($date, $tier) {
+  $seconds = tier_to_seconds($tier);
+  $last_poll = strtotime($date);
+  $next_poll = $last_poll + $seconds;
+
+  $relative = new \RelativeTime\RelativeTime(['suffix'=>false, 'truncate'=>1]);
+  return $relative->timeLeft(date('Y-m-d H:i:s', $next_poll));
+}
+
+function time_ago($date) {
+  $relative = new \RelativeTime\RelativeTime(['suffix'=>true, 'truncate'=>1]);
+  return $relative->timeago($date);
+}
+
 function download_file($url, $ext='jpg') {
   $filename = tempnam(__DIR__.'/../tmp/', 'ig').'.'.$ext;
   $fp = fopen($filename, 'w+');

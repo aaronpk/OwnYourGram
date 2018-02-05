@@ -397,6 +397,12 @@ $app->post('/instagram/test.json', function() use($app) {
       $user->micropub_success = 1;
       $user->last_micropub_url = $location = $response['headers']['Location'][0];
       $user->photo_count = $user->photo_count + 1;
+
+      // If their account was disabled, enable it again
+      if($user->tier == 0) {
+        $user->tier = 2;
+      }
+
       $photo->canonical_url = $location;
     } else {
       $location = false;

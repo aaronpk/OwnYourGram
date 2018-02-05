@@ -1,9 +1,18 @@
 <?php if($this->user->instagram_username && $this->user->micropub_success): ?>
+  <?php if($this->user->tier == 0): ?>
+  <div class="bs-callout bs-callout-danger">
+    <p>Your account has been disabled. To enable your account again, please <a href="/photos">manually import a photo</a>.</p>
+  </div>
+  <?php else: ?>
   <div class="bs-callout bs-callout-success">
     <p><b>Your account is active and we're sending your Instagram photos to your site!</b></p>
     <p>Please note that due to changes in Instagram's API, we are unable to send your photos in realtime. The more photos you post, the more often OwnYourGram will check your account. <a href="/docs">See the documentation</a> for more information about the polling tiers.</p>
     <p>Your account is currently being checked <b>every <?= polling_tier_description($this->user->tier) ?></b>.</p>
+    <?php if($this->user->last_poll_date): ?>
+      <p>Your account was last checked <b><?= time_ago($this->user->last_poll_date) ?></b> and will be checked again in <b><?= time_until_next_poll($this->user->last_poll_date, $this->user->tier) ?></b>.</p>
+    <?php endif; ?>
   </div>
+  <?php endif; ?>
 
   <h3>Settings</h3>
 
@@ -82,7 +91,7 @@
   </div>
 
   <div id="send-media-as" class="panel">
-    <h4>Settings</h4>
+    <h4>Micropub Settings</h4>
 
     <form>
       <p>Send photo and videos as:</p>
