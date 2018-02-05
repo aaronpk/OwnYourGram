@@ -101,6 +101,31 @@ function download_file($url, $ext='jpg') {
   return $filename;  
 }
 
+function copy_to_media_endpoint($user, $file, $type) {
+  if(preg_match('/http:\/\//', $file)) {
+    $tmp = download_file($file);
+  } else {
+    $tmp = $file;
+  }
+
+  $http = new p3k\HTTP('OwnYourGram');
+  $multipart = new p3k\Multipart();
+  $multipart->addFile('file', $tmp, $type);
+
+  $response = $http->post($user->media_endpoint, $multipart->data(), 
+    ['Authorization: Bearer ' .$user->micropub_access_token, 'Content-type: '.$multipart->contentType()]);
+
+  if(in_array($response['code'], [201,202]) && isset($response['headers']['Location'])) {
+    Logger::$log->info('Uploaded file to media endpoint', ['user'=>$user->url, 'url'=>$response['headers']['Location']]);
+    $media_url = $response['headers']['Location'];
+  } else {
+    Logger::$log->info('Error uploading file to media endpoint', ['user'=>$user->url, 'response'=>$response]);
+    $media_url = false;
+  }
+
+  return $media_url;
+}
+
 function micropub_post($user, $params, $photo_filename=false, $video_filename=false) {
 
   $endpoint = $user->micropub_endpoint;
@@ -133,32 +158,80 @@ function micropub_post($user, $params, $photo_filename=false, $video_filename=fa
     if(k($params, 'place_name'))
       $postfields['place_name'] = $params['place_name'];
 
-    $multipart = new p3k\Multipart();
+    if($user->media_endpoint) {
 
-    $multipart->addArray($postfields);
-
-    if($photo_filename) {
-      if(is_array($photo_filename)) {
+      $media_endpoint_error = false;
+      
+      if($photo_filename) {
+        $photos = [];
+        if(!is_array($photo_filename)) $photo_filename = [$photo_filename];
         foreach($photo_filename as $f) {
-          $multipart->addFile('photo[]', $f, 'image/jpeg');
+          $loc = copy_to_media_endpoint($user, $f, 'image/jpeg');
+          if($loc) {
+            $photos[] = $loc;
+          } else {
+            $media_endpoint_error = true;
+          }
         }
-      } else {
-        $multipart->addFile('photo', $photo_filename, 'image/jpeg');
+        $postfields['photo'] = $photos;
       }
-    }
 
-    if($video_filename) {
-      if(is_array($video_filename)) {
-        foreach($video_filename as $f) {
-          $multipart->addFile('video[]', $f, 'video/mp4');
+      if($video_filename) {
+        $videos = [];
+        if(!is_array($video_filename)) $video_filename = [$video_filename];
+        foreach($video_filename as $igurl) {
+          $loc = copy_to_media_endpoint($user, $igurl, 'video/mp4');
+          if($loc) {
+            $videos[] = $loc;
+          } else {
+            $media_endpoint_error = true;
+          }
         }
-      } else {
-        $multipart->addFile('video', $video_filename, 'video/mp4');
+        $postfields['video'] = $videos;
       }
-    }
 
-    $body = $multipart->data();
-    $content_type = $multipart->contentType();
+      $content_type = 'application/x-www-form-urlencoded';
+      $body = http_build_query($postfields);
+
+      if($media_endpoint_error) {
+        // Abort on media endpoint errors
+        return array(
+          'response' => '',
+          'code' => 0,
+          'headers' => '',
+          'error' => 'Error uploading to Media Endpoint',
+          'curlinfo' => ''
+        );
+      }
+
+    } else {
+      $multipart = new p3k\Multipart();
+
+      $multipart->addArray($postfields);
+
+      if($photo_filename) {
+        if(is_array($photo_filename)) {
+          foreach($photo_filename as $f) {
+            $multipart->addFile('photo[]', $f, 'image/jpeg');
+          }
+        } else {
+          $multipart->addFile('photo', $photo_filename, 'image/jpeg');
+        }
+      }
+
+      if($video_filename) {
+        if(is_array($video_filename)) {
+          foreach($video_filename as $f) {
+            $multipart->addFile('video[]', $f, 'video/mp4');
+          }
+        } else {
+          $multipart->addFile('video', $video_filename, 'video/mp4');
+        }
+      }
+
+      $body = $multipart->data();
+      $content_type = $multipart->contentType();
+    }
   } else {
     $content_type = 'application/json';
 
@@ -181,41 +254,23 @@ function micropub_post($user, $params, $photo_filename=false, $video_filename=fa
 
       if(isset($properties['photo']))
       foreach($properties['photo'] as $igurl) {
-        $tmp = download_file($igurl);
-
-        $http = new p3k\HTTP('OwnYourGram');
-        $multipart = new p3k\Multipart();
-        $multipart->addFile('file', $tmp, 'image/jpeg');
-
-        $response = $http->post($user->media_endpoint, $multipart->data(), 
-          ['Authorization: Bearer ' .$access_token, 'Content-type: '.$multipart->contentType()]);
-
-        if(in_array($response['code'], [201,202]) && isset($response['headers']['Location'])) {
-          Logger::$log->info('Uploaded photo to media endpoint', ['user'=>$user->url, 'url'=>$response['headers']['Location']]);
-          $photos[] = $response['headers']['Location'];
+        $loc = copy_to_media_endpoint($user, $igurl, 'image/jpeg');
+        if($loc) {
+          $photos[] = $loc;
         } else {
-          Logger::$log->info('Error uploading photo to media endpoint', ['user'=>$user->url, 'response'=>$response]);
           $photos[] = $igurl;
         }
       }
 
       if(isset($properties['video']))
       foreach($properties['video'] as $igurl) {
-        $tmp = download_file($igurl);
-
-        $http = new p3k\HTTP('OwnYourGram');
-        $multipart = new p3k\Multipart();
-        $multipart->addFile('file', $tmp, 'video/mp4');
-
-        $response = $http->post($user->media_endpoint, $multipart->data(), 
-          ['Authorization: Bearer ' .$access_token, 'Content-type: '.$multipart->contentType()]);
-
-        if(in_array($response['code'], [201,202]) && isset($response['headers']['Location'])) {
-          Logger::$log->info('Uploaded video to media endpoint', ['user'=>$user->url, 'url'=>$response['headers']['Location']]);
-          $videos[] = $response['headers']['Location'];
+        $loc = copy_to_media_endpoint($user, $igurl, 'video/mp4');
+        if($loc) {
+          $videos[] = $loc;
         } else {
           $videos[] = $igurl;
         }
+        $tmp = download_file($igurl);
       }
 
       $properties['photo'] = $photos;
