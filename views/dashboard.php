@@ -331,7 +331,10 @@
 
   <script>
   $(function(){
+    $("#loading").removeClass("hidden");
     $.get("/instagram/photos.json", function(data){
+      $("#loading").addClass("hidden");
+      
       if(data.items.length == 0) {
         $("#instagram_photos_error").removeClass("hidden");
         return;

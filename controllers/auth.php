@@ -57,29 +57,25 @@ $app->get('/auth/start', function() use($app) {
     $user->token_endpoint = $tokenEndpoint;
     $user->save();
 
-    $app->redirect($authorizationURL, 301);
+    $app->redirect($authorizationURL, 302);
 
   } else {
 
-    if(!$user)
-      $user = ORM::for_table('users')->create();
-    $user->url = $me;
-    $user->date_created = date('Y-m-d H:i:s');
-    $user->micropub_endpoint = $micropubEndpoint;
-    $user->authorization_endpoint = $authorizationEndpoint;
-    $user->token_endpoint = $tokenEndpoint;
-    $user->save();
-
-    render('auth_start', array(
-      'title' => 'Sign In',
-      'me' => $me,
-      'authorizing' => $me,
-      'meParts' => parse_url($me),
-      'tokenEndpoint' => $tokenEndpoint,
-      'micropubEndpoint' => $micropubEndpoint,
-      'authorizationEndpoint' => $authorizationEndpoint,
-      'authorizationURL' => $authorizationURL
-    ));
+    // If all three endpoints are found, redirect immediately
+    if($micropubEndpoint && $authorizationEndpoint && $tokenEndpoint) {
+      $app->redirect($authorizationURL, 302);
+    } else {
+      render('auth_start', array(
+        'title' => 'Sign In',
+        'me' => $me,
+        'authorizing' => $me,
+        'meParts' => parse_url($me),
+        'tokenEndpoint' => $tokenEndpoint,
+        'micropubEndpoint' => $micropubEndpoint,
+        'authorizationEndpoint' => $authorizationEndpoint,
+        'authorizationURL' => $authorizationURL
+      ));
+    }
   }
 });
 
@@ -157,6 +153,12 @@ $app->get('/auth/callback', function() use($app) {
       $user = ORM::for_table('users')->create();
       $user->url = $me;
       $user->date_created = date('Y-m-d H:i:s');
+
+      $q = micropub_get($micropubEndpoint, $token['auth']['access_token'], ['q'=>'config']);
+      if($q && $q['data'] && $q['data']['media-endpoint']) {
+        $user->send_media_as = 'url';
+      }
+
     }
     $user->micropub_endpoint = $micropubEndpoint;
     $user->micropub_access_token = $token['auth']['access_token'];
