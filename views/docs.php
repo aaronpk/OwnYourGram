@@ -1,4 +1,7 @@
-<?php ob_start() ?>
+<?php 
+use Michelf\Markdown;
+ob_start() 
+?>
 ## OwnYourGram
 
 ### Importing from Instagram
@@ -55,4 +58,4 @@ To learn more about setting up a Micropub endpoint, refer to the documentation a
 * [Creating a Micropub endpoint](https://indieweb.org/micropub-endpoint)
 * [Creating a Token endpoint](https://indieweb.org/token-endpoint)
 
-<?= Markdown(ob_get_clean()) ?>
+<?= Markdown::defaultTransform(ob_get_clean()) ?>
