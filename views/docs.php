@@ -25,6 +25,8 @@ If OwnYourGram encounters any Micropub errors when posting the photo to your sit
 OwnYourGram will convert your Instagram photos and videos into a Micropub request, 
 and send them to your Micropub endpoint.
 
+### Form-Encoded Request
+
 The request to create a photo will be sent as multipart form-encoded with a file upload,
 so that the actual photo (and video) data is sent along with the request. Most web frameworks
 will automatically handle parsing the HTTP request and providing the POST parameters 
@@ -36,13 +38,43 @@ The request will contain the following POST parameters:
 * `content` - The caption of the Instagram photo.
 * `published` - An ISO8601 formatted date string for the date the photo was taken.
 * `category[]` - Each hashtag used in the photo caption will be sent as a `category[]` parameter. Additionally, if there are any people tagged in the photo, their Instagram profile URL or website URL will be included as categories. ([What is a person tag?](https://indieweb.org/person-tag))
-* `location` - Either a <a href="https://indieweb.org/geo_URI">Geo URI</a> including the latitude and longitude of the photo if included (e.g. `geo:37.786971,-122.399677`), or an <a href="http://microformats.org/wiki/h-card">h-card</a> if your account is set to JSON posts.
+* `location` - A <a href="https://indieweb.org/geo_URI">Geo URI</a> including the latitude and longitude of the photo if available (e.g. `geo:37.786971,-122.399677`)
 * `place_name` - If the location on Instagram has a name, the name will be included here. (Note: this property is deprecated and will only be sent for non-JSON requests, since it's included in the h-card location above.)
 * `syndication` - The Instagram URL of your photo. You can use this to link to the Instagram copy of your photo, and to enable backfeed of comments and likes via <a href="https://brid.gy">Bridgy</a>.
 * `photo` or `photo[]` - (multipart) - The photo will be sent in a parameter named "photo". There will one or more photos per request. If there are multiple photos, then multiple `photo[]` properties will be sent in the request. For Instagram videos, this will be the thumbnail of the video.
 * `video` - (multipart) - For Instagram videos, the video file will be uploaded as well.
 
-By default, OwnYourGram will send a multipart request to your Micropub endpoint with the photo (and video) as an upload. You can opt in to receiving a JSON request that references the Instagram URL instead. You can then download the media from Instagram's URL yourself rather than have OwnYourGram upload them to your endpoint.
+### JSON Request
+
+By default, OwnYourGram will send a multipart request to your Micropub endpoint with the photo (and video) as an upload. You can opt in to receiving a JSON request that references the Instagram URL instead. You can then download the media from Instagram's URL yourself rather than have OwnYourGram upload them to your Micropub endpoint.
+
+The JSON request will look like the below. The properties are the same as the form-encoded request with the exception of how location information is handled.
+
+<pre>
+{
+  "type": ["h-entry"],
+  "properties": {
+    "content": ["Photo caption from Instagram including #hashtags"],
+    "published": ["2018-01-22T16:58:01-05:00"],
+    "category": ["hashtags"],
+    "location": [{
+      "type": ["h-card"],
+      "properties": {
+        "name": ["Baltimore, Maryland"],
+        "latitude": [39.2903],
+        "longitude": [-76.6125]
+      }
+    }],
+    "syndication": ["https://www.instagram.com/p/BeRIVrpAdcm/"],
+    "photo": ["https://instagram.fsea1-1.fna.fbcdn.net/vp/afbe9ef713ea6a784b8b2d16cac075c7/5B0BB2B8/t51.2885-15/e35/26276701_146389926072712_1687561928420884480_n.jpg"]
+  }
+}
+</pre>
+
+Note that every value is an array, even if there is only one value, which is the standard Microformats2 JSON format. See the [Micropub specification](https://www.w3.org/TR/micropub/#json-syntax) for more details on the JSON syntax.
+
+
+### Authentication
 
 The request will also contain an access token in the HTTP `Authorization` header:
 
