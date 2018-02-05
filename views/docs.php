@@ -36,10 +36,10 @@ The request will contain the following POST parameters:
 * `location` - Either a <a href="https://indieweb.org/geo_URI">Geo URI</a> including the latitude and longitude of the photo if included (e.g. `geo:37.786971,-122.399677`), or an <a href="http://microformats.org/wiki/h-card">h-card</a> if your account is set to JSON posts.
 * `place_name` - If the location on Instagram has a name, the name will be included here. (Note: this property is deprecated and will only be sent for non-JSON requests, since it's included in the h-card location above.)
 * `syndication` - The Instagram URL of your photo. You can use this to link to the Instagram copy of your photo, and to enable backfeed of comments and likes via <a href="https://brid.gy">Bridgy</a>.
-* `photo` - The photo will be sent in a parameter named "photo". There will only be one photo per request. For Instagram videos, this will be the thumbnail of the video.
-* `video` - For Instagram videos, the video file will be uploaded as well.
+* `photo` or `photo[]` - (multipart) - The photo will be sent in a parameter named "photo". There will one or more photos per request. If there are multiple photos, then multiple `photo[]` properties will be sent in the request. For Instagram videos, this will be the thumbnail of the video.
+* `video` - (multipart) - For Instagram videos, the video file will be uploaded as well.
 
-By default, OwnYourGram will send a multipart request to your Micropub endpoint with the photo as an upload. You can opt in to receiving a JSON request that references the Instagram URL instead. You can then download the photo (and video) from Instagram's URL yourself rather than have OwnYourGram upload them.
+By default, OwnYourGram will send a multipart request to your Micropub endpoint with the photo (and video) as an upload. You can opt in to receiving a JSON request that references the Instagram URL instead. You can then download the media from Instagram's URL yourself rather than have OwnYourGram upload them to your endpoint.
 
 The request will also contain an access token in the HTTP `Authorization` header:
 
