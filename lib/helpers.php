@@ -63,7 +63,7 @@ function polling_tier_description($tier) {
 }
 
 function download_file($url, $ext='jpg') {
-  $filename = tempnam(dirname(__FILE__).'../tmp/', 'ig').'.'.$ext;
+  $filename = tempnam(__DIR__.'/../tmp/', 'ig').'.'.$ext;
   $fp = fopen($filename, 'w+');
   $ch = curl_init();
   curl_setopt($ch, CURLOPT_URL, $url);
