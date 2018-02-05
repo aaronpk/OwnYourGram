@@ -1,8 +1,6 @@
 <?php
 
-ORM::configure('mysql:host=' . Config::$dbHost . ';dbname=' . Config::$dbName);
-ORM::configure('username', Config::$dbUsername);
-ORM::configure('password', Config::$dbPassword);
+p3k\initdb();
 
 class Logger {
   public static $log;
@@ -14,7 +12,6 @@ class Logger {
 }
 
 Logger::init();
-
 
 function render($page, $data) {
   global $app;
@@ -39,20 +36,6 @@ function partial($template, $data, $debug=false) {
   return ob_get_clean();
 }
 
-function session($key) {
-  if(array_key_exists($key, $_SESSION))
-    return $_SESSION[$key];
-  else
-    return null;
-}
-
-function redis() {
-  static $client = false;
-  if(!$client)
-    $client = new Predis\Client(Config::$redis);
-  return $client;
-}
-
 function k($a, $k, $default=null) {
   if(is_array($k)) {
     $result = true;
@@ -70,26 +53,12 @@ function k($a, $k, $default=null) {
   }
 }
 
-function friendly_url($url) {
-  return preg_replace(['/https?:\/\//','/\/$/'],'',$url);
-}
-
-function bs()
-{
-  static $pheanstalk;
-  if(!isset($pheanstalk))
-  {
-    $pheanstalk = new Pheanstalk\Pheanstalk(Config::$beanstalkServer, Config::$beanstalkPort);
-  }
-  return $pheanstalk;
-}
-
-function get_timezone($lat, $lng) {
-  $timezone = p3k\Timezone::timezone_for_location($lat, $lng);
-  if($timezone) {
-    return new DateTimeZone($timezone);
-  } else {
-    return null;
+function polling_tier_description($tier) {
+  switch($tier) {
+    case 4: return '15 minutes';
+    case 3: return 'hour';
+    case 2: return '6 hours';
+    case 1: return '24 hours';
   }
 }
 

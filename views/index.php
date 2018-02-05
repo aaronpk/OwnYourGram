@@ -36,7 +36,7 @@
           <div class="thumbnail">
             <a href="<?= $user->last_micropub_url ?>"><img src="<?= $user->last_instagram_img_url ?>"></a>
             <div class="caption">
-              <p><a href="<?= $user->url ?>"><?= friendly_url($user->url) ?></a></p>
+              <p><a href="<?= $user->url ?>"><?= p3k\url\display_url($user->url) ?></a></p>
               <p>
                 <?= $user->num ?> this week<br>
                 <?= $user->photo_count ?> total<br>

@@ -17,7 +17,7 @@ function get_user_photos($username, $ignoreCache=false) {
   $cacheTime = 60*15; # cache feeds for 15 minutes
 
   if(Config::$cacheIGRequests && !$ignoreCache) {
-    if($data = redis()->get($cacheKey)) {
+    if($data = \p3k\redis()->get($cacheKey)) {
       return json_decode($data, true);
     }
   }
@@ -52,7 +52,7 @@ function get_user_photos($username, $ignoreCache=false) {
     'latest' => $latest,
   ];
   if(count($items))
-    redis()->setex($cacheKey, $cacheTime, json_encode($response));
+    \p3k\redis()->setex($cacheKey, $cacheTime, json_encode($response));
   return $response;
 }
 
@@ -61,7 +61,7 @@ function get_profile($username, $ignoreCache=false) {
   $cacheTime = 86400 * 7; # cache profiles for 7 days
 
   if(Config::$cacheIGRequests && !$ignoreCache) {
-    if($data = redis()->get($cacheKey)) {
+    if($data = \p3k\redis()->get($cacheKey)) {
       return json_decode($data, true);
     }
   }
@@ -76,7 +76,7 @@ function get_profile($username, $ignoreCache=false) {
   $profile = @json_decode($response, true);
   if($profile && array_key_exists('user', $profile)) {
     $user = $profile['user'];
-    redis()->setex($cacheKey, $cacheTime, json_encode($user));
+    \p3k\redis()->setex($cacheKey, $cacheTime, json_encode($user));
     return $user;
   } else {
     return null;

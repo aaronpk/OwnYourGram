@@ -52,15 +52,15 @@
     </div>
     <div class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-        <?php if(session('me')) { ?>
+        <?php if(p3k\session('me')) { ?>
           <li><a href="/dashboard">Dashboard</a></li>
           <li><a href="/photos">Photos</a></li>
         <?php } ?>
         <li><a href="/docs">Docs</a></li>
       </ul>
-      <?php if(session('me')) { ?>
+      <?php if(p3k\session('me')) { ?>
         <ul class="nav navbar-nav navbar-right">
-          <li><a><?= session('me') ?></a></li>
+          <li><a><?= p3k\url\display_url(p3k\session('me')) ?></a></li>
           <li><a href="/signout">Sign Out</a></li>
         </ul>
       <?php } else if(property_exists($this, 'authorizing')) { ?>
