@@ -26,6 +26,18 @@
 
   <div class="panel container-fluid">
     <form class="row">
+      <div class="col-md-12 always-add-tags">
+        <h4>Always Add Tags</h4>
+        <p>If you'd like, OwnYourGram can add one or more tags to your post when it sends it to your site. Enter one or more space-separated words below and they will be sent along with any hashtags in your photo caption.</p>
+        <textarea class="form-control" id="always-add-tags" placeholder="space-separated tags"><?= htmlspecialchars($this->user->add_tags) ?></textarea>
+        <input type="button" class="btn btn-primary" value="Save" id="add-tags-save" style="margin-top:4px;">
+        <div class="hidden check">&check;</div>
+      </div>
+    </form>
+  </div>
+
+  <div class="panel container-fluid">
+    <form class="row">
       <div class="col-md-6 whitelist">
         <h4>Whitelist</h4>
         <p>Import photos <b>only if</b> the photo caption has one of the keywords listed here.</p>
@@ -171,6 +183,19 @@
         $(".blacklist .check").removeClass("hidden");
         setTimeout(function(){
           $(".blacklist .check").addClass("hidden");
+        }, 500);
+      });
+    });
+
+    $("#add-tags-save").click(function(){
+      $("#add-tags-save").addClass("disabled");
+      $.post("/prefs/save", {
+        add_tags: $("#always-add-tags").val()
+      }, function(data){
+        $("#add-tags-save").removeClass("disabled");
+        $(".always-add-tags .check").removeClass("hidden");
+        setTimeout(function(){
+          $(".always-add-tags .check").addClass("hidden");
         }, 500);
       });
     });

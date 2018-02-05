@@ -320,6 +320,8 @@ $app->post('/prefs/save', function() use($app) {
       $user->blacklist = $params['blacklist'];
     if(array_key_exists('whitelist', $params))
       $user->whitelist = $params['whitelist'];
+    if(array_key_exists('add_tags', $params))
+      $user->add_tags = $params['add_tags'];
     if(array_key_exists('send_media_as', $params))
       $user->send_media_as = $params['send_media_as'];
     if(array_key_exists('multi_photo', $params))

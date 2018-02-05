@@ -171,6 +171,15 @@ foreach($users as $user) {
             }
           }
 
+          if($user->add_tags) {
+            $tags = preg_split('/[ ]+/', $user->add_tags);
+            if(!isset($entry['category']))
+              $entry['category'] = [];
+            foreach($tags as $t)
+              $entry['category'][] = $t;
+            $entry['category'] = array_unique($entry['category']);
+          }
+
           log_msg("Sending ".($video_filename ? 'video' : 'photo')." ".$url." to micropub endpoint: ".$user->micropub_endpoint.$syndications, $user);
 
           $response = micropub_post($user, $entry, $photo_filename, $video_filename);

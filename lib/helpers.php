@@ -1,6 +1,7 @@
 <?php
 
 p3k\initdb();
+ORM::configure('driver_options', [PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4']);
 
 class Logger {
   public static $log;
