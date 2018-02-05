@@ -1,10 +1,11 @@
 <?php 
-use Michelf\Markdown;
+use Michelf\MarkdownExtra;
+$parser = new MarkdownExtra();
 ob_start() 
 ?>
 ## OwnYourGram
 
-### Importing from Instagram
+### Importing from Instagram {#instagram}
 
 OwnYourGram does not use the Instagram API, but instead will poll your account to find your photos. Because it has to poll, OwnYourGram has several polling tiers based on how often you post on Instagram.
 
@@ -20,12 +21,12 @@ Every time your account is checked, your polling tier is recalculated. This mean
 If OwnYourGram encounters any Micropub errors when posting the photo to your site, your account is demoted by one tier.
 
 
-## Micropub
+## Micropub {#micropub}
 
 OwnYourGram will convert your Instagram photos and videos into a Micropub request, 
 and send them to your Micropub endpoint.
 
-### Form-Encoded Request
+### Form-Encoded Request {#form}
 
 The request to create a photo will be sent as multipart form-encoded with a file upload,
 so that the actual photo (and video) data is sent along with the request. Most web frameworks
@@ -44,7 +45,7 @@ The request will contain the following POST parameters:
 * `photo` or `photo[]` - (multipart) - The photo will be sent in a parameter named "photo". There will one or more photos per request. If there are multiple photos, then multiple `photo[]` properties will be sent in the request. For Instagram videos, this will be the thumbnail of the video.
 * `video` - (multipart) - For Instagram videos, the video file will be uploaded as well.
 
-### JSON Request
+### JSON Request {#json}
 
 By default, OwnYourGram will send a multipart request to your Micropub endpoint with the photo (and video) as an upload. You can opt in to receiving a JSON request that references the Instagram URL instead. You can then download the media from Instagram's URL yourself rather than have OwnYourGram upload them to your Micropub endpoint.
 
@@ -74,7 +75,7 @@ The JSON request will look like the below. The properties are the same as the fo
 Note that every value is an array, even if there is only one value, which is the standard Microformats2 JSON format. See the [Micropub specification](https://www.w3.org/TR/micropub/#json-syntax) for more details on the JSON syntax.
 
 
-### Authentication
+### Authentication {#authentication}
 
 The request will also contain an access token in the HTTP `Authorization` header:
 
@@ -90,4 +91,4 @@ To learn more about setting up a Micropub endpoint, refer to the documentation a
 * [Creating a Micropub endpoint](https://indieweb.org/micropub-endpoint)
 * [Creating a Token endpoint](https://indieweb.org/token-endpoint)
 
-<?= Markdown::defaultTransform(ob_get_clean()) ?>
+<?= $parser->defaultTransform(ob_get_clean()) ?>
