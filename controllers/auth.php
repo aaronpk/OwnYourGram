@@ -148,16 +148,26 @@ $app->get('/auth/callback', function() use($app) {
       // If they have logged in before and we already have an access token, then redirect to the dashboard now
       if($user->micropub_access_token)
         $hasAlreadyLoggedInBefore = true;
+
+      // Discover the media endpoint every time they log in, and remove it if not found
+      $q = micropub_get($micropubEndpoint, $token['auth']['access_token'], ['q'=>'config']);
+      if($q && $q['data'] && $q['data']['media-endpoint']) {
+        $user->media_endpoint = $q['data']['media-endpoint'];
+      } else {
+        $user->media_endpoint = '';
+      }
+
     } else {
       // New user! Store the user in the database
       $user = ORM::for_table('users')->create();
       $user->url = $me;
       $user->date_created = date('Y-m-d H:i:s');
 
-      // $q = micropub_get($micropubEndpoint, $token['auth']['access_token'], ['q'=>'config']);
-      // if($q && $q['data'] && $q['data']['media-endpoint']) {
-      //   $user->send_media_as = 'url';
-      // }
+      $q = micropub_get($micropubEndpoint, $token['auth']['access_token'], ['q'=>'config']);
+      if($q && $q['data'] && $q['data']['media-endpoint']) {
+        $user->media_endpoint = $q['data']['media-endpoint'];
+        // $user->send_media_as = 'url';
+      }
 
     }
     $user->micropub_endpoint = $micropubEndpoint;

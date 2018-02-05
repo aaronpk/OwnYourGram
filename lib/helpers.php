@@ -87,6 +87,8 @@ function time_ago($date) {
 }
 
 function download_file($url, $ext='jpg') {
+  Logger::$log->info('Downloading temp file', ['url'=>$url]);
+
   $filename = tempnam(__DIR__.'/../tmp/', 'ig').'.'.$ext;
   $fp = fopen($filename, 'w+');
   $ch = curl_init();
@@ -170,6 +172,54 @@ function micropub_post($user, $params, $photo_filename=false, $video_filename=fa
     foreach($properties as $k=>$v) {
       if(!is_array($v) || !array_key_exists(0, $v))
         $properties[$k] = [$v];
+    }
+
+    // If the user has a media endpoint, first upload the files there and replace the URLs in the Micropub request
+    if($user->media_endpoint) {
+      $photos = [];
+      $videos = [];
+
+      if(isset($properties['photo']))
+      foreach($properties['photo'] as $igurl) {
+        $tmp = download_file($igurl);
+
+        $http = new p3k\HTTP('OwnYourGram');
+        $multipart = new p3k\Multipart();
+        $multipart->addFile('file', $tmp, 'image/jpeg');
+
+        $response = $http->post($user->media_endpoint, $multipart->data(), 
+          ['Authorization: Bearer ' .$access_token, 'Content-type: '.$multipart->contentType()]);
+
+        if(in_array($response['code'], [201,202]) && isset($response['headers']['Location'])) {
+          Logger::$log->info('Uploaded photo to media endpoint', ['user'=>$user->url, 'url'=>$response['headers']['Location']]);
+          $photos[] = $response['headers']['Location'];
+        } else {
+          Logger::$log->info('Error uploading photo to media endpoint', ['user'=>$user->url, 'response'=>$response]);
+          $photos[] = $igurl;
+        }
+      }
+
+      if(isset($properties['video']))
+      foreach($properties['video'] as $igurl) {
+        $tmp = download_file($igurl);
+
+        $http = new p3k\HTTP('OwnYourGram');
+        $multipart = new p3k\Multipart();
+        $multipart->addFile('file', $tmp, 'video/mp4');
+
+        $response = $http->post($user->media_endpoint, $multipart->data(), 
+          ['Authorization: Bearer ' .$access_token, 'Content-type: '.$multipart->contentType()]);
+
+        if(in_array($response['code'], [201,202]) && isset($response['headers']['Location'])) {
+          Logger::$log->info('Uploaded video to media endpoint', ['user'=>$user->url, 'url'=>$response['headers']['Location']]);
+          $videos[] = $response['headers']['Location'];
+        } else {
+          $videos[] = $igurl;
+        }
+      }
+
+      $properties['photo'] = $photos;
+      $properties['video'] = $videos;
     }
 
     $body = json_encode([

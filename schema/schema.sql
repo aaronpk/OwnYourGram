@@ -7,6 +7,7 @@ CREATE TABLE `users` (
   `instagram_access_token` varchar(255) DEFAULT NULL,
   `instagram_response` text,
   `micropub_endpoint` varchar(255) DEFAULT NULL,
+  `media_endpoint` varchar(255) DEFAULT NULL,
   `micropub_syndication_targets` text,
   `micropub_access_token` text,
   `micropub_response` text,

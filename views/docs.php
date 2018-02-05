@@ -47,7 +47,9 @@ The request will contain the following POST parameters:
 
 ### JSON Request {#json}
 
-By default, OwnYourGram will send a multipart request to your Micropub endpoint with the photo (and video) as an upload. You can opt in to receiving a JSON request that references the Instagram URL instead. You can then download the media from Instagram's URL yourself rather than have OwnYourGram upload them to your Micropub endpoint.
+By default, OwnYourGram will send a multipart request to your Micropub endpoint with the photo (and video) as an upload. A better option is to handle the JSON format, since you'll get better information about venues, as well as person-tags. 
+
+If you have a Media Endpoint, then OwnYourGram will first upload the photo to your Media Endpoint and include the URL in the JSON request. If you don't have a Media Endpoint, then the Instagram URL will be included instead.
 
 The JSON request will look like the below. The properties are the same as the form-encoded request with the exception of how location information is handled.
 

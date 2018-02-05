@@ -109,9 +109,9 @@
       <p>Send photo and videos as:</p>
       <ul>
         <li><input type="radio" name="send_media_as" value="upload" <?= $this->user->send_media_as == 'upload' ? 'checked="checked"' : '' ?>> Multipart Upload</li>
-        <li><input type="radio" name="send_media_as" value="url" <?= $this->user->send_media_as == 'url' ? 'checked="checked"' : '' ?>> Instagram URLs (JSON request)</li>
+        <li><input type="radio" name="send_media_as" value="url" <?= $this->user->send_media_as == 'url' ? 'checked="checked"' : '' ?>> URLs (JSON request)</li>
       </ul>
-      <p class="note">Note: Choosing the JSON option will also change the location property to send a named location as an h-card rather than a string <code>geo://</code> URI.</p>
+      <p class="note">Note: Choosing the JSON option will also change the location property to send a named location as an h-card rather than a string <code>geo://</code> URI. See <a href="/docs#json">the documentation</a> for more details.</p>
 
       <p>For Instagram posts with multiple photos, send:</p>
       <ul>
