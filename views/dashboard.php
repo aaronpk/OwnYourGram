@@ -1,7 +1,8 @@
 <?php if($this->user->instagram_username && $this->user->micropub_success): ?>
   <div class="bs-callout bs-callout-success">
     <p><b>Your account is active and we're sending your Instagram photos to your site!</b></p>
-    <p>Please note that due to changes in Instagram's API, we are unable to send your photos in realtime, so you may experience some delay between posting photos on Instagram and seeing them on your website.</p>
+    <p>Please note that due to changes in Instagram's API, we are unable to send your photos in realtime. The more photos you post, the more often OwnYourGram will check your account. <a href="/docs">See the documentation</a> for more information about the polling tiers.</p>
+    <p>Your account is currently being checked <b>every <?= polling_tier_description($this->user->tier) ?></b>.</p>
   </div>
 
   <h3>Settings</h3>
