@@ -162,6 +162,7 @@ $app->get('/auth/callback', function() use($app) {
       $user = ORM::for_table('users')->create();
       $user->url = $me;
       $user->date_created = date('Y-m-d H:i:s');
+      $user->tier = 4;
 
       $q = micropub_get($micropubEndpoint, $token['auth']['access_token'], ['q'=>'config']);
       if($q && $q['data'] && $q['data']['media-endpoint']) {
