@@ -192,19 +192,11 @@ function micropub_post($user, $params, $photo_filename=false, $video_filename=fa
 
       $content_type = 'application/x-www-form-urlencoded';
       $body = http_build_query($postfields);
+    }
 
-      if($media_endpoint_error) {
-        // Abort on media endpoint errors
-        return array(
-          'response' => '',
-          'code' => 0,
-          'headers' => '',
-          'error' => 'Error uploading to Media Endpoint',
-          'curlinfo' => ''
-        );
-      }
+    if(!$user->media_endpoint || $media_endpoint_error) {
+      // Send as form-encoded if there is no media endpoint or if there was a media endpoint error
 
-    } else {
       $multipart = new p3k\Multipart();
 
       $multipart->addArray($postfields);
