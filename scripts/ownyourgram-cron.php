@@ -140,26 +140,6 @@ foreach($users as $user) {
         if($should_import) {
           // Post to the Micropub endpoint
 
-          if($user->send_media_as == 'upload') {
-            if(is_array($entry['photo'])) {
-              $photo_filename = [];
-              foreach($entry['photo'] as $f) {
-                $photo_filename[] = download_file($f);
-              }
-            } else {
-              $photo_filename = download_file($entry['photo']);
-            }
-      
-            if(isset($entry['video'])) {
-              $video_filename = download_file($entry['video'],'mp4');
-            } else {
-              $video_filename = false;
-            }
-          } else {
-            $photo_filename = $entry['photo']; // will be either a string or array already
-            $video_filename = isset($entry['video']) ? $entry['video'] : false;
-          }
-
           $rules = ORM::for_table('syndication_rules')->where('user_id', $user->id)->find_many();
           $syndications = '';
           foreach($rules as $rule) {
@@ -182,14 +162,7 @@ foreach($users as $user) {
 
           log_msg("Sending ".($video_filename ? 'video' : 'photo')." ".$url." to micropub endpoint: ".$user->micropub_endpoint.$syndications, $user);
 
-          $response = micropub_post($user, $entry, $photo_filename, $video_filename);
-          if(!is_array($photo_filename))
-            $photo_filename = [$photo_filename];
-          foreach($photo_filename as $f) {
-            if(!preg_match('/^http/', $f)) {
-              unlink($f);
-            }
-          }
+          $response = micropub_post($user, $entry);
 
           $user->last_micropub_response = json_encode($response);
           $user->last_instagram_photo = $photo->id;

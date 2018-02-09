@@ -126,7 +126,7 @@ function copy_to_media_endpoint($user, $file, $type) {
   return $media_url;
 }
 
-function micropub_post($user, $params, $photo_filename=false, $video_filename=false) {
+function micropub_post($user, $params) {
 
   $endpoint = $user->micropub_endpoint;
   $access_token = $user->micropub_access_token;
@@ -162,76 +162,77 @@ function micropub_post($user, $params, $photo_filename=false, $video_filename=fa
 
       $media_endpoint_error = false;
       
-      if($photo_filename) {
+      if(isset($params['photo'])) {
         $photos = [];
-        if(!is_array($photo_filename)) $photo_filename = [$photo_filename];
-        foreach($photo_filename as $f) {
-          $loc = copy_to_media_endpoint($user, $f, 'image/jpeg');
+        if(!is_array($params['photo'])) $params['photo'] = [$params['photo']];
+        foreach($params['photo'] as $u) {
+          $loc = copy_to_media_endpoint($user, $u, 'image/jpeg');
           if($loc) {
             $photos[] = $loc;
           } else {
             $media_endpoint_error = true;
           }
         }
+        if(count($photos) == 1) $photos = $photos[0];
         $postfields['photo'] = $photos;
       }
 
-      if($video_filename) {
+      if(isset($params['video'])) {
         $videos = [];
-        if(!is_array($video_filename)) $video_filename = [$video_filename];
-        foreach($video_filename as $igurl) {
-          $loc = copy_to_media_endpoint($user, $igurl, 'video/mp4');
+        if(!is_array($params['video'])) $params['video'] = [$params['video']];
+        foreach($params['video'] as $u) {
+          $loc = copy_to_media_endpoint($user, $u, 'video/mp4');
           if($loc) {
             $videos[] = $loc;
           } else {
             $media_endpoint_error = true;
           }
         }
+        if(count($videos) == 1) $videos = $videos[0];
         $postfields['video'] = $videos;
       }
 
       $content_type = 'application/x-www-form-urlencoded';
       $body = http_build_query($postfields);
+      $body = preg_replace('/%5B[0-9]+%5D=/simU', '%5B%5D=', $body);
     }
 
     if(!$user->media_endpoint || $media_endpoint_error) {
-      // Send as form-encoded if there is no media endpoint or if there was a media endpoint error
+      // Send as multipart upload if there is no media endpoint or if there was a media endpoint error
 
       $multipart = new p3k\Multipart();
 
       $multipart->addArray($postfields);
 
-      if($photo_filename) {
-        if(is_array($photo_filename)) {
-          foreach($photo_filename as $f) {
-            $multipart->addFile('photo[]', $f, 'image/jpeg');
-          }
-        } else {
-          $multipart->addFile('photo', $photo_filename, 'image/jpeg');
+      if(isset($params['photo'])) {
+        if(!is_array($params['photo'])) $params['photo'] = [$params['photo']];
+        foreach($params['photo'] as $u) {
+          $fn = download_file($u);
+          $multipart->addFile('photo[]', $fn, 'image/jpeg');
         }
       }
 
-      if($video_filename) {
-        if(is_array($video_filename)) {
-          foreach($video_filename as $f) {
-            $multipart->addFile('video[]', $f, 'video/mp4');
-          }
-        } else {
-          $multipart->addFile('video', $video_filename, 'video/mp4');
+      if(isset($params['video'])) {
+        if(!is_array($params['video'])) $params['video'] = [$params['video']];
+        foreach($params['video'] as $u) {
+          $fn = download_file($u);
+          $multipart->addFile('video[]', $fn, 'video/mp4');
         }
       }
 
       $body = $multipart->data();
       $content_type = $multipart->contentType();
     }
+
+    Logger::$log->info($body);
   } else {
     $content_type = 'application/json';
 
-    if($photo_filename)
-      $properties['photo'] = $photo_filename;
+    if(isset($params['photo']))
+      $properties['photo'] = $params['photo'];
 
-    if($video_filename)
-      $properties['video'] = $video_filename;
+    if(isset($params['video']))
+      $properties['video'] = $params['video'];
 
     // Convert everything to an array
     foreach($properties as $k=>$v) {
@@ -262,7 +263,6 @@ function micropub_post($user, $params, $photo_filename=false, $video_filename=fa
         } else {
           $videos[] = $igurl;
         }
-        $tmp = download_file($igurl);
       }
 
       $properties['photo'] = $photos;
@@ -410,13 +410,10 @@ function h_entry_from_photo($url, $oldLocationFormat=true, $multiPhoto=false) {
 
   // Include the photo/video media URLs
   if(!empty($photo['video'])) {
-    $entry['photo'] = $photo['photo'][0];
-    $entry['video'] = $photo['video'][0];
+    $entry['photo'] = $photo['photo'];
+    $entry['video'] = $photo['video'];
   } else {
-    if($multiPhoto)
-      $entry['photo'] = count($photo['photo']) > 1 ? $photo['photo'] : $photo['photo'][0];
-    else
-      $entry['photo'] = $photo['photo'][0];
+    $entry['photo'] = $photo['photo'];
   }
 
   return $entry;

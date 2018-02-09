@@ -350,30 +350,11 @@ $app->post('/instagram/test.json', function() use($app) {
       ->where('user_id', $user->id)
       ->where('id', $params['id'])
       ->find_one();
+
     if(!$photo)
       $app->redirect('/');
 
     $entry = json_decode($photo->instagram_data, true);
-
-    if($user->send_media_as == 'upload') {
-      if(is_array($entry['photo'])) {
-        $photo_filename = [];
-        foreach($entry['photo'] as $f) {
-          $photo_filename[] = download_file($f);
-        }
-      } else {
-        $photo_filename = download_file($entry['photo']);
-      }
-
-      if(isset($entry['video'])) {
-        $video_filename = download_file($entry['video'],'mp4');
-      } else {
-        $video_filename = false;
-      }
-    } else {
-      $photo_filename = $entry['photo']; // will be either a string or array
-      $video_filename = isset($entry['video']) ? $entry['video'] : false;
-    }
 
     // Build syndication links for post-again
     if(isset($_POST['syndicate']) && $_POST['syndicate'] == 'true') {
@@ -390,7 +371,7 @@ $app->post('/instagram/test.json', function() use($app) {
     }
 
     // Now send to the micropub endpoint
-    $response = micropub_post($user, $entry, $photo_filename, $video_filename);
+    $response = micropub_post($user, $entry);
 
     $user->last_micropub_response = json_encode($response);
 
@@ -408,6 +389,8 @@ $app->post('/instagram/test.json', function() use($app) {
       $photo->canonical_url = $location;
     } else {
       $location = false;
+
+      Logger::$log->info('Error posting to Micropub endpoint: '."\n".$response['response']);      
     }
 
     $photo->processed = 1;
