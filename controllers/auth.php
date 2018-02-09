@@ -165,7 +165,7 @@ $app->get('/auth/callback', function() use($app) {
       $user->tier = 4;
 
       $q = micropub_get($micropubEndpoint, $token['auth']['access_token'], ['q'=>'config']);
-      if($q && $q['data'] && $q['data']['media-endpoint']) {
+      if($q && isset($q['data']) && isset($q['data']['media-endpoint'])) {
         $user->media_endpoint = $q['data']['media-endpoint'];
         // $user->send_media_as = 'url';
       }
