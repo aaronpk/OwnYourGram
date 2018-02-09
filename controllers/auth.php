@@ -151,7 +151,7 @@ $app->get('/auth/callback', function() use($app) {
 
       // Discover the media endpoint every time they log in, and remove it if not found
       $q = micropub_get($micropubEndpoint, $token['auth']['access_token'], ['q'=>'config']);
-      if($q && $q['data'] && $q['data']['media-endpoint']) {
+      if($q && isset($q['data']) && isset($q['data']['media-endpoint'])) {
         $user->media_endpoint = $q['data']['media-endpoint'];
       } else {
         $user->media_endpoint = '';
