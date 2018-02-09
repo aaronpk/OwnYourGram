@@ -40,10 +40,12 @@ function load_photos(force_refresh) {
         $(item).find(".photo-img").html('<img src="'+photo.instagram_img+'">');
       }
       $(item).find(".btn").attr("data-id", photo.id);
-      if(photo.data.content == "") {
-        $(item).find(".caption").addClass("hidden");
-      } else {
-        $(item).find(".caption").text(photo.data.content);
+      if(photo.data) {
+        if(photo.data.content == "") {
+          $(item).find(".caption").addClass("hidden");
+        } else {
+          $(item).find(".caption").text(photo.data.content);
+        }
       }
       if(photo.canonical_url) {
         $(item).find(".btn-success").text("Post Again");
