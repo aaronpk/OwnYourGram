@@ -224,7 +224,6 @@ function micropub_post($user, $params) {
       $content_type = $multipart->contentType();
     }
 
-    Logger::$log->info($body);
   } else {
     $content_type = 'application/json';
 
