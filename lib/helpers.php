@@ -98,7 +98,7 @@ function download_file($url, $ext='jpg') {
   curl_exec($ch);
   curl_close($ch);
   fclose($fp);
-  return $filename;  
+  return $filename;
 }
 
 function copy_to_media_endpoint($user, $file, $type) {
@@ -112,7 +112,7 @@ function copy_to_media_endpoint($user, $file, $type) {
   $multipart = new p3k\Multipart();
   $multipart->addFile('file', $tmp, $type);
 
-  $response = $http->post($user->media_endpoint, $multipart->data(), 
+  $response = $http->post($user->media_endpoint, $multipart->data(),
     ['Authorization: Bearer ' .$user->micropub_access_token, 'Content-type: '.$multipart->contentType()]);
 
   if(in_array($response['code'], [201,202]) && isset($response['headers']['Location'])) {
@@ -161,7 +161,7 @@ function micropub_post($user, $params) {
     if($user->media_endpoint) {
 
       $media_endpoint_error = false;
-      
+
       if(isset($params['photo'])) {
         $photos = [];
         if(!is_array($params['photo'])) $params['photo'] = [$params['photo']];
