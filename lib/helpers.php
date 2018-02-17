@@ -208,7 +208,8 @@ function micropub_post($user, $params) {
         if(!is_array($params['photo'])) $params['photo'] = [$params['photo']];
         foreach($params['photo'] as $u) {
           $fn = download_file($u);
-          $multipart->addFile('photo[]', $fn, 'image/jpeg');
+          $key = count($params['photo']) == 1 ? 'photo' : 'photo[]';
+          $multipart->addFile($key, $fn, 'image/jpeg');
         }
       }
 
@@ -216,7 +217,8 @@ function micropub_post($user, $params) {
         if(!is_array($params['video'])) $params['video'] = [$params['video']];
         foreach($params['video'] as $u) {
           $fn = download_file($u);
-          $multipart->addFile('video[]', $fn, 'video/mp4');
+          $key = count($params['video']) == 1 ? 'video' : 'video[]';
+          $multipart->addFile($key, $fn, 'video/mp4');
         }
       }
 
