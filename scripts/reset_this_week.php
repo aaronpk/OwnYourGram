@@ -9,4 +9,3 @@ $db = new PDO(
 );
 
 $db->exec('UPDATE users SET photo_count_this_week = 0');
-

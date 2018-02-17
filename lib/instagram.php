@@ -101,6 +101,5 @@ function extract_ig_data($html) {
     }
   }
 
-  return $data;  
+  return $data;
 }
-

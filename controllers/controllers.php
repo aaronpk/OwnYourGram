@@ -230,7 +230,7 @@ $app->get('/instagram/photos.json', function() use($app) {
     }
 
     $targets = json_decode($user->micropub_syndication_targets);
-    
+
     $app->response()->header('Content-Type', 'application/json');
     $app->response()->body(json_encode([
       'items' => $photos,
@@ -294,7 +294,7 @@ $app->get('/instagram/verify', function() use($app) {
         $success = true;
       }
     }
-    
+
     if($success) {
       // Remove this username from a previous account
       ORM::for_table('users')->raw_execute('UPDATE users SET instagram_username="" WHERE instagram_username=:u', ['u'=>$_SESSION['instagram_username']]);
@@ -392,7 +392,7 @@ $app->post('/instagram/test.json', function() use($app) {
     } else {
       $location = false;
 
-      Logger::$log->info('Error posting to Micropub endpoint: '."\n".$response['response']);      
+      Logger::$log->info('Error posting to Micropub endpoint: '."\n".$response['response']);
     }
 
     $photo->processed = 1;

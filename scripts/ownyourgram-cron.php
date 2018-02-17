@@ -2,7 +2,6 @@
 chdir(dirname(__FILE__).'/..');
 require 'vendor/autoload.php';
 
-
 $users = ORM::for_table('users')
   ->where('micropub_success', 1)
   ->where_not_null('instagram_username');
@@ -170,7 +169,7 @@ foreach($users as $user) {
           $user->last_instagram_photo = $photo->id;
           $user->last_photo_date = date('Y-m-d H:i:s');
 
-          if($response && isset($response['headers']['Location']) 
+          if($response && isset($response['headers']['Location'])
             && in_array($response['code'], [201,202,301,302])) {
             $photo_url = $response['headers']['Location'][0];
             $user->last_micropub_url = $photo_url;
@@ -201,7 +200,7 @@ foreach($users as $user) {
 
     // After importing this batch, look at the user's posting frequency and determine their polling tier.
     if($micropub_errors > 0) {
-      // Micropub errors demote the user to a lower tier. 
+      // Micropub errors demote the user to a lower tier.
       // If they're already at the lowest tier, this will disable polling their account until they log back in.
       $user->tier = $user->tier - 1;
       log_msg("Encountered a Micropub error. Demoting to tier ".$user->tier, $user);
@@ -249,4 +248,3 @@ function log_msg($msg, $user) {
     echo '[' . $user->url . '] ';
   echo $msg . "\n";
 }
-
