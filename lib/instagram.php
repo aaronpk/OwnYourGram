@@ -36,13 +36,14 @@ function get_user_photos($username, $ignoreCache=false) {
 
   $items = [];
   if($data) {
-    foreach($data['user']['media']['nodes'] as $item) {
+    foreach($data['graphql']['user']['edge_owner_to_timeline_media']['edges'] as $item) {
+      $item = $item['node'];
       $items[] = [
-        'url' => 'https://www.instagram.com/p/'.$item['code'].'/',
-        'published' => date('Y-m-d H:i:s', $item['date'])
+        'url' => 'https://www.instagram.com/p/'.$item['shortcode'].'/',
+        'published' => date('Y-m-d H:i:s', $item['taken_at_timestamp'])
       ];
-      if($item['date'] > $latest)
-        $latest = $item['date'];
+      if($item['taken_at_timestamp'] > $latest)
+        $latest = $item['taken_at_timestamp'];
     }
   }
 
@@ -74,8 +75,8 @@ function get_profile($username, $ignoreCache=false) {
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
   $response = curl_exec($ch);
   $profile = @json_decode($response, true);
-  if($profile && array_key_exists('user', $profile)) {
-    $user = $profile['user'];
+  if($profile && isset($profile['graphql']['user'])) {
+    $user = $profile['graphql']['user'];
     \p3k\redis()->setex($cacheKey, $cacheTime, json_encode($user));
     return $user;
   } else {
