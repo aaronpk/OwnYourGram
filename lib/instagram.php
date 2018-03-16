@@ -52,7 +52,7 @@ function get_user_photos($username, $ignoreCache=false) {
     'items' => $items,
     'latest' => $latest,
   ];
-  if(count($items))
+  if(Config::$redis && count($items))
     \p3k\redis()->setex($cacheKey, $cacheTime, json_encode($response));
   return $response;
 }
