@@ -3,7 +3,7 @@ php:
 - 7.2
 sudo: false
 before_install:
-- cp lib/config.template.php lib/config.php
+- cp lib/config.travis.php lib/config.php
 before_script:
 - composer self-update
 - composer install --prefer-dist --no-interaction

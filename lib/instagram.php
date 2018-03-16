@@ -16,7 +16,7 @@ function get_user_photos($username, $ignoreCache=false) {
   $cacheKey = Config::$hostname.'::userfeed::'.$username;
   $cacheTime = 60*15; # cache feeds for 15 minutes
 
-  if(Config::$cacheIGRequests && !$ignoreCache) {
+  if(Config::$redis && Config::$cacheIGRequests && !$ignoreCache) {
     if($data = \p3k\redis()->get($cacheKey)) {
       return json_decode($data, true);
     }
@@ -61,7 +61,7 @@ function get_profile($username, $ignoreCache=false) {
   $cacheKey = Config::$hostname.'::profile::'.$username;
   $cacheTime = 86400 * 7; # cache profiles for 7 days
 
-  if(Config::$cacheIGRequests && !$ignoreCache) {
+  if(Config::$redis && Config::$cacheIGRequests && !$ignoreCache) {
     if($data = \p3k\redis()->get($cacheKey)) {
       return json_decode($data, true);
     }
@@ -77,30 +77,29 @@ function get_profile($username, $ignoreCache=false) {
   $profile = @json_decode($response, true);
   if($profile && isset($profile['graphql']['user'])) {
     $user = $profile['graphql']['user'];
-    \p3k\redis()->setex($cacheKey, $cacheTime, json_encode($user));
+    if(Config::$redis)
+      \p3k\redis()->setex($cacheKey, $cacheTime, json_encode($user));
     return $user;
   } else {
     return null;
   }
 }
 
-function extract_ig_data($html) {
-  $doc = new DOMDocument();
-  @$doc->loadHTML($html);
+// Check that a user's profile contains a link to the given website
+function profile_matches_website($username, $url, $profile_data=false) {
+  if($profile_data)
+    $profile = $profile_data;
+  else
+    $profile = get_profile($username, true); // always ignore cache
 
-  if(!$doc) {
-    return null;
+  $success = false;
+
+  if($profile) {
+    if(isset($profile['external_url']) && $profile['external_url'] == $url)
+      $success = true;
+    elseif(isset($profile['biography']) && strpos($profile['biography'], $url) !== false)
+      $success = true;
   }
 
-  $xpath = new DOMXPath($doc);
-
-  $data = null;
-
-  foreach($xpath->query('//script') as $script) {
-    if(preg_match('/window\._sharedData = ({.+});/', $script->textContent, $match)) {
-      $data = json_decode($match[1], true);
-    }
-  }
-
-  return $data;
+  return $success;
 }

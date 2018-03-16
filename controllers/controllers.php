@@ -286,14 +286,7 @@ $app->get('/instagram/verify', function() use($app) {
     // Check the instagram account looking for the link back to the user's home page
     $profile = IG\get_profile($_SESSION['instagram_username'], true);
 
-    $success = false;
-
-    if($profile) {
-      if($profile['external_url'] == $user->url
-        || strpos($profile['biography'], $user->url) !== false) {
-        $success = true;
-      }
-    }
+    $success = IG\profile_matches_website($_SESSION['instagram_username'], $user->url);
 
     if($success) {
       // Remove this username from a previous account
