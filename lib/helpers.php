@@ -395,8 +395,8 @@ function h_entry_from_photo($url, $oldLocationFormat=true, $multiPhoto=false) {
         ]
       ];
       if(!empty($location['latitude'])) {
-        $entry['location']['properties']['latitude'] = $location['latitude'];
-        $entry['location']['properties']['longitude'] = $location['longitude'];
+        $entry['location']['properties']['latitude'] = [(string)$location['latitude']];
+        $entry['location']['properties']['longitude'] = [(string)$location['longitude']];
       }
     }
   }
