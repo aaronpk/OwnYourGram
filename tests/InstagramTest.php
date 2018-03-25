@@ -48,6 +48,6 @@ final class InstagramTest extends TestCase
     $this->assertSame(['muffins'], $entry['category']);
     $this->assertSame('Meow #muffins', $entry['content']);
     $this->assertSame('https://www.instagram.com/p/BGDpqNoiMJ0/', $entry['syndication']);
-    $this->assertContains('748eee59d8b3c8f19b274042dd8d50d3/5B2A6392/t51.2885-15/e35/13266755_877794672348882_1908663476_n.jpg', $entry['photo'][0]);
+    $this->assertContains('9433ea494a8b055bebabf70fd81cfa32/5B51F092/t51.2885-15/e35/13266755_877794672348882_1908663476_n.jpg', $entry['photo'][0]);
   }
 }
