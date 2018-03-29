@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "8af2940968628362332add439f31d76b",
+    "content-hash": "52131f74788abc8dada6ac3fbbdadc5d",
     "packages": [
         {
             "name": "cebe/markdown",
@@ -405,17 +405,82 @@
             "time": "2013-12-12T10:25:27+00:00"
         },
         {
-            "name": "mf2/mf2",
-            "version": "v0.4.1",
+            "name": "masterminds/html5",
+            "version": "2.3.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/indieweb/php-mf2.git",
-                "reference": "e044330550a16d1a512248a5b9f663736538da44"
+                "url": "https://github.com/Masterminds/html5-php.git",
+                "reference": "2c37c6c520b995b761674de3be8455a381679067"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/indieweb/php-mf2/zipball/e044330550a16d1a512248a5b9f663736538da44",
-                "reference": "e044330550a16d1a512248a5b9f663736538da44",
+                "url": "https://api.github.com/repos/Masterminds/html5-php/zipball/2c37c6c520b995b761674de3be8455a381679067",
+                "reference": "2c37c6c520b995b761674de3be8455a381679067",
+                "shasum": ""
+            },
+            "require": {
+                "ext-libxml": "*",
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.*",
+                "sami/sami": "~2.0",
+                "satooshi/php-coveralls": "1.0.*"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.2-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Masterminds\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Matt Butcher",
+                    "email": "technosophos@gmail.com"
+                },
+                {
+                    "name": "Asmir Mustafic",
+                    "email": "goetas@gmail.com"
+                },
+                {
+                    "name": "Matt Farina",
+                    "email": "matt@mattfarina.com"
+                }
+            ],
+            "description": "An HTML5 parser and serializer.",
+            "homepage": "http://masterminds.github.io/html5-php",
+            "keywords": [
+                "HTML5",
+                "dom",
+                "html",
+                "parser",
+                "querypath",
+                "serializer",
+                "xml"
+            ],
+            "time": "2017-09-04T12:26:28+00:00"
+        },
+        {
+            "name": "mf2/mf2",
+            "version": "v0.4.4-alpha",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/indieweb/php-mf2.git",
+                "reference": "e8da04f93d548d26287a8980eca4216639cbc61d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/indieweb/php-mf2/zipball/e8da04f93d548d26287a8980eca4216639cbc61d",
+                "reference": "e8da04f93d548d26287a8980eca4216639cbc61d",
                 "shasum": ""
             },
             "require": {
@@ -427,7 +492,8 @@
                 "phpunit/phpunit": "4.8.*"
             },
             "suggest": {
-                "barnabywalters/mf-cleaner": "To more easily handle the canonical data php-mf2 gives you"
+                "barnabywalters/mf-cleaner": "To more easily handle the canonical data php-mf2 gives you",
+                "masterminds/html5": "Alternative HTML parser for PHP, for better HTML5 support."
             },
             "bin": [
                 "bin/fetch-mf2",
@@ -457,7 +523,7 @@
                 "parser",
                 "semantic"
             ],
-            "time": "2018-03-15T16:51:15+00:00"
+            "time": "2018-03-29T20:48:28+00:00"
         },
         {
             "name": "michelf/php-markdown",
@@ -848,16 +914,16 @@
         },
         {
             "name": "p3k/xray",
-            "version": "v1.4.23",
+            "version": "v1.4.25",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aaronpk/XRay.git",
-                "reference": "6687167d5c6b920c9ac5a3109c123eb98b9a9493"
+                "reference": "47f532d3595a8906f036078a26d334ef6c2605cf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aaronpk/XRay/zipball/6687167d5c6b920c9ac5a3109c123eb98b9a9493",
-                "reference": "6687167d5c6b920c9ac5a3109c123eb98b9a9493",
+                "url": "https://api.github.com/repos/aaronpk/XRay/zipball/47f532d3595a8906f036078a26d334ef6c2605cf",
+                "reference": "47f532d3595a8906f036078a26d334ef6c2605cf",
                 "shasum": ""
             },
             "require": {
@@ -866,7 +932,8 @@
                 "ezyang/htmlpurifier": "4.10.*",
                 "facebook/graph-sdk": "^5.5",
                 "indieweb/link-rel-parser": "0.1.*",
-                "mf2/mf2": ">=0.4.0",
+                "masterminds/html5": "^2.3",
+                "mf2/mf2": "0.4.4-alpha",
                 "p3k/http": ">=0.1.7",
                 "p3k/picofeed": ">=0.1.38",
                 "p3k/timezone": "*"
@@ -892,7 +959,7 @@
             ],
             "description": "X-Ray returns structured data from any URL",
             "homepage": "https://github.com/aaronpk/XRay",
-            "time": "2018-03-15T16:58:07+00:00"
+            "time": "2018-03-29T21:35:26+00:00"
         },
         {
             "name": "predis/predis",
@@ -2574,7 +2641,8 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "saltybeagle/savant3": 20
+        "saltybeagle/savant3": 20,
+        "mf2/mf2": 15
     },
     "prefer-stable": false,
     "prefer-lowest": false,
