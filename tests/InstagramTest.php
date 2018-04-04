@@ -41,8 +41,8 @@ final class InstagramTest extends TestCase
       'type' => ['h-card'],
       'properties' => [
         'name' => ['Burnside 26'],
-        'latitude' => ['45.52322'],
-        'longitude' => ['-122.63885']
+        'latitude' => ['45.5228640678'],
+        'longitude' => ['-122.6389405085']
       ]
     ], $entry['location']);
     $this->assertSame(['muffins','https://indiewebcat.com/'], $entry['category']);
