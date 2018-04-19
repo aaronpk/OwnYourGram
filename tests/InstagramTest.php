@@ -22,15 +22,11 @@ final class InstagramTest extends TestCase
     $this->assertSame('pk_spam', $feed['username']);
     $this->assertCount(12, $feed['items']);
 
-    $this->assertContains([
-      'url' => 'https://www.instagram.com/p/Be0lBpGDncI/',
-      'published' => '2018-02-05 16:22:07'
-    ], $feed['items']);
+    $this->assertEquals('https://www.instagram.com/p/Be0lBpGDncI/', $feed['items'][0]['url']);
+    $this->assertEquals('2018-02-05T16:22:07+00:00', $feed['items'][0]['published']);
 
-    $this->assertContains([
-      'url' => 'https://www.instagram.com/p/BOuszCXhunE/',
-      'published' => '2017-01-01 17:12:16'
-    ], $feed['items']);
+    $this->assertEquals('https://www.instagram.com/p/BGC8l_ZCMKb/', $feed['items'][11]['url']);
+    $this->assertEquals('2016-05-30T21:12:34+00:00', $feed['items'][11]['published']);
   }
 
   public function testGetPhoto() {

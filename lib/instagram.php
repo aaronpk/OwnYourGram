@@ -4,12 +4,8 @@ use DOMDocument, DOMXPath;
 use Config;
 use Logger;
 
-function http_headers() {
-  return [
-    'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-    'Accept-Language: en-US,en;q=0.8',
-    'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.110 Safari/537.36',
-  ];
+function user_agent() {
+  return 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.110 Safari/537.36';
 }
 
 function get_user_photos($username, $ignoreCache=false) {
@@ -24,26 +20,22 @@ function get_user_photos($username, $ignoreCache=false) {
 
   Logger::$log->info('Fetching user timeline', ['username'=>$username]);
 
-  $ch = curl_init();
-  curl_setopt($ch, CURLOPT_URL, 'https://www.instagram.com/'.$username.'/?__a=1');
-  curl_setopt($ch, CURLOPT_HTTPHEADER, http_headers());
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-  $response = curl_exec($ch);
+  $xray = new \p3k\XRay();
+  $xray->http = new \p3k\HTTP(user_agent());
+  $data = $xray->parse('https://www.instagram.com/'.$username, ['expect' => 'feed']);
 
-  $data = json_decode($response, true);
+  if(isset($data['data']['items'])) {
+    $items = $data['data']['items'];
+  } else {
+    $items = [];
+  }
 
   $latest = 0;
 
-  $items = [];
   if($data) {
-    foreach($data['graphql']['user']['edge_owner_to_timeline_media']['edges'] as $item) {
-      $item = $item['node'];
-      $items[] = [
-        'url' => 'https://www.instagram.com/p/'.$item['shortcode'].'/',
-        'published' => date('Y-m-d H:i:s', $item['taken_at_timestamp'])
-      ];
-      if($item['taken_at_timestamp'] > $latest)
-        $latest = $item['taken_at_timestamp'];
+    foreach($data['data']['items'] as $photo) {
+      if(strtotime($photo['published']) > $latest)
+        $latest = strtotime($photo['published']);
     }
   }
 
@@ -69,20 +61,18 @@ function get_profile($username, $ignoreCache=false) {
 
   Logger::$log->info('Fetching Instagram profile', ['username'=>$username]);
 
-  $ch = curl_init('https://www.instagram.com/'.$username.'/?__a=1');
-  curl_setopt($ch, CURLOPT_HTTPHEADER, http_headers());
-  curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-  $response = curl_exec($ch);
-  $profile = @json_decode($response, true);
-  if($profile && isset($profile['graphql']['user'])) {
-    $user = $profile['graphql']['user'];
+  $xray = new \p3k\XRay();
+  $xray->http = new \p3k\HTTP(user_agent());
+  $data = $xray->parse('https://www.instagram.com/'.$username);
+
+  if(isset($data['data']['type']) && $data['data']['type'] == 'card') {
     if(Config::$redis)
-      \p3k\redis()->setex($cacheKey, $cacheTime, json_encode($user));
-    return $user;
-  } else {
-    return null;
+      \p3k\redis()->setex($cacheKey, $cacheTime, json_encode($data['data']));
+
+    return $data['data'];
   }
+
+  return null;
 }
 
 // Check that a user's profile contains a link to the given website
@@ -95,9 +85,9 @@ function profile_matches_website($username, $url, $profile_data=false) {
   $success = false;
 
   if($profile) {
-    if(isset($profile['external_url']) && $profile['external_url'] == $url)
+    if(isset($profile['url']) && $profile['url'] == $url)
       $success = true;
-    elseif(isset($profile['biography']) && strpos($profile['biography'], $url) !== false)
+    elseif(isset($profile['note']) && strpos($profile['note'], $url) !== false)
       $success = true;
   }
 
