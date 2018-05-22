@@ -1,6 +1,12 @@
 
 <div style="text-align: right; margin: 8px;">
-  <a id="reload_photos" class="btn btn-xs btn-default">Reload Photos</a>
+  <labe for="photos_length">Number of Photos: </label><select id="photos_length">
+    <option value="10">10</option>
+    <option value="20" selected>20</option>
+    <option value="30">30</option>
+    <option value="40">40</option>
+    <option value="50">50</option>
+  </select> <a id="reload_photos" class="btn btn-xs btn-default">Reload Photos</a>
 </div>
 
 <div id="loading"><span class="glyphicon glyphicon-refresh glyphicon-spin"></span></div>
@@ -14,13 +20,13 @@
 </div>
 
 <script>
-function load_photos(force_refresh) {
+function load_photos(force_refresh,length) {
   $("#loading").removeClass("hidden");
   $("#instagram_photos_list").html('');
 
   $.get("/instagram/photos.json", {
     force_refresh: force_refresh?1:0,
-    num: 20
+    num: length
   }, function(data){
     $("#loading").addClass("hidden");
 
@@ -28,7 +34,7 @@ function load_photos(force_refresh) {
       $("#instagram_photos_error").removeClass("hidden");
     }
 
-    $("#instagram_photos_list").html('<p>Showing your latest 20 photos below.</p>');
+    $("#instagram_photos_list").html('<p>Showing your latest '+length+' photos below.</p>');
 
     var template = $("#photo-template").html();
     for(var i in data.items) {
@@ -76,7 +82,7 @@ function load_photos(force_refresh) {
         $("#loading").addClass("hidden");
 
         if(data.location) {
-          load_photos();
+          load_photos(false,20);
         } else {
           btn.parent().find(".error").removeClass("hidden");
           btn.text("Post");
@@ -88,10 +94,12 @@ function load_photos(force_refresh) {
 }
 
 $(function(){
-  load_photos(false);
+  load_photos(false,20);
 
   $("#reload_photos").click(function(){
-    load_photos(true);
+    length = $("#photos_length").val();
+    console.log(length);
+    load_photos(true,length);
     return false;
   });
 });
