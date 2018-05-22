@@ -8,7 +8,7 @@ function user_agent() {
   return 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.110 Safari/537.36';
 }
 
-function get_user_photos($username, $ignoreCache=false) {
+function get_user_photos($username, $ignoreCache=false, $limit=12) {
   $cacheKey = Config::$hostname.'::userfeed::'.$username;
   $cacheTime = 60*15; # cache feeds for 15 minutes
 
@@ -22,7 +22,7 @@ function get_user_photos($username, $ignoreCache=false) {
 
   $xray = new \p3k\XRay();
   $xray->http = new \p3k\HTTP(user_agent());
-  $data = $xray->parse('https://www.instagram.com/'.$username, ['expect' => 'feed']);
+  $data = $xray->parse('https://www.instagram.com/'.$username, ['expect' => 'feed', 'length' => $limit]);
 
   if(isset($data['data']['items'])) {
     $items = $data['data']['items'];
