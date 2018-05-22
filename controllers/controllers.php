@@ -184,7 +184,7 @@ $app->get('/instagram/photos.json', function() use($app) {
     else
       $num = 4;
 
-    $feed = IG\get_user_photos($user->instagram_username, $refresh);
+    $feed = IG\get_user_photos($user->instagram_username, $refresh, $num);
 
     $photos = [];
 
