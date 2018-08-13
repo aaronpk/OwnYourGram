@@ -914,16 +914,16 @@
         },
         {
             "name": "p3k/xray",
-            "version": "v1.6.6",
+            "version": "v1.6.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aaronpk/XRay.git",
-                "reference": "feee49364bd943a17583e6bf9ae0b705da728b9e"
+                "reference": "43db6098fc442ba533c5f6f7a94508ae2837397a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aaronpk/XRay/zipball/feee49364bd943a17583e6bf9ae0b705da728b9e",
-                "reference": "feee49364bd943a17583e6bf9ae0b705da728b9e",
+                "url": "https://api.github.com/repos/aaronpk/XRay/zipball/43db6098fc442ba533c5f6f7a94508ae2837397a",
+                "reference": "43db6098fc442ba533c5f6f7a94508ae2837397a",
                 "shasum": ""
             },
             "require": {
@@ -959,7 +959,7 @@
             ],
             "description": "X-Ray returns structured data from any URL",
             "homepage": "https://github.com/aaronpk/XRay",
-            "time": "2018-08-02T17:17:19+00:00"
+            "time": "2018-08-13T19:46:40+00:00"
         },
         {
             "name": "predis/predis",
