@@ -5,7 +5,7 @@ function buildRedirectURI() {
 }
 
 function clientID() {
-  return 'https://ownyourgram.com';
+  return 'https://'.Config::$hostname.'/';
 }
 
 $app->get('/signin', function() use($app) {
