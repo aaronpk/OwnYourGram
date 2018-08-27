@@ -33,14 +33,12 @@ final class InstagramTest extends TestCase
     $entry = h_entry_from_photo('https://www.instagram.com/p/BGDpqNoiMJ0/', false, true);
 
     $this->assertSame('2016-05-30T20:46:22-07:00', $entry['published']);
-    $this->assertSame([
-      'type' => ['h-card'],
-      'properties' => [
-        'name' => ['Burnside 26'],
-        'latitude' => ['45.5228640678'],
-        'longitude' => ['-122.6389405085']
-      ]
-    ], $entry['location']);
+    $this->assertSame(['h-card'], $entry['location']['type']);
+    $this->assertSame(['Burnside 26'], $entry['location']['properties']['name']);
+    $this->assertGreaterThan(45.52, $entry['location']['properties']['latitude'][0]);
+    $this->assertLessThan(45.53, $entry['location']['properties']['latitude'][0]);
+    $this->assertGreaterThan(-122.639, $entry['location']['properties']['longitude'][0]);
+    $this->assertLessThan(-122.638, $entry['location']['properties']['longitude'][0]);
     $this->assertSame(['muffins','https://indiewebcat.com/'], $entry['category']);
     $this->assertSame('Meow #muffins', $entry['content']);
     $this->assertSame('https://www.instagram.com/p/BGDpqNoiMJ0/', $entry['syndication']);

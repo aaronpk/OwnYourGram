@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "52131f74788abc8dada6ac3fbbdadc5d",
+    "content-hash": "6f9de82103fb5e6922fd694b8f2179fe",
     "packages": [
         {
             "name": "cebe/markdown",
@@ -471,16 +471,16 @@
         },
         {
             "name": "mf2/mf2",
-            "version": "v0.4.4-alpha",
+            "version": "v0.4.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/indieweb/php-mf2.git",
-                "reference": "e8da04f93d548d26287a8980eca4216639cbc61d"
+                "reference": "35fee8b6481695438a44f336534b4cd782bcd518"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/indieweb/php-mf2/zipball/e8da04f93d548d26287a8980eca4216639cbc61d",
-                "reference": "e8da04f93d548d26287a8980eca4216639cbc61d",
+                "url": "https://api.github.com/repos/indieweb/php-mf2/zipball/35fee8b6481695438a44f336534b4cd782bcd518",
+                "reference": "35fee8b6481695438a44f336534b4cd782bcd518",
                 "shasum": ""
             },
             "require": {
@@ -523,7 +523,7 @@
                 "parser",
                 "semantic"
             ],
-            "time": "2018-03-29T20:48:28+00:00"
+            "time": "2018-08-02T17:12:58+00:00"
         },
         {
             "name": "michelf/php-markdown",
@@ -914,16 +914,16 @@
         },
         {
             "name": "p3k/xray",
-            "version": "v1.4.29",
+            "version": "v1.6.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aaronpk/XRay.git",
-                "reference": "fc74da5be9fb2b219c12a54f2205361662525aee"
+                "reference": "43db6098fc442ba533c5f6f7a94508ae2837397a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aaronpk/XRay/zipball/fc74da5be9fb2b219c12a54f2205361662525aee",
-                "reference": "fc74da5be9fb2b219c12a54f2205361662525aee",
+                "url": "https://api.github.com/repos/aaronpk/XRay/zipball/43db6098fc442ba533c5f6f7a94508ae2837397a",
+                "reference": "43db6098fc442ba533c5f6f7a94508ae2837397a",
                 "shasum": ""
             },
             "require": {
@@ -933,7 +933,7 @@
                 "facebook/graph-sdk": "^5.5",
                 "indieweb/link-rel-parser": "0.1.*",
                 "masterminds/html5": "^2.3",
-                "mf2/mf2": "0.4.4-alpha",
+                "mf2/mf2": "^0.4",
                 "p3k/http": ">=0.1.7",
                 "p3k/picofeed": ">=0.1.38",
                 "p3k/timezone": "*"
@@ -959,7 +959,7 @@
             ],
             "description": "X-Ray returns structured data from any URL",
             "homepage": "https://github.com/aaronpk/XRay",
-            "time": "2018-04-19T18:10:05+00:00"
+            "time": "2018-08-13T19:46:40+00:00"
         },
         {
             "name": "predis/predis",
@@ -2641,8 +2641,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "saltybeagle/savant3": 20,
-        "mf2/mf2": 15
+        "saltybeagle/savant3": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
