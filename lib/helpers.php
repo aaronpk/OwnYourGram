@@ -8,7 +8,7 @@ class Logger {
 
   public static function init() {
     self::$log = new Monolog\Logger('name');
-    self::$log->pushHandler(new Monolog\Handler\StreamHandler(dirname(__FILE__).'/../logs/ownyourgram.log', Monolog\Logger::INFO));
+    self::$log->pushHandler(new Monolog\Handler\StreamHandler(dirname(__FILE__).'/../scripts/logs/ownyourgram.log', Monolog\Logger::INFO));
   }
 }
 
@@ -246,28 +246,29 @@ function micropub_post($user, $params) {
       $photos = [];
       $videos = [];
 
-      if(isset($properties['photo']))
-      foreach($properties['photo'] as $igurl) {
-        $loc = copy_to_media_endpoint($user, $igurl, 'image/jpeg');
-        if($loc) {
-          $photos[] = $loc;
-        } else {
-          $photos[] = $igurl;
+      if(isset($properties['photo'])) {
+        foreach($properties['photo'] as $igurl) {
+          $loc = copy_to_media_endpoint($user, $igurl, 'image/jpeg');
+          if($loc) {
+            $photos[] = $loc;
+          } else {
+            $photos[] = $igurl;
+          }
         }
+        $properties['photo'] = $photos;
       }
 
-      if(isset($properties['video']))
-      foreach($properties['video'] as $igurl) {
-        $loc = copy_to_media_endpoint($user, $igurl, 'video/mp4');
-        if($loc) {
-          $videos[] = $loc;
-        } else {
-          $videos[] = $igurl;
+      if(isset($properties['video'])) {
+        foreach($properties['video'] as $igurl) {
+          $loc = copy_to_media_endpoint($user, $igurl, 'video/mp4');
+          if($loc) {
+            $videos[] = $loc;
+          } else {
+            $videos[] = $igurl;
+          }
         }
+        $properties['video'] = $videos;
       }
-
-      $properties['photo'] = $photos;
-      $properties['video'] = $videos;
     }
 
     $body = json_encode([
