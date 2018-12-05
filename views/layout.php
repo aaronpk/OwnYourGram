@@ -22,6 +22,7 @@
     <meta name="theme-color" content="#ffffff">
 
     <script src="/js/jquery-1.7.1.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.min.js"></script>
   </head>
 
 <body role="document">
