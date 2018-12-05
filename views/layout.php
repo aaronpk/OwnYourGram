@@ -72,7 +72,7 @@
           <li><a href="https://indieauth.com/setup">What's This?</a></li>
         </ul>
         <form action="/auth/start" method="get" class="navbar-form navbar-right">
-          <input type="text" name="me" placeholder="yourdomain.com" class="form-control" />
+          <input type="url" name="me" placeholder="yourdomain.com" class="form-control" autocomplete="url" />
           <button type="submit" class="btn">Sign In</button>
           <input type="hidden" name="redirect_uri" value="https://<?= $_SERVER['SERVER_NAME'] ?>/indieauth" />
         </form>
