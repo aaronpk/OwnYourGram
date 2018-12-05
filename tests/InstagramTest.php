@@ -26,7 +26,7 @@ final class InstagramTest extends TestCase
     $this->assertEquals('2018-02-05T16:22:07+00:00', $feed['items'][0]['published']);
 
     $this->assertEquals('https://www.instagram.com/p/BGC8l_ZCMKb/', $feed['items'][11]['url']);
-    $this->assertEquals('2016-05-30T21:12:34+00:00', $feed['items'][11]['published']);
+    $this->assertEquals('2016-05-30T14:12:34-07:00', $feed['items'][11]['published']);
   }
 
   public function testGetPhoto() {
