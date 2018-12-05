@@ -1,5 +1,5 @@
-  <div class="jumbotron">
-    <h2>#OwnYourGram</h2>
+  <div class="jumbotron h-x-app">
+    <h2 class="p-name">#OwnYourGram</h2>
     <?php if($this->signed_in): ?>
       <p><a href="/dashboard" class="btn btn-primary btn-lg" role="button">Dashboard &raquo;</a></p>
     <?php else: ?>
