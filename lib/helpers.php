@@ -7,7 +7,7 @@ class Logger {
   public static $log;
 
   public static function init() {
-    self::$log = new Monolog\Logger('name');
+    self::$log = new Monolog\Logger('ownyourgram');
     self::$log->pushHandler(new Monolog\Handler\StreamHandler(dirname(__FILE__).'/../scripts/logs/ownyourgram.log', Monolog\Logger::INFO));
   }
 }
