@@ -87,10 +87,12 @@ function time_ago($date) {
 }
 
 function download_file($url, $ext='jpg') {
-  Logger::$log->info('Downloading temp file', ['url'=>$url]);
 
   $filename = tempnam(__DIR__.'/../tmp/', 'ig').'.'.$ext;
   $fp = fopen($filename, 'w+');
+
+  Logger::$log->info('Downloading temp file', ['url'=>$url, 'tmpfile'=>$filename]);
+
   $ch = curl_init();
   curl_setopt($ch, CURLOPT_URL, $url);
   curl_setopt($ch, CURLOPT_FILE, $fp);
@@ -102,9 +104,12 @@ function download_file($url, $ext='jpg') {
 }
 
 function copy_to_media_endpoint($user, $file, $type) {
-  if(preg_match('/http:\/\//', $file)) {
+  if(preg_match('/https?:\/\//', $file)) {
     $tmp = download_file($file);
   } else {
+    // This fallback case should be fixed. This means this script failed to download the file,
+    // but the URL will just be passed on to the multipart library which will try to download it
+    // itself, probably failing again.
     $tmp = $file;
   }
 
