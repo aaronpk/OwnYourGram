@@ -104,8 +104,11 @@ function download_file($url, $ext='jpg') {
 }
 
 function copy_to_media_endpoint($user, $file, $type) {
+  $ext = 'jpg';
+  if($type == 'video/mp4') $ext = 'mp4';
+
   if(preg_match('/https?:\/\//', $file)) {
-    $tmp = download_file($file);
+    $tmp = download_file($file, $ext);
   } else {
     // This fallback case should be fixed. This means this script failed to download the file,
     // but the URL will just be passed on to the multipart library which will try to download it
