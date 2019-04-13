@@ -49,6 +49,13 @@ foreach($users as $user) {
         continue;
       }
 
+      // Skip any photos from before their OYG account was created
+      // I've been getting reports from people that they were surprised when OYG imported older photos,
+      // and they only wanted it to import photos starting when they signed up for it.
+      if(strtotime($item['published']) < strtotime($user->date_created)) {
+        continue;
+      }
+
       $photo = ORM::for_table('photos')
         ->where('user_id', $user->id)
         ->where('instagram_url', $url)
