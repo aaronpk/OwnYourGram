@@ -5,7 +5,7 @@ function buildRedirectURI() {
 }
 
 function clientID() {
-  return 'https://ownyourgram.com';
+  return 'https://'.Config::$hostname.'/';
 }
 
 $app->get('/signin', function() use($app) {
@@ -24,7 +24,7 @@ $app->get('/auth/start', function() use($app) {
     $html = render('auth_error', array(
       'title' => 'Sign In',
       'error' => 'Invalid "me" Parameter',
-      'errorDescription' => 'The ID you entered, <strong>' . $params['me'] . '</strong> is not valid.'
+      'errorDescription' => 'The ID you entered, <strong>' . ($params['me'] ?? '') . '</strong> is not valid.'
     ));
     $app->response()->body($html);
     return;

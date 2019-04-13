@@ -203,7 +203,7 @@ $app->get('/instagram/photos.json', function() use($app) {
 
           $photo->instagram_data = json_encode($entry);
 
-          if($user->multi_photo && is_array($entry['photo'])) {
+          if($user->multi_photo && is_array($entry['photo']) && (count($entry['photo']) > 1)) {
             $photo->instagram_img_list = json_encode($entry['photo']);
           } else {
             if(is_array($entry['photo'])) $entry['photo'] = $entry['photo'][0];

@@ -7,8 +7,8 @@ class Logger {
   public static $log;
 
   public static function init() {
-    self::$log = new Monolog\Logger('name');
-    self::$log->pushHandler(new Monolog\Handler\StreamHandler(dirname(__FILE__).'/../logs/ownyourgram.log', Monolog\Logger::INFO));
+    self::$log = new Monolog\Logger('ownyourgram');
+    self::$log->pushHandler(new Monolog\Handler\StreamHandler(dirname(__FILE__).'/../scripts/logs/ownyourgram.log', Monolog\Logger::INFO));
   }
 }
 
@@ -87,10 +87,12 @@ function time_ago($date) {
 }
 
 function download_file($url, $ext='jpg') {
-  Logger::$log->info('Downloading temp file', ['url'=>$url]);
 
   $filename = tempnam(__DIR__.'/../tmp/', 'ig').'.'.$ext;
   $fp = fopen($filename, 'w+');
+
+  Logger::$log->info('Downloading temp file', ['url'=>$url, 'tmpfile'=>$filename]);
+
   $ch = curl_init();
   curl_setopt($ch, CURLOPT_URL, $url);
   curl_setopt($ch, CURLOPT_FILE, $fp);
@@ -102,9 +104,15 @@ function download_file($url, $ext='jpg') {
 }
 
 function copy_to_media_endpoint($user, $file, $type) {
-  if(preg_match('/http:\/\//', $file)) {
-    $tmp = download_file($file);
+  $ext = 'jpg';
+  if($type == 'video/mp4') $ext = 'mp4';
+
+  if(preg_match('/https?:\/\//', $file)) {
+    $tmp = download_file($file, $ext);
   } else {
+    // This fallback case should be fixed. This means this script failed to download the file,
+    // but the URL will just be passed on to the multipart library which will try to download it
+    // itself, probably failing again.
     $tmp = $file;
   }
 
@@ -246,28 +254,29 @@ function micropub_post($user, $params) {
       $photos = [];
       $videos = [];
 
-      if(isset($properties['photo']))
-      foreach($properties['photo'] as $igurl) {
-        $loc = copy_to_media_endpoint($user, $igurl, 'image/jpeg');
-        if($loc) {
-          $photos[] = $loc;
-        } else {
-          $photos[] = $igurl;
+      if(isset($properties['photo'])) {
+        foreach($properties['photo'] as $igurl) {
+          $loc = copy_to_media_endpoint($user, $igurl, 'image/jpeg');
+          if($loc) {
+            $photos[] = $loc;
+          } else {
+            $photos[] = $igurl;
+          }
         }
+        $properties['photo'] = $photos;
       }
 
-      if(isset($properties['video']))
-      foreach($properties['video'] as $igurl) {
-        $loc = copy_to_media_endpoint($user, $igurl, 'video/mp4');
-        if($loc) {
-          $videos[] = $loc;
-        } else {
-          $videos[] = $igurl;
+      if(isset($properties['video'])) {
+        foreach($properties['video'] as $igurl) {
+          $loc = copy_to_media_endpoint($user, $igurl, 'video/mp4');
+          if($loc) {
+            $videos[] = $loc;
+          } else {
+            $videos[] = $igurl;
+          }
         }
+        $properties['video'] = $videos;
       }
-
-      $properties['photo'] = $photos;
-      $properties['video'] = $videos;
     }
 
     $body = json_encode([
