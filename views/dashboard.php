@@ -84,7 +84,7 @@
       </tr>
     </table>
 
-    <p style="font-size:0.9em; color: #999;">Note that OwnYourGram won't actually post anything to Twitter or Facebook for you. All this does is set the appropriate parameter in the Micropub request to indicate to your Micropub endpoint that the post should be syndicated. If you don't yet have this set up, you might want to try <a href="https://silo.pub">silo.pub</a> or <a href="https://www.brid.gy/publish">Bridgy Publish</a> for an easy way to post to Twitter, Facebook and others.</p>
+    <p style="font-size:0.9em; color: #999;">Note that OwnYourGram won't actually post anything to Twitter or Facebook for you. All this does is set the appropriate parameter in the Micropub request to indicate to your Micropub endpoint that the post should be syndicated. If you don't yet have this set up, you might want to try <a href="https://indieweb.org/silo.pub">silo.pub</a> or <a href="https://www.brid.gy/publish">Bridgy Publish</a> for an easy way to post to Twitter, Facebook and others.</p>
   </div>
 
   <div class="panel">
