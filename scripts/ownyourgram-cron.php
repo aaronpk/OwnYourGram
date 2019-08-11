@@ -168,11 +168,11 @@ foreach($users as $user) {
             $entry['category'] = array_unique($entry['category']);
           }
 
-          log_msg("Sending ".($video_filename ? 'video' : 'photo')." ".$url." to micropub endpoint: ".$user->micropub_endpoint.$syndications, $user);
+          log_msg("Sending ".(isset($entry['video']) ? 'video' : 'photo')." ".$url." to micropub endpoint: ".$user->micropub_endpoint.$syndications, $user);
 
           $response = micropub_post($user, $entry);
 
-          $user->last_micropub_response = json_encode($response);
+          $user->last_micropub_response = substr(json_encode($response),0,65535);
           $user->last_instagram_photo = $photo->id;
           $user->last_photo_date = date('Y-m-d H:i:s');
 
