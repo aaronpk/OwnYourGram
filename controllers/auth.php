@@ -40,7 +40,7 @@ $app->get('/auth/start', function() use($app) {
     $_SESSION['auth_state'] = $state;
     $_SESSION['auth_me'] = $me;
 
-    $scope = 'create';
+    $scope = 'create media';
     $authorizationURL = IndieAuth\Client::buildAuthorizationURL($authorizationEndpoint, $me, buildRedirectURI(), clientID(), $state, $scope);
   } else {
     $authorizationURL = false;
@@ -50,7 +50,7 @@ $app->get('/auth/start', function() use($app) {
   // the debugging screens and redirect immediately to the auth endpoint.
   // This will still generate a new access token when they finish logging in.
   $user = ORM::for_table('users')->where('url', $me)->find_one();
-  if($user && $user->micropub_access_token && !array_key_exists('restart', $params)) {
+  if($user && $user->micropub_access_token && !array_key_exists('restart', $params) && $authorizationURL) {
 
     $user->micropub_endpoint = $micropubEndpoint;
     $user->authorization_endpoint = $authorizationEndpoint;
