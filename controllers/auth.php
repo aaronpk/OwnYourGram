@@ -40,7 +40,7 @@ $app->get('/auth/start', function() use($app) {
     $_SESSION['auth_state'] = $state;
     $_SESSION['auth_me'] = $me;
 
-    $scope = 'create';
+    $scope = 'create media';
     $authorizationURL = IndieAuth\Client::buildAuthorizationURL($authorizationEndpoint, $me, buildRedirectURI(), clientID(), $state, $scope);
   } else {
     $authorizationURL = false;
