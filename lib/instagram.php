@@ -32,7 +32,7 @@ function get_user_photos($username, $ignoreCache=false) {
 
   $latest = 0;
 
-  if($data) {
+  if($data && isset($data['data'])) {
     foreach($data['data']['items'] as $photo) {
       if(strtotime($photo['published']) > $latest)
         $latest = strtotime($photo['published']);
