@@ -165,6 +165,34 @@ lag.min 0
 });
 
 
+$app->get('/stats/ratelimited', function() use($app) {
+
+  $params = $app->request()->params();
+
+  if(isset($params['config'])) {
+
+    $response = "graph_title OwnYourGram Rate Limited
+graph_info How long OwnYourGram is rate limited
+graph_vlabel Rate Limited
+graph_category ownyourgram
+graph_args --lower-limit 0
+graph_scale yes
+
+ratelimited.label Rate Limited
+ratelimited.type GAUGE
+ratelimited.min 0
+ratelimited.max 1
+";
+  } else {
+
+    $response = 'ratelimited.value '.(\p3k\redis()->get('ownyourgram-ig-ratelimited') ? 1 : 0);
+  }
+
+  respond_text($app, $response);
+});
+
+
+
 function respond_text(&$app, $response) {
   $app->response()->header('Content-Type', 'text/plain');
   $app->response()->body($response);
