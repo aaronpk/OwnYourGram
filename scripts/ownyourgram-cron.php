@@ -2,6 +2,11 @@
 chdir(dirname(__FILE__).'/..');
 require 'vendor/autoload.php';
 
+if(\p3k\redis()->get('ownyourgram-ig-ratelimited')) {
+  // Rate limited, wait until next cron job
+  die();
+}
+
 $users = ORM::for_table('users')
   ->where('micropub_success', 1)
   ->where_gt('tier', 0)
@@ -37,7 +42,13 @@ if(Config::$redis) {
     $user->save();
 
     $feed = IG\get_user_photos($user->instagram_username);
-    
+
+    if(isset($feed['url']) && $feed['url'] == 'https://www.instagram.com/accounts/login/') {
+      // Instagram returns the login URL when rate limited
+      // Stop all fetches for 5 minutes
+      \p3k\redis()->setex('ownyourgram-ig-ratelimited', 60*4.5, 1);
+    }
+
     if(!$feed || count($feed['items']) == 0) {
       $user->tier = max($user->tier - 1, 0);
       log_msg("Error retrieving user's Instagram feed. Demoting to ".$user->tier, $user);

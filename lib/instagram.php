@@ -59,6 +59,10 @@ function get_user_photos($username, $ignoreCache=false) {
   ];
   if(Config::$redis && count($items))
     \p3k\redis()->setex($cacheKey, $cacheTime, json_encode($response));
+
+  // Don't store the returned URL in the cache
+  $response['url'] = $data['url'];
+
   return $response;
 }
 
