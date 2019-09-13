@@ -13,6 +13,7 @@ $app = new \Slim\Slim(array(
 
 require 'controllers/auth.php';
 require 'controllers/controllers.php';
+require 'controllers/stats.php';
 
 session_start();
 

@@ -7,22 +7,28 @@ $users = ORM::for_table('users')
   ->where_not_null('instagram_username');
 
 if(isset($argv[1])) {
-  if(is_numeric($argv[1])) {
-    $users = $users->where('tier',$argv[1]);
-  } else {
-    $users = $users->where('instagram_username',$argv[1]);
-  }
+  $users = $users->where('instagram_username',$argv[1]);
+} else {
+  $users = $users->where_lt('next_poll_date', date('Y-m-d H:i:s'))
+    ->order_by_asc('next_poll_date');
 }
 
-$users = $users->find_many();
+$user = $users->find_one();
 
-if(count($users)) {
-  echo "========================================\n";
-  echo date('Y-m-d H:i:s') . "\n";
-  echo "Processing " . (is_numeric($argv[1]) ? "Tier" : "User") . " " . $argv[1] . " (" . count($users) . " Users)\n";
+if(!$user) {
+  die();
 }
 
-foreach($users as $user) {
+echo "========================================\n";
+echo date('Y-m-d H:i:s') . "\n";
+echo "Processing User " . $user->instagram_username . "\n";
+$seconds = time() - strtotime($user->next_poll_date);
+echo "Target poll date: ".$user->next_poll_date." (".round($seconds/60)." minute lag)\n";
+
+// Push this timing delay into redis to be graphed later
+if(Config::$redis) {
+  \p3k\redis()->lpush('ownyourgram-poll-lag', $seconds);
+}
 
   try {
 
@@ -34,8 +40,9 @@ foreach($users as $user) {
     if(!$feed) {
       $user->tier = $user->tier - 1;
       log_msg("Error retrieving user's Instagram feed. Demoting to ".$user->tier, $user);
+      set_next_poll_date($user);
       $user->save();
-      continue;
+      die();
     }
 
     $micropub_errors = 0;
@@ -211,6 +218,7 @@ foreach($users as $user) {
       // If they're already at the lowest tier, this will disable polling their account until they log back in.
       $user->tier = $user->tier - 1;
       log_msg("Encountered a Micropub error. Demoting to tier ".$user->tier, $user);
+      set_next_poll_date($user);
       $user->save();
     } else {
       // Check how many photos they've taken in the last 14 days
@@ -233,10 +241,12 @@ foreach($users as $user) {
       if($new_tier > $previous_tier && $successful_photos > 0) {
         log_msg('Upgrading user to tier ' . $new_tier, $user);
         $user->tier = $new_tier;
+        set_next_poll_date($user);
         $user->save();
       } elseif($new_tier < $previous_tier) {
         log_msg('Demoting user to tier ' . $new_tier, $user);
         $user->tier = $new_tier;
+        set_next_poll_date($user);
         $user->save();
       }
     }
@@ -245,13 +255,23 @@ foreach($users as $user) {
     // Bump down a tier on errors
     $user->tier = $user->tier - 1;
     log_msg("There was an error processing this user. Demoting to tier ".$user->tier." '".$e->getMessage()."'", $user);
+    set_next_poll_date($user);
     $user->save();
   }
-}
+
+
 
 function log_msg($msg, $user) {
   echo date('Y-m-d H:i:s ');
   if($user)
     echo '[' . $user->url . '] ';
   echo $msg . "\n";
+}
+
+function set_next_poll_date(&$user) {
+  // Use the user's current polling tier and update their next poll date
+  $seconds = tier_to_seconds($user->tier);
+  $last = strtotime($user->last_poll_date);
+  $next = $last + $seconds;
+  $user->next_poll_date = date('Y-m-d H:i:s', $next);
 }
