@@ -144,7 +144,7 @@ lag.min 0
     }
 
     if(count($timing))
-      $lag = array_sum($timing) / count($timing);
+      $lag = round(array_sum($timing) / count($timing));
     else
       $lag = 0;
 
