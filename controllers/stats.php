@@ -24,7 +24,8 @@ active_users.min 0
     $total_users = ORM::for_table('users')->count();
     $active_users = ORM::for_table('users')
       ->where('micropub_success', 1)
-      ->where_not_null('instagram_username')
+      ->where_gt('tier', 0)
+      ->where_not_equal('instagram_username', '')
       ->count();
     $response = 'total_users.value '.$total_users.'
 active_users.value '.$active_users;
