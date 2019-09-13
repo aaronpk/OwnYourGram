@@ -4,7 +4,7 @@ require 'vendor/autoload.php';
 
 $users = ORM::for_table('users')
   ->where('micropub_success', 1)
-  ->where_not_null('instagram_username');
+  ->where_not_equal('instagram_username', '');
 
 if(isset($argv[1])) {
   $users = $users->where('instagram_username',$argv[1]);
