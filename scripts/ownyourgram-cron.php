@@ -47,6 +47,7 @@ if(Config::$redis) {
       // Instagram returns the login URL when rate limited
       // Stop all fetches for 5 minutes
       \p3k\redis()->setex('ownyourgram-ig-ratelimited', 60*4.5, 1);
+      die();
     }
 
     if(!$feed || count($feed['items']) == 0) {
