@@ -4,6 +4,7 @@ require 'vendor/autoload.php';
 
 $users = ORM::for_table('users')
   ->where('micropub_success', 1)
+  ->where_gt('tier', 0)
   ->where_not_equal('instagram_username', '');
 
 if(isset($argv[1])) {
@@ -38,7 +39,7 @@ if(Config::$redis) {
     $feed = IG\get_user_photos($user->instagram_username);
 
     if(!$feed || count($feed['items']) == 0) {
-      $user->tier = $user->tier - 1;
+      $user->tier = max($user->tier - 1, 0);
       log_msg("Error retrieving user's Instagram feed. Demoting to ".$user->tier, $user);
       set_next_poll_date($user);
       $user->save();
@@ -216,7 +217,7 @@ if(Config::$redis) {
     if($micropub_errors > 0) {
       // Micropub errors demote the user to a lower tier.
       // If they're already at the lowest tier, this will disable polling their account until they log back in.
-      $user->tier = $user->tier - 1;
+      $user->tier = max($user->tier - 1, 0);
       log_msg("Encountered a Micropub error. Demoting to tier ".$user->tier, $user);
       set_next_poll_date($user);
       $user->save();
@@ -253,7 +254,7 @@ if(Config::$redis) {
 
   } catch(Exception $e) {
     // Bump down a tier on errors
-    $user->tier = $user->tier - 1;
+    $user->tier = max($user->tier - 1, 0);
     log_msg("There was an error processing this user. Demoting to tier ".$user->tier." '".$e->getMessage()."'", $user);
     set_next_poll_date($user);
     $user->save();
