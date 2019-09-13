@@ -37,7 +37,7 @@ if(Config::$redis) {
 
     $feed = IG\get_user_photos($user->instagram_username);
 
-    if(!$feed) {
+    if(!$feed || count($feed['items']) == 0) {
       $user->tier = $user->tier - 1;
       log_msg("Error retrieving user's Instagram feed. Demoting to ".$user->tier, $user);
       set_next_poll_date($user);
