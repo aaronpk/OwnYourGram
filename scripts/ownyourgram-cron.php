@@ -37,7 +37,7 @@ if(Config::$redis) {
     $user->save();
 
     $feed = IG\get_user_photos($user->instagram_username);
-
+    
     if(!$feed || count($feed['items']) == 0) {
       $user->tier = max($user->tier - 1, 0);
       log_msg("Error retrieving user's Instagram feed. Demoting to ".$user->tier, $user);
@@ -247,6 +247,10 @@ if(Config::$redis) {
       } elseif($new_tier < $previous_tier) {
         log_msg('Demoting user to tier ' . $new_tier, $user);
         $user->tier = $new_tier;
+        set_next_poll_date($user);
+        $user->save();
+      } else {
+        log_msg('Keeping user at the same tier: '.$new_tier, $user);
         set_next_poll_date($user);
         $user->save();
       }
