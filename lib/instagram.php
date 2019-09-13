@@ -30,7 +30,7 @@ function get_user_photos($username, $ignoreCache=false) {
     'url' => 'https://www.instagram.com/'.$username,
     'expect' => 'feed',
   ];
-  
+
   $http = new \p3k\HTTP(user_agent());
   $response = $http->get('https://xray.p3k.app/parse?'.http_build_query($xrayParams));
   $data = json_decode($response['body'], true);
@@ -40,6 +40,8 @@ function get_user_photos($username, $ignoreCache=false) {
   } else {
     $items = [];
   }
+
+  Logger::$log->info('Photos found:', ['username'=>$username, 'photos'=>count($items)]);
 
   $latest = 0;
 
@@ -81,7 +83,7 @@ function get_profile($username, $ignoreCache=false) {
   $xrayParams = [
     'url' => 'https://www.instagram.com/'.$username,
   ];
-  
+
   $http = new \p3k\HTTP(user_agent());
   $response = $http->get('https://xray.p3k.app/parse?'.http_build_query($xrayParams));
   $data = json_decode($response['body'], true);
