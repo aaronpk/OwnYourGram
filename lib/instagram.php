@@ -20,9 +20,20 @@ function get_user_photos($username, $ignoreCache=false) {
 
   Logger::$log->info('Fetching user timeline', ['username'=>$username]);
 
+/*
   $xray = new \p3k\XRay();
   $xray->http = new \p3k\HTTP(user_agent());
   $data = $xray->parse('https://www.instagram.com/'.$username, ['expect' => 'feed']);
+*/
+
+  $xrayParams = [
+    'url' => 'https://www.instagram.com/'.$username,
+    'expect' => 'feed',
+  ];
+  
+  $http = new \p3k\HTTP(user_agent());
+  $response = $http->get('https://xray.p3k.app/parse?'.http_build_query($xrayParams));
+  $data = json_decode($response['body'], true);
 
   if(isset($data['data']['items'])) {
     $items = $data['data']['items'];
@@ -32,8 +43,8 @@ function get_user_photos($username, $ignoreCache=false) {
 
   $latest = 0;
 
-  if($data) {
-    foreach($data['data']['items'] as $photo) {
+  if(count($items)) {
+    foreach($items as $photo) {
       if(strtotime($photo['published']) > $latest)
         $latest = strtotime($photo['published']);
     }
@@ -61,9 +72,19 @@ function get_profile($username, $ignoreCache=false) {
 
   Logger::$log->info('Fetching Instagram profile', ['username'=>$username]);
 
+/*
   $xray = new \p3k\XRay();
   $xray->http = new \p3k\HTTP(user_agent());
   $data = $xray->parse('https://www.instagram.com/'.$username);
+*/
+
+  $xrayParams = [
+    'url' => 'https://www.instagram.com/'.$username,
+  ];
+  
+  $http = new \p3k\HTTP(user_agent());
+  $response = $http->get('https://xray.p3k.app/parse?'.http_build_query($xrayParams));
+  $data = json_decode($response['body'], true);
 
   if(isset($data['data']['type']) && $data['data']['type'] == 'card') {
     if(Config::$redis)
