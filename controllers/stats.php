@@ -72,6 +72,9 @@ graph_category ownyourgram
 graph_args --lower-limit 0
 graph_scale yes
 
+tier0.label Tier 0
+tier0.type GAUGE
+tier0.min 0
 tier1.label Tier 1
 tier1.type GAUGE
 tier1.min 0
@@ -87,28 +90,34 @@ tier4.min 0
 ";
   } else {
 
+    $tier0 = ORM::for_table('users')
+      ->where('micropub_success', 1)
+      ->where_not_equal('instagram_username', '')
+      ->where('tier', 0)
+      ->count();
     $tier1 = ORM::for_table('users')
       ->where('micropub_success', 1)
-      ->where_not_null('instagram_username')
+      ->where_not_equal('instagram_username', '')
       ->where('tier', 1)
       ->count();
     $tier2 = ORM::for_table('users')
       ->where('micropub_success', 1)
-      ->where_not_null('instagram_username')
+      ->where_not_equal('instagram_username', '')
       ->where('tier', 2)
       ->count();
     $tier3 = ORM::for_table('users')
       ->where('micropub_success', 1)
-      ->where_not_null('instagram_username')
+      ->where_not_equal('instagram_username', '')
       ->where('tier', 3)
       ->count();
     $tier4 = ORM::for_table('users')
       ->where('micropub_success', 1)
-      ->where_not_null('instagram_username')
+      ->where_not_equal('instagram_username', '')
       ->where('tier', 4)
       ->count();
 
-    $response = 'tier1.value '.$tier1.'
+    $response = 'tier0.value '.$tier0.'
+tier1.value '.$tier1.'
 tier2.value '.$tier2.'
 tier3.value '.$tier3.'
 tier4.value '.$tier4;
