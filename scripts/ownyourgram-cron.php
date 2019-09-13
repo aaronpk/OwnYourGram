@@ -48,6 +48,9 @@ if(Config::$redis) {
       // Stop all fetches for 5 minutes
       log_msg("Rejected by Instagram, enabling global rate limit block ", $user);
       \p3k\redis()->setex('ownyourgram-ig-ratelimited', 60*4.5, 1);
+      // Schedule this user again for later at the same tier
+      set_next_poll_date($user);
+      $user->save();
       die();
     }
 
