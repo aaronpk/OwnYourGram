@@ -46,6 +46,7 @@ if(Config::$redis) {
     if(isset($feed['url']) && $feed['url'] == 'https://www.instagram.com/accounts/login/') {
       // Instagram returns the login URL when rate limited
       // Stop all fetches for 5 minutes
+      log_msg("Rejected by Instagram, enabling global rate limit block ", $user);
       \p3k\redis()->setex('ownyourgram-ig-ratelimited', 60*4.5, 1);
       die();
     }
