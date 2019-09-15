@@ -3,8 +3,9 @@ chdir(dirname(__FILE__).'/..');
 require 'vendor/autoload.php';
 
 if($limit=\p3k\redis()->get('ownyourgram-ig-ratelimited')) {
+  $limit = json_decode($limit, true);
   // Rate limited, check if we've passed the cutoff, and increment if not
-  if($limit === 1) {
+  if(!is_array($limit)) {
     // migrate from old rate limiting
     $limit = [
       'wait' => 1,
@@ -13,7 +14,6 @@ if($limit=\p3k\redis()->get('ownyourgram-ig-ratelimited')) {
     \p3k\redis()->set('ownyourgram-ig-ratelimited', json_encode($limit));
     die();
   } else {
-    $limit = json_decode($limit, true);
     if($limit && is_array($limit) && time() < $limit['from']+$limit['wait']) {
       // If now is before the rate limiting says to run, abort now and wait for the next loop
       die();
