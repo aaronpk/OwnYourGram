@@ -8,7 +8,7 @@ if($limit=\p3k\redis()->get('ownyourgram-ig-ratelimited')) {
   if(!is_array($limit)) {
     // migrate from old rate limiting
     $limit = [
-      'wait' => 1,
+      'wait' => 60,
       'from' => time(),
     ];
     \p3k\redis()->set('ownyourgram-ig-ratelimited', json_encode($limit));
