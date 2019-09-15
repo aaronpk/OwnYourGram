@@ -2,9 +2,28 @@
 chdir(dirname(__FILE__).'/..');
 require 'vendor/autoload.php';
 
-if(\p3k\redis()->get('ownyourgram-ig-ratelimited')) {
-  // Rate limited, wait until next cron job
-  die();
+if($limit=\p3k\redis()->get('ownyourgram-ig-ratelimited')) {
+  // Rate limited, check if we've passed the cutoff, and increment if not
+  if($limit === 1) {
+    // migrate from old rate limiting
+    $limit = [
+      'wait' => 1,
+      'from' => time(),
+    ];
+    \p3k\redis()->set('ownyourgram-ig-ratelimited', json_encode($limit));
+    die();
+  } else {
+    $limit = json_decode($limit, true);
+    if($limit && is_array($limit) && time() < $limit['from']+$limit['wait']) {
+      // If now is before the rate limiting says to run, abort now and wait for the next loop
+      die();
+    } else {
+      // If we've passed the rate limiting window, increment the interval and let this loop run
+      $limit['wait'] *= 1.5;
+      $limit['from'] = time();
+      \p3k\redis()->set('ownyourgram-ig-ratelimited', json_encode($limit));
+    }
+  }
 }
 
 $users = ORM::for_table('users')
@@ -45,13 +64,21 @@ if(Config::$redis) {
 
     if(isset($feed['url']) && $feed['url'] == 'https://www.instagram.com/accounts/login/') {
       // Instagram returns the login URL when rate limited
-      // Stop all fetches for 5 minutes
       log_msg("Rejected by Instagram, enabling global rate limit block ", $user);
-      \p3k\redis()->setex('ownyourgram-ig-ratelimited', 60*4.5, 1);
+      // If there is already a rate limit in place, leave it
+      if(!\p3k\redis()->get('ownyourgram-ig-ratelimited')) {
+        \p3k\redis()->set('ownyourgram-ig-ratelimited', json_encode([
+          'wait' => 60,
+          'from' => time()
+        ]));
+      }
       // Schedule this user again for later at the same tier
       set_next_poll_date($user);
       $user->save();
       die();
+    } else {
+      // If this worked, reset the rate limiting
+      \p3k\redis()->del('ownyourgram-ig-ratelimited');
     }
 
     if(!$feed || count($feed['items']) == 0) {
