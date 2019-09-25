@@ -1,3 +1,9 @@
+  <?php if(!Config::$newUsersAllowed): ?>
+  <div class="alert alert-danger">
+    We're experiencing trouble with Instagram blocking requests from this website. New accounts are disabled, and you will experience long delays importing photos on existing accounts.
+  </div>
+<?php endif; ?>
+
   <div class="jumbotron h-x-app">
     <h2 class="p-name">#OwnYourGram</h2>
     <?php if($this->signed_in): ?>
@@ -17,9 +23,10 @@
     <i><strong><?= $this->total_photos ?></strong> grams owned by <?= $this->total_users ?> users on their own sites and counting!</i>
   </div>
 
+  <?php if(count($this->users) > 0): ?>
   <div class="top-users">
     <h3>Top users this week</h3>
-    
+
     <?php
     if(count($this->users) == 0):
       ?>
@@ -49,3 +56,4 @@
       ?>
     </div>
   </div>
+  <?php endif; ?>

@@ -14,6 +14,10 @@ class Logger {
 
 Logger::init();
 
+function user_agent() {
+  return 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.110 Safari/537.36';
+}
+
 function render($page, $data) {
   global $app;
   return $app->render('layout.php', array_merge($data, array('page' => $page)));
@@ -361,7 +365,7 @@ function parse_headers($headers) {
   return $retVal;
 }
 
-// Given an Instagram photo object, return an h-entry array with all the necessary keys.
+// Given an Instagram photo URL, return an h-entry array with all the necessary keys.
 // This method potentially makes additional HTTP requests to fetch venue and other user information.
 function h_entry_from_photo($url, $oldLocationFormat=true, $multiPhoto=false) {
   $entry = array(
@@ -375,9 +379,20 @@ function h_entry_from_photo($url, $oldLocationFormat=true, $multiPhoto=false) {
   if($oldLocationFormat)
     $entry['place_name'] = null;
 
-  $xray = new p3k\XRay();
-  // Fetch the photo permalink, as well as associated profiles and locations
-  $data = $xray->parse($url);
+  if(Config::$xray) {
+    $http = new \p3k\HTTP(user_agent());
+    $response = $http->get('https://'.Config::$xray.'/parse?'.http_build_query([
+      'url' => $url,
+      'instagram_session' => Config::$igCookie,
+    ]));
+    $data = json_decode($response['body'], true);
+  } else {
+    $xray = new p3k\XRay();
+    // Fetch the photo permalink, as well as associated profiles and locations
+    $data = $xray->parse($url, [
+      'instagram_session' => Config::$igCookie
+    ]);
+  }
 
   if(!$data || $data['code'] != 200) {
     return null;

@@ -4,10 +4,6 @@ use DOMDocument, DOMXPath;
 use Config;
 use Logger;
 
-function user_agent() {
-  return 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.110 Safari/537.36';
-}
-
 function get_user_photos($username, $ignoreCache=false) {
   $cacheKey = Config::$hostname.'::userfeed::'.$username;
   $cacheTime = 60*15; # cache feeds for 15 minutes
@@ -20,20 +16,22 @@ function get_user_photos($username, $ignoreCache=false) {
 
   Logger::$log->info('Fetching user timeline', ['username'=>$username]);
 
-/*
-  $xray = new \p3k\XRay();
-  $xray->http = new \p3k\HTTP(user_agent());
-  $data = $xray->parse('https://www.instagram.com/'.$username, ['expect' => 'feed']);
-*/
-
-  $xrayParams = [
-    'url' => 'https://www.instagram.com/'.$username,
-    'expect' => 'feed',
-  ];
-
-  $http = new \p3k\HTTP(user_agent());
-  $response = $http->get('https://xray.p3k.app/parse?'.http_build_query($xrayParams));
-  $data = json_decode($response['body'], true);
+  if(Config::$xray) {
+    $http = new \p3k\HTTP(user_agent());
+    $response = $http->get('https://'.Config::$xray.'/parse?'.http_build_query([
+      'url' => 'https://www.instagram.com/'.$username,
+      'expect' => 'feed',
+      'instagram_session' => Config::$igCookie,
+    ]));
+    $data = json_decode($response['body'], true);
+  } else {
+    $xray = new \p3k\XRay();
+    $xray->http = new \p3k\HTTP(user_agent());
+    $data = $xray->parse('https://www.instagram.com/'.$username, [
+      'expect' => 'feed',
+      'instagram_session' => Config::$igCookie,
+    ]);
+  }
 
   if(isset($data['data']['items'])) {
     $items = $data['data']['items'];
@@ -78,19 +76,20 @@ function get_profile($username, $ignoreCache=false) {
 
   Logger::$log->info('Fetching Instagram profile', ['username'=>$username]);
 
-/*
-  $xray = new \p3k\XRay();
-  $xray->http = new \p3k\HTTP(user_agent());
-  $data = $xray->parse('https://www.instagram.com/'.$username);
-*/
-
-  $xrayParams = [
-    'url' => 'https://www.instagram.com/'.$username,
-  ];
-
-  $http = new \p3k\HTTP(user_agent());
-  $response = $http->get('https://xray.p3k.app/parse?'.http_build_query($xrayParams));
-  $data = json_decode($response['body'], true);
+  if(Config::$xray) {
+    $http = new \p3k\HTTP(user_agent());
+    $response = $http->get('https://'.Config::$xray.'/parse?'.http_build_query([
+      'url' => 'https://www.instagram.com/'.$username,
+      'instagram_session' => Config::$igCookie,
+    ]));
+    $data = json_decode($response['body'], true);
+  } else {
+    $xray = new \p3k\XRay();
+    $xray->http = new \p3k\HTTP(user_agent());
+    $data = $xray->parse('https://www.instagram.com/'.$username, [
+      'instagram_session' => Config::$igCookie,
+    ]);
+  }
 
   if(isset($data['data']['type']) && $data['data']['type'] == 'card') {
     if(Config::$redis)

@@ -1,7 +1,7 @@
 <?php
 
 function buildRedirectURI() {
-  return (Config::$ssl ? 'https' : 'http') . '://' . $_SERVER['SERVER_NAME'] . '/auth/callback';
+  return (Config::$ssl ? 'https' : 'http') . '://' . Config::$hostname . '/auth/callback';
 }
 
 function clientID() {
@@ -158,18 +158,36 @@ $app->get('/auth/callback', function() use($app) {
       }
 
     } else {
-      // New user! Store the user in the database
-      $user = ORM::for_table('users')->create();
-      $user->url = $me;
-      $user->date_created = date('Y-m-d H:i:s');
-      $user->tier = 4;
 
-      $q = micropub_get($micropubEndpoint, $token['auth']['access_token'], ['q'=>'config']);
-      if($q && isset($q['data']) && isset($q['data']['media-endpoint'])) {
-        $user->media_endpoint = $q['data']['media-endpoint'];
-        // $user->send_media_as = 'url';
+      if(Config::$newUsersAllowed) {
+
+        // New user! Store the user in the database
+        $user = ORM::for_table('users')->create();
+        $user->url = $me;
+        $user->date_created = date('Y-m-d H:i:s');
+        $user->tier = 4;
+
+        $q = micropub_get($micropubEndpoint, $token['auth']['access_token'], ['q'=>'config']);
+        if($q && isset($q['data']) && isset($q['data']['media-endpoint'])) {
+          $user->media_endpoint = $q['data']['media-endpoint'];
+          // $user->send_media_as = 'url';
+        }
+
+      } else {
+
+        unset($_SESSION['auth_state']);
+        unset($_SESSION['auth_me']);
+        unset($_SESSION['user_id']);
+        unset($_SESSION['me']);
+
+        render('auth_error', array(
+          'title' => 'Registration Disabled',
+          'error' => 'Registration Disabled',
+          'errorDescription' => 'Sorry, This website is not configured to allow new users to log in. Only users with an existing account can log in.'
+        ));
+        return;
+
       }
-
     }
     $user->micropub_endpoint = $micropubEndpoint;
     $user->micropub_access_token = $token['auth']['access_token'];

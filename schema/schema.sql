@@ -1,7 +1,7 @@
 CREATE TABLE `users` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `url` varchar(255) DEFAULT NULL,
-  `tier` TINYINT(4) NOT NULL DEFAULT 4,
+  `tier` TINYINT(4) NOT NULL DEFAULT '3',
   `instagram_user_id` varchar(255) DEFAULT NULL,
   `instagram_username` varchar(255) DEFAULT NULL,
   `instagram_access_token` varchar(255) DEFAULT NULL,
@@ -40,10 +40,20 @@ CREATE TABLE `photos` (
   `user_id` int(11) unsigned NOT NULL,
   `instagram_url` varchar(255) DEFAULT NULL,
   `instagram_img` varchar(512) DEFAULT NULL,
-  `instagram_img_list` text DEFAULT NULL,
+  `instagram_img_list` text,
   `published` datetime DEFAULT NULL,
   `instagram_data` text,
   `canonical_url` varchar(255) DEFAULT NULL,
-  `processed` tinyint(4) NOT NULL DEFAULT 0,
+  `processed` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `syndication_rules` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT NULL,
+  `match` varchar(255) DEFAULT NULL,
+  `syndicate_to` text,
+  `syndicate_to_name` text,
+  PRIMARY KEY (`id`)
+);
+

@@ -2,26 +2,30 @@
 chdir(dirname(__FILE__).'/..');
 require 'vendor/autoload.php';
 
-if($limit=\p3k\redis()->get('ownyourgram-ig-ratelimited')) {
-  $limit = json_decode($limit, true);
-  // Rate limited, check if we've passed the cutoff, and increment if not
-  if(!is_array($limit)) {
-    // migrate from old rate limiting
-    $limit = [
-      'wait' => 60,
-      'from' => time(),
-    ];
-    \p3k\redis()->set('ownyourgram-ig-ratelimited', json_encode($limit));
-    die();
-  } else {
-    if($limit && is_array($limit) && time() < $limit['from']+$limit['wait']) {
-      // If now is before the rate limiting says to run, abort now and wait for the next loop
+if(Config::$redis) {
+  if($limit=\p3k\redis()->get('ownyourgram-ig-ratelimited')) {
+    $limit = json_decode($limit, true);
+    // Rate limited, check if we've passed the cutoff, and increment if not
+    if(!is_array($limit)) {
+      // migrate from old rate limiting
+      $limit = [
+        'wait' => 60,
+        'from' => time(),
+      ];
+      \p3k\redis()->set('ownyourgram-ig-ratelimited', json_encode($limit));
       die();
     } else {
-      // If we've passed the rate limiting window, increment the interval and let this loop run
-      $limit['wait'] *= 1.5;
-      $limit['from'] = time();
-      \p3k\redis()->set('ownyourgram-ig-ratelimited', json_encode($limit));
+      if($limit && is_array($limit) && time() < $limit['from']+$limit['wait']) {
+        // If now is before the rate limiting says to run, abort now and wait for the next loop
+        die();
+      } else {
+        // If we've passed the rate limiting window, increment the interval and let this loop run
+        $limit['wait'] *= 1.5;
+        // Cap the rate limiting at 24 hours
+        if($limit['wait'] > 86400) $limit['wait'] = 86400;
+        $limit['from'] = time();
+        \p3k\redis()->set('ownyourgram-ig-ratelimited', json_encode($limit));
+      }
     }
   }
 }
@@ -63,22 +67,26 @@ if(Config::$redis) {
     $feed = IG\get_user_photos($user->instagram_username);
 
     if(isset($feed['url']) && $feed['url'] == 'https://www.instagram.com/accounts/login/') {
-      // Instagram returns the login URL when rate limited
-      log_msg("Rejected by Instagram, enabling global rate limit block ", $user);
-      // If there is already a rate limit in place, leave it
-      if(!\p3k\redis()->get('ownyourgram-ig-ratelimited')) {
-        \p3k\redis()->set('ownyourgram-ig-ratelimited', json_encode([
-          'wait' => 60,
-          'from' => time()
-        ]));
+      if(Config::$redis) {
+        // Instagram returns the login URL when rate limited
+        log_msg("Rejected by Instagram, enabling global rate limit block ", $user);
+        // If there is already a rate limit in place, leave it
+        if(!\p3k\redis()->get('ownyourgram-ig-ratelimited')) {
+          \p3k\redis()->set('ownyourgram-ig-ratelimited', json_encode([
+            'wait' => 60,
+            'from' => time()
+          ]));
+        }
       }
       // Schedule this user again for later at the same tier
       set_next_poll_date($user);
       $user->save();
       die();
     } else {
-      // If this worked, reset the rate limiting
-      \p3k\redis()->del('ownyourgram-ig-ratelimited');
+      if(Config::$redis) {
+        // If this worked, reset the rate limiting
+        \p3k\redis()->del('ownyourgram-ig-ratelimited');
+      }
     }
 
     if(!$feed || count($feed['items']) == 0) {
