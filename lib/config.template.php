@@ -10,15 +10,15 @@ class Config {
   #public static $redis = 'tcp://127.0.0.1:6379';
   public static $cacheIGRequests = true;
 
-  public static $xray = 'xray.p3k.app';
-  #public static $xray = false; // set to false to fetch locally
+  #public static $xray = 'xray.example.com'; // Set this to the hostname of an XRay server to fetch remotely
+  public static $xray = false; // set to false to fetch from the local server
   public static $igCookie = false;
 
   public static $db = [
     'host' => '127.0.0.1',
     'database' => 'ownyourgram',
     'username' => 'ownyourgram',
-    'password' => '',
+    'password' => 'ownyourgram',
   ];
 }
 

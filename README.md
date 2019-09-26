@@ -83,7 +83,8 @@ Ensure you have something like the following in a server block for OwnYourGram, 
 #### built-in server
 
 ```
-php -S 127.0.0.1:8080 -t public
+cd public
+php -S 127.0.0.1:8080 router.php
 ```
 
 Now you can visit the app and log in! The first time you log in it will prompt you to connect an Instagram account.
