@@ -6,6 +6,8 @@ class Config {
 
   public static $redis = false;
   public static $cacheIGRequests = false;
+  
+  public static $xray = false;
 
   public static $db = [
     'host' => '127.0.0.1',
