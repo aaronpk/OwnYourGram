@@ -63,7 +63,7 @@ exit
 Create the tables:
 
 ```
-mysql -u ownyourgram -pownyourgram < schema/schema.sql
+mysql -u ownyourgram -p ownyourgram < schema/schema.sql
 ```
 
 Configure a web server to serve the `public` folder of this project, or use the built-in PHP server.
