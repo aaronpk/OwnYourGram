@@ -441,6 +441,8 @@ function h_entry_from_photo($url, $oldLocationFormat=true, $multiPhoto=false) {
     $entry['photo'] = $photo['photo'];
   }
 
+  $entry['author'] = $photo['author'];
+
   return $entry;
 }
 

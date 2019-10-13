@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "6f9de82103fb5e6922fd694b8f2179fe",
+    "content-hash": "e31a9382ef7499d16893be643694a503",
     "packages": [
         {
             "name": "cebe/markdown",
@@ -471,16 +471,16 @@
         },
         {
             "name": "mf2/mf2",
-            "version": "v0.4.5",
+            "version": "0.4.6",
             "source": {
                 "type": "git",
-                "url": "https://github.com/indieweb/php-mf2.git",
-                "reference": "35fee8b6481695438a44f336534b4cd782bcd518"
+                "url": "https://github.com/microformats/php-mf2.git",
+                "reference": "00b70ee7eb7f5b0585b1bd467f6c9cbd75055d23"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/indieweb/php-mf2/zipball/35fee8b6481695438a44f336534b4cd782bcd518",
-                "reference": "35fee8b6481695438a44f336534b4cd782bcd518",
+                "url": "https://api.github.com/repos/microformats/php-mf2/zipball/00b70ee7eb7f5b0585b1bd467f6c9cbd75055d23",
+                "reference": "00b70ee7eb7f5b0585b1bd467f6c9cbd75055d23",
                 "shasum": ""
             },
             "require": {
@@ -523,7 +523,7 @@
                 "parser",
                 "semantic"
             ],
-            "time": "2018-08-02T17:12:58+00:00"
+            "time": "2018-08-24T14:47:04+00:00"
         },
         {
             "name": "michelf/php-markdown",
@@ -699,16 +699,16 @@
         },
         {
             "name": "p3k/http",
-            "version": "0.1.7",
+            "version": "0.1.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aaronpk/p3k-http.git",
-                "reference": "1826647c4902a18dea5ec532f21509ba4d51210b"
+                "reference": "a43977636d7a930080009eddda06994037c88fd7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aaronpk/p3k-http/zipball/1826647c4902a18dea5ec532f21509ba4d51210b",
-                "reference": "1826647c4902a18dea5ec532f21509ba4d51210b",
+                "url": "https://api.github.com/repos/aaronpk/p3k-http/zipball/a43977636d7a930080009eddda06994037c88fd7",
+                "reference": "a43977636d7a930080009eddda06994037c88fd7",
                 "shasum": ""
             },
             "require": {
@@ -733,7 +733,7 @@
             ],
             "description": "A simple wrapper API around the PHP curl functions",
             "homepage": "https://github.com/aaronpk/p3k-http",
-            "time": "2018-03-04T15:21:58+00:00"
+            "time": "2019-06-15T20:49:26+00:00"
         },
         {
             "name": "p3k/multipart",
@@ -914,16 +914,16 @@
         },
         {
             "name": "p3k/xray",
-            "version": "v1.6.7",
+            "version": "v1.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aaronpk/XRay.git",
-                "reference": "43db6098fc442ba533c5f6f7a94508ae2837397a"
+                "reference": "1213ee080d56d5c20aee58b88d998097bc4636e2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aaronpk/XRay/zipball/43db6098fc442ba533c5f6f7a94508ae2837397a",
-                "reference": "43db6098fc442ba533c5f6f7a94508ae2837397a",
+                "url": "https://api.github.com/repos/aaronpk/XRay/zipball/1213ee080d56d5c20aee58b88d998097bc4636e2",
+                "reference": "1213ee080d56d5c20aee58b88d998097bc4636e2",
                 "shasum": ""
             },
             "require": {
@@ -934,8 +934,8 @@
                 "indieweb/link-rel-parser": "0.1.*",
                 "masterminds/html5": "^2.3",
                 "mf2/mf2": "^0.4",
-                "p3k/http": ">=0.1.7",
-                "p3k/picofeed": ">=0.1.38",
+                "p3k/http": ">=0.1.8",
+                "p3k/picofeed": ">=0.1.35",
                 "p3k/timezone": "*"
             },
             "require-dev": {
@@ -959,7 +959,7 @@
             ],
             "description": "X-Ray returns structured data from any URL",
             "homepage": "https://github.com/aaronpk/XRay",
-            "time": "2018-08-13T19:46:40+00:00"
+            "time": "2019-10-13T18:11:19+00:00"
         },
         {
             "name": "predis/predis",
@@ -1982,6 +1982,7 @@
                 "mock",
                 "xunit"
             ],
+            "abandoned": true,
             "time": "2018-02-15T05:27:38+00:00"
         },
         {

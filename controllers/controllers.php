@@ -405,6 +405,7 @@ $app->post('/instagram/test.json', function() use($app) {
       }
 
       $photo->canonical_url = $location;
+      $photo->date_imported = date('Y-m-d H:i:s');
     } else {
       $location = false;
 
@@ -423,3 +424,79 @@ $app->post('/instagram/test.json', function() use($app) {
     )));
   }
 });
+
+$app->post('/instagram/preview-import.json', function() use($app) {
+  if($user=require_login($app)) {
+    $params = $app->request()->params();
+
+    $app->response()->header('Content-Type', 'application/json');
+
+    if(empty($params['url'])) {
+      $app->response()->body(json_encode([
+        'error' => 'invalid_input',
+        'error_description' => 'No URL provided',
+      ]));
+      return;
+    }
+
+    if(!preg_match('/https?:\/\/www\.instagram\.com\/p\/[a-zA-Z0-9]+/', $params['url'])) {
+      $app->response()->body(json_encode([
+        'error' => 'invalid_url',
+        'error_description' => 'The URL provided does not appear to be an instagram photo URL',
+      ]));
+      return;
+    }
+
+    $instagram_url = $params['url'];
+
+    // Check if this photo has already been imported into the database
+    $photo = ORM::for_table('photos')
+      ->where('user_id', $user->id)
+      ->where('instagram_url', $instagram_url)
+      ->find_one();
+
+    // Create an h-entry from this photo.
+    // We always want to do this even if the photo has been seen before, in case the user
+    // has changed their import settings or in case of previous failures.
+    // This may cause some additional HTTP requests to fetch venue information and such.
+    $entry = h_entry_from_photo($instagram_url, $user->send_media_as == 'upload', $user->multi_photo);
+
+    // Double check that this photo belongs to them and is not from a different user
+    if($entry['author']['nickname'] != $user->instagram_username) {
+      $app->response()->body(json_encode([
+        'error' => 'forbidden',
+        'error_description' => 'This photo is from a different user\'s Instagram account. You can only import your own photos',
+      ]));
+      return;
+    }
+
+    // Now add the photo to the database (or update the existing one)
+    if(!$photo) {
+      $photo = ORM::for_table('photos')->create();
+      $photo->user_id = $user->id;
+      $photo->instagram_url = $instagram_url;
+    }
+    $photo->instagram_data = json_encode($entry);
+    if($user->multi_photo && is_array($entry['photo']) && (count($entry['photo']) > 1)) {
+      $photo->instagram_img_list = json_encode($entry['photo']);
+    } else {
+      if(is_array($entry['photo'])) $entry['photo'] = $entry['photo'][0];
+      $photo->instagram_img = $entry['photo'];
+    }
+    $photo->published = date('Y-m-d H:i:s', strtotime($entry['published']));
+    $photo->save();
+
+
+    $app->response()->body(json_encode([
+      'instagram_url' => $photo->instagram_url,
+      'instagram_img' => $photo->instagram_img,
+      'instagram_img_list' => json_decode($photo->instagram_img_list),
+      'video' => (isset($entry['video']) ? $entry['video'] : false),
+      'canonical_url' => $photo->canonical_url,
+      'id' => $photo->id,
+      'data' => $entry,
+    ]));
+    return;
+  }
+});
+

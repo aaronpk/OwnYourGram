@@ -240,6 +240,7 @@ if(Config::$redis) {
             $user->photo_count_this_week = $user->photo_count_this_week + 1;
 
             $photo->canonical_url = $photo_url;
+            $photo->date_imported = date('Y-m-d H:i:s');
             $successful_photos++;
             log_msg("Posted to ".$photo_url, $user);
           } else {
