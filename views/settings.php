@@ -39,14 +39,14 @@
   <div class="panel container-fluid">
     <form class="row">
       <div class="col-md-6 whitelist">
-        <h4>Whitelist</h4>
+        <h4>Match Photos</h4>
         <p>Import photos <b>only if</b> the photo caption has one of the keywords listed here.</p>
         <textarea class="form-control" id="whitelist-keywords" placeholder="space-separated keywords"><?= htmlspecialchars($this->user->whitelist) ?></textarea>
         <input type="button" class="btn btn-primary" value="Save" id="whitelist-save" style="margin-top:4px;">
         <div class="hidden check">&check;</div>
       </div>
       <div class="col-md-6 blacklist">
-        <h4>Blacklist</h4>
+        <h4>Block Photos</h4>
         <p>Prevent importing photos that contain any of the keywords listed here.</p>
         <textarea class="form-control" id="blacklist-keywords" placeholder="space-separated keywords"><?= htmlspecialchars($this->user->blacklist) ?></textarea>
         <input type="button" class="btn btn-primary" value="Save" id="blacklist-save" style="margin-top:4px;">
@@ -312,7 +312,7 @@
     #instagram_photos .p {
       position: relative;
       width: 212px;
-      margin: 0 auto;      
+      margin: 0 auto;
     }
 
     #instagram_photos img {
@@ -323,7 +323,7 @@
     #instagram_photos .multi img {
       box-shadow: none;
     }
-    
+
     #instagram_photos .btn {
       margin-top: 10px;
     }
@@ -334,7 +334,7 @@
     $("#loading").removeClass("hidden");
     $.get("/instagram/photos.json", function(data){
       $("#loading").addClass("hidden");
-      
+
       if(data.items.length == 0) {
         $("#instagram_photos_error").removeClass("hidden");
         return;

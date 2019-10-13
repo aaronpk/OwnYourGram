@@ -72,8 +72,9 @@ if(Config::$redis) {
         log_msg("Rejected by Instagram, enabling global rate limit block ", $user);
         // If there is already a rate limit in place, leave it
         if(!\p3k\redis()->get('ownyourgram-ig-ratelimited')) {
+          // Enable rate limiting
           \p3k\redis()->set('ownyourgram-ig-ratelimited', json_encode([
-            'wait' => 60,
+            'wait' => 600,
             'from' => time()
           ]));
         }
@@ -102,11 +103,6 @@ if(Config::$redis) {
 
     foreach($feed['items'] as $item) {
       $url = $item['url'];
-
-      // Skip any photos from before the cron task was launched
-      if(strtotime($item['published']) < strtotime('2016-05-31T14:00:00-0700')) {
-        continue;
-      }
 
       // Skip any photos from before their OYG account was created
       // I've been getting reports from people that they were surprised when OYG imported older photos,
@@ -273,18 +269,18 @@ if(Config::$redis) {
       set_next_poll_date($user);
       $user->save();
     } else {
-      // Check how many photos they've taken in the last 14 days
+      // Check how many photos they've taken in the last 30 days
       $previous_tier = $user->tier;
 
       $count = ORM::for_table('photos')
         ->where('user_id', $user->id)
-        ->where_gt('published', date('Y-m-d H:i:s', strtotime('-14 days')))
+        ->where_gt('published', date('Y-m-d H:i:s', strtotime('-30 days')))
         ->count();
-      if($count >= 7) {
+      if($count >= 15) {
         $new_tier = 4;
-      } elseif($count >= 4) {
+      } elseif($count >= 8) {
         $new_tier = 3;
-      } elseif($count >= 2) {
+      } elseif($count >= 4) {
         $new_tier = 2;
       } else {
         $new_tier = 1;

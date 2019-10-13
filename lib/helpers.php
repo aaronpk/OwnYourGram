@@ -60,19 +60,19 @@ function k($a, $k, $default=null) {
 
 function polling_tier_description($tier) {
   switch($tier) {
-    case 4: return '15 minutes';
-    case 3: return 'hour';
-    case 2: return '6 hours';
-    case 1: return '24 hours';
+    case 4: return '24 hours';
+    case 3: return '48 hours';
+    case 2: return '72 hours';
+    case 1: return 'once a week';
   }
 }
 
 function tier_to_seconds($tier) {
   switch($tier) {
-    case 4: return 15 * 60;
-    case 3: return 60 * 60;
-    case 2: return 6 * 60 * 60;
-    case 1: return 24 * 60 * 60;
+    case 4: return 24 * 60 * 60;
+    case 3: return 48 * 60 * 60;
+    case 2: return 72 * 60 * 60;
+    case 1: return 24 * 7 * 60 * 60;
   }
 }
 

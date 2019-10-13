@@ -46,6 +46,10 @@ $app->get('/', function($format='html') use($app) {
 });
 
 $app->get('/dashboard', function() use($app) {
+  $app->redirect('/photos', 302);
+});
+
+$app->get('/settings', function() use($app) {
   if($user=require_login($app)) {
 
     if(!$user->instagram_username) {
@@ -59,8 +63,8 @@ $app->get('/dashboard', function() use($app) {
       ->order_by_asc('match')
       ->find_many();
 
-    render('dashboard', array(
-      'title' => 'OwnYourGram Dashboard',
+    render('settings', array(
+      'title' => 'Settings - OwnYourGram',
       'user' => $user,
       'rules' => $rules,
     ));
@@ -69,9 +73,30 @@ $app->get('/dashboard', function() use($app) {
 
 $app->get('/photos', function() use($app) {
   if($user=require_login($app)) {
+
+    $photoQuery = ORM::for_table('photos')
+      ->where('user_id', $user->id)
+      ->order_by_desc('published')
+      ->limit(20)
+      ->find_many();
+
+    $photos = [];
+    foreach($photoQuery as $photo) {
+      $photos[] = [
+        'instagram_url' => $photo->instagram_url,
+        'instagram_img' => $photo->instagram_img,
+        'instagram_img_list' => json_decode($photo->instagram_img_list),
+        'video' => (isset($entry['video']) ? $entry['video'] : false),
+        'canonical_url' => $photo->canonical_url,
+        'id' => $photo->id,
+        'data' => json_decode($photo->instagram_data, true),
+      ];
+    }
+
     render('photos', array(
       'title' => 'Import Photos - OwnYourGram',
       'user' => $user,
+      'photos' => $photos,
     ));
   }
 });
