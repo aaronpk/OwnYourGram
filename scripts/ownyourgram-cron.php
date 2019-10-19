@@ -32,6 +32,7 @@ if(Config::$redis) {
 
 $users = ORM::for_table('users')
   ->where('micropub_success', 1)
+  ->where('polling_enabled', 1)
   ->where_gt('tier', 0)
   ->where_not_equal('instagram_username', '');
 

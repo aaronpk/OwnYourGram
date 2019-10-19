@@ -18,7 +18,20 @@
 
     <p>You are logged in as <b><?= $this->user->url ?></b> and are connected to the Instagram username <b><a href="https://instagram.com/<?= $this->user->instagram_username ?>"><?= $this->user->instagram_username ?></a></b>.</p>
 
-    <a href="#" id="disconnect-instagram" class="btn btn-xs btn-warning">Disconnect Instagram</a>
+    <div id="polling-save-option">
+      <p>With polling enabled, OwnYourGram will attempt to check your Instagram account for new photos periodically and send them to your website. With polling disabled, OwnYourGram will only post photos to your site when you explictly post them through the <a href="/photos">Photos</a> page.</p>
+      <ul>
+        <li><input type="radio" name="polling_enabled" value="1" <?= $this->user->polling_enabled == 1 ? 'checked="checked"' : '' ?>> Enable Polling</li>
+        <li><input type="radio" name="polling_enabled" value="0" <?= $this->user->polling_enabled == 0 ? 'checked="checked"' : '' ?>> Disable Polling</li>
+      </ul>
+      <input type="button" class="btn btn-primary" value="Save" id="polling-save" style="margin-top:4px;">
+      <span class="hidden check">&check;</span>
+    </div>
+
+    <div style="margin-top: 1em;">
+      <p>You can completely disconnect your Instagram account with the button below. You will need to reconnect and verify your Instagram account again if you do.</p>
+      <a href="#" id="disconnect-instagram" class="btn btn-xs btn-danger">Disconnect Instagram</a>
+    </div>
   </div>
 
   <div class="panel container-fluid">
@@ -218,6 +231,19 @@
         window.location = window.location;
       });
       return false;
+    });
+
+    $("#polling-save").click(function(){
+      $("#polling-save").addClass("disabled");
+      $.post("/prefs/save", {
+        polling_enabled: $("input[name=polling_enabled]:checked").val()
+      }, function(data){
+        $("#polling-save").removeClass("disabled");
+        $("#polling-save-option .check").removeClass("hidden");
+        setTimeout(function(){
+          $("#polling-save-option .check").addClass("hidden");
+        }, 500);
+      });
     });
 
   });

@@ -30,6 +30,7 @@ CREATE TABLE `users` (
   `whitelist` text CHARACTER SET utf8mb4,
   `blacklist` text CHARACTER SET utf8mb4,
   `add_tags` text CHARACTER SET utf8mb4,
+  `polling_enabled` tinyint(4) NOT NULL DEFAULT '1',
   `send_media_as` varchar(20) NOT NULL DEFAULT 'upload',
   `multi_photo` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)

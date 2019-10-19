@@ -344,6 +344,8 @@ $app->post('/prefs/save', function() use($app) {
       $user->send_media_as = $params['send_media_as'];
     if(array_key_exists('multi_photo', $params))
       $user->multi_photo = $params['multi_photo'];
+    if(array_key_exists('polling_enabled', $params))
+      $user->polling_enabled = $params['polling_enabled'] ? 1 : 0;
 
     $user->save();
 
