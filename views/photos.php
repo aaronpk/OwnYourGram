@@ -93,7 +93,7 @@
   <form id="preview-import-form">
     <div class="form-group">
       <label for="import-url">Instagram Post</label>
-      <input type="url" id="import-url" class="form-control" placeholder="https://www.instagram.com/p/B3fIP5zhT0P/">
+      <input type="url" id="import-url" class="form-control" placeholder="https://www.instagram.com/p/B3fIP5zhT0P/" value="<?= htmlspecialchars($this->input_url) ?>">
       <p class="help-block">Paste a link to one of your Instagram posts above to begin importing it</p>
     </div>
     <button type="submit" class="btn btn-primary disabled" id="preview-import-button">Preview Import</button>
@@ -230,6 +230,11 @@ $(function(){
       });
       return false;
     });
+
+    // click the preview button if a URL is prefilled from the query string
+    if($("#import-url").val()) {
+      $("#preview-import-button").click();
+    }
 
     $("#do-import-button").click(function(){
       $("#do-import-button").addClass("disabled");

@@ -93,10 +93,13 @@ $app->get('/photos', function() use($app) {
       ];
     }
 
+    $params = $app->request()->params();
+
     render('photos', array(
       'title' => 'Import Photos - OwnYourGram',
       'user' => $user,
       'photos' => $photos,
+      'input_url' => ($params['url'] ?? false)
     ));
   }
 });

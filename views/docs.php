@@ -15,6 +15,16 @@ OwnYourGram will still continue to poll your profile, however it does so only on
 
 If OwnYourGram encounters too many Micropub errors when posting the photo to your site, your automatic import may be disabled entirely.
 
+### Integration with Other Apps {#integration}
+
+You can launch the individual photo import interface with an Instagram URL pre-filled. You can use this to integrate with other applications, such as iOS Shortcuts, to send an Instagram photo URL to OwnYourGram and import the photo with just one more click.
+
+To preview importing a photo from Instagram, add a parameter <code>url</code> to the <code>/photos</code> page with an Instagram URL, e.g.:
+
+```
+https://ownyourgram.com/photos?url=https://www.instagram.com/p/B3fIP5zhT0P/
+```
+
 
 ## Micropub {#micropub}
 
