@@ -337,10 +337,10 @@ $app->post('/prefs/save', function() use($app) {
   if($user=require_login($app)) {
     $params = $app->request()->params();
 
-    if(array_key_exists('blacklist', $params))
-      $user->blacklist = $params['blacklist'];
-    if(array_key_exists('whitelist', $params))
-      $user->whitelist = $params['whitelist'];
+    if(array_key_exists('blocklist', $params))
+      $user->blocklist = $params['blocklist'];
+    if(array_key_exists('allowlist', $params))
+      $user->allowlist = $params['allowlist'];
     if(array_key_exists('add_tags', $params))
       $user->add_tags = $params['add_tags'];
     if(array_key_exists('send_media_as', $params))
