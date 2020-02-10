@@ -145,57 +145,57 @@ if(Config::$redis) {
         $photo->published = date('Y-m-d H:i:s', strtotime($entry['published']));
         $photo->save();
 
-        // Check the whitelist/blacklist
-        if($user->whitelist) {
-          // Default to not post unless something in the whitelist matches
+        // Check the allow/blocklist
+        if($user->allowlist) {
+          // Default to not post unless something in the allowlist matches
           $should_import = false;
 
-          $whitelist_matched = false;
-          $blacklist_matched = false;
+          $allowlist_matched = false;
+          $blocklist_matched = false;
 
-          // If there is a whitelist, check that the caption contains one of the words
-          $whitelist_words = preg_split('/[ ]+/', $user->whitelist);
-          foreach($whitelist_words as $word) {
+          // If there is a allowlist, check that the caption contains one of the words
+          $allowlist_words = preg_split('/[ ]+/', $user->allowlist);
+          foreach($allowlist_words as $word) {
             if(stripos($entry['content'], $word) !== false) {
               $should_import = true;
-              $whitelist_matched = $word;
+              $allowlist_matched = $word;
             }
           }
 
-          // If there is also a blacklist, check that now
-          $blacklist_words = preg_split('/[ ]+/', $user->blacklist);
-          foreach($blacklist_words as $word) {
+          // If there is also a blocklist, check that now
+          $blocklist_words = preg_split('/[ ]+/', $user->blocklist);
+          foreach($blocklist_words as $word) {
             if(stripos($entry['content'], $word) !== false) {
               $should_import = false;
-              $blacklist_matched = $word;
+              $blocklist_matched = $word;
             }
           }
 
-          if($whitelist_matched)
-            log_msg("Whitelist matched ".$whitelist_matched, $user);
-          if($blacklist_matched)
-            log_msg("Blacklist matched ".$blacklist_matched, $user);
+          if($allowlist_matched)
+            log_msg("allowlist matched ".$allowlist_matched, $user);
+          if($blocklist_matched)
+            log_msg("blocklist matched ".$blocklist_matched, $user);
 
-          #log_msg("Whitelist: ".($should_import ? 'Import' : 'Do not import'), $user);
+          #log_msg("allowlist: ".($should_import ? 'Import' : 'Do not import'), $user);
 
-        } elseif($user->blacklist) {
-          // Default to post unless something in the blacklist matches
+        } elseif($user->blocklist) {
+          // Default to post unless something in the blocklist matches
           $should_import = true;
 
-          $blacklist_matched = false;
+          $blocklist_matched = false;
 
-          $blacklist_words = preg_split('/[ ]+/', $user->blacklist);
-          foreach($blacklist_words as $word) {
+          $blocklist_words = preg_split('/[ ]+/', $user->blocklist);
+          foreach($blocklist_words as $word) {
             if(stripos($entry['content'], $word) !== false) {
               $should_import = false;
-              $blacklist_matched = $word;
+              $blocklist_matched = $word;
             }
           }
 
-          if($blacklist_matched)
-            log_msg("Blacklist matched ".$blacklist_matched, $user);
+          if($blocklist_matched)
+            log_msg("blocklist matched ".$blocklist_matched, $user);
 
-          #log_msg("Blacklist: ".($should_import ? 'Import' : 'Do not import'), $user);
+          #log_msg("blocklist: ".($should_import ? 'Import' : 'Do not import'), $user);
 
         } else {
           $should_import = true;

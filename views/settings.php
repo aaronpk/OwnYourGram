@@ -48,18 +48,18 @@
 
   <div class="panel container-fluid">
     <form class="row">
-      <div class="col-md-6 whitelist">
+      <div class="col-md-6 allowlist">
         <h4>Match Photos</h4>
         <p>Import photos <b>only if</b> the photo caption has one of the keywords listed here.</p>
-        <textarea class="form-control" id="whitelist-keywords" placeholder="space-separated keywords"><?= htmlspecialchars($this->user->whitelist) ?></textarea>
-        <input type="button" class="btn btn-primary" value="Save" id="whitelist-save" style="margin-top:4px;">
+        <textarea class="form-control" id="allowlist-keywords" placeholder="space-separated keywords"><?= htmlspecialchars($this->user->allowlist) ?></textarea>
+        <input type="button" class="btn btn-primary" value="Save" id="allowlist-save" style="margin-top:4px;">
         <div class="hidden check">&check;</div>
       </div>
-      <div class="col-md-6 blacklist">
+      <div class="col-md-6 blocklist">
         <h4>Block Photos</h4>
         <p>Prevent importing photos that contain any of the keywords listed here.</p>
-        <textarea class="form-control" id="blacklist-keywords" placeholder="space-separated keywords"><?= htmlspecialchars($this->user->blacklist) ?></textarea>
-        <input type="button" class="btn btn-primary" value="Save" id="blacklist-save" style="margin-top:4px;">
+        <textarea class="form-control" id="blocklist-keywords" placeholder="space-separated keywords"><?= htmlspecialchars($this->user->blocklist) ?></textarea>
+        <input type="button" class="btn btn-primary" value="Save" id="blocklist-save" style="margin-top:4px;">
         <div class="hidden check">&check;</div>
       </div>
     </form>
@@ -171,28 +171,28 @@
       return false;
     });
 
-    $("#whitelist-save").click(function(){
-      $("#whitelist-save").addClass("disabled");
+    $("#allowlist-save").click(function(){
+      $("#allowlist-save").addClass("disabled");
       $.post("/prefs/save", {
-        whitelist: $("#whitelist-keywords").val()
+        allowlist: $("#allowlist-keywords").val()
       }, function(data){
-        $("#whitelist-save").removeClass("disabled");
-        $(".whitelist .check").removeClass("hidden");
+        $("#allowlist-save").removeClass("disabled");
+        $(".allowlist .check").removeClass("hidden");
         setTimeout(function(){
-          $(".whitelist .check").addClass("hidden");
+          $(".allowlist .check").addClass("hidden");
         }, 500);
       });
     });
 
-    $("#blacklist-save").click(function(){
-      $("#blacklist-save").addClass("disabled");
+    $("#blocklist-save").click(function(){
+      $("#blocklist-save").addClass("disabled");
       $.post("/prefs/save", {
-        blacklist: $("#blacklist-keywords").val()
+        blocklist: $("#blocklist-keywords").val()
       }, function(data){
-        $("#blacklist-save").removeClass("disabled");
-        $(".blacklist .check").removeClass("hidden");
+        $("#blocklist-save").removeClass("disabled");
+        $(".blocklist .check").removeClass("hidden");
         setTimeout(function(){
-          $(".blacklist .check").addClass("hidden");
+          $(".blocklist .check").addClass("hidden");
         }, 500);
       });
     });
@@ -211,7 +211,7 @@
     });
 
     $("#settings-save-button").click(function(){
-      $("#blacklist-save").addClass("disabled");
+      $("#blocklist-save").addClass("disabled");
       $.post("/prefs/save", {
         send_media_as: $("input[name=send_media_as]:checked").val(),
         multi_photo: $("input[name=send_multi]:checked").val(),
