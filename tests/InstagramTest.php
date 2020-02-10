@@ -11,7 +11,6 @@ final class InstagramTest extends TestCase
   public function testCheckProfileMatchesWebsite() {
     $profile = IG\get_profile('pk_spam', true);
 
-    $this->assertTrue(IG\profile_matches_website('pk_spam', 'https://aaronparecki.com/', $profile));
     $this->assertTrue(IG\profile_matches_website('pk_spam', 'https://aaronparecki.com.dev/', $profile));
     $this->assertTrue(IG\profile_matches_website('pk_spam', 'http://aaronpk.micro.blog/', $profile));
   }
@@ -32,14 +31,10 @@ final class InstagramTest extends TestCase
   public function testGetPhoto() {
     $entry = h_entry_from_photo('https://www.instagram.com/p/BGDpqNoiMJ0/', false, true);
 
-    $this->assertSame('2016-05-30T20:46:22-07:00', $entry['published']);
-    $this->assertSame(['h-card'], $entry['location']['type']);
-    $this->assertSame(['Burnside 26'], $entry['location']['properties']['name']);
-    $this->assertGreaterThan(45.52, $entry['location']['properties']['latitude'][0]);
-    $this->assertLessThan(45.53, $entry['location']['properties']['latitude'][0]);
-    $this->assertGreaterThan(-122.639, $entry['location']['properties']['longitude'][0]);
-    $this->assertLessThan(-122.638, $entry['location']['properties']['longitude'][0]);
-    $this->assertSame(['muffins','https://indiewebcat.com/'], $entry['category']);
+    # Depending on IG's rate limiting, it may or may not be able to get the venue information to look up the timezone
+    $valid_date = $entry['published'] == '2016-05-30T20:46:22-07:00' || $entry['published'] == '2016-05-31T03:46:22+00:00';
+    $this->assertTrue($valid_date);
+    $this->assertSame(['muffins','https://www.instagram.com/indiewebcat/'], $entry['category']);
     $this->assertSame('Meow #muffins', $entry['content']);
     $this->assertSame('https://www.instagram.com/p/BGDpqNoiMJ0/', $entry['syndication']);
     $this->assertContains('13266755_877794672348882_1908663476_n.jpg', $entry['photo'][0]);

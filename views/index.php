@@ -1,4 +1,4 @@
-  <?php if(!Config::$newUsersAllowed): ?>
+<?php if(!Config::$newUsersAllowed): ?>
   <div class="alert alert-danger">
     We're experiencing trouble with Instagram blocking requests from this website. New accounts are disabled, and you will experience long delays importing photos on existing accounts.
   </div>
