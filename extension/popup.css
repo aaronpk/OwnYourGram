@@ -1,0 +1,25 @@
+article {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+article pre {
+  overflow: scroll;
+}
+
+#photos.photos-1 img {
+  width: 100%;
+}
+
+#photos.photos-2 img {
+  width: 50%;
+}
+
+#action {
+  margin: 1em 0;
+}
+
+#destination {
+  margin: 1em 0;
+}
+

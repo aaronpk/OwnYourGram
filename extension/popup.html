@@ -1,0 +1,26 @@
+<script src="popup.js"></script>
+<link href="popup.css" rel="stylesheet">
+
+<article>
+  <h1>Preview Post</h1>
+
+  <div id="photos"></div>
+  <div id="caption"></div>
+
+  <div id="action">
+    <button id="post">Post!</button>
+  </div>
+
+  <div id="destination">This post will be sent to <span id="micropub_endpoint"></span></div>
+
+  <input type="hidden" id="micropub_access_token">
+
+  <details>
+    <summary>See full JSON</summary>
+    <pre id="debug"></pre>
+  </details>
+
+
+  <pre id="response"></pre>
+
+</article>
