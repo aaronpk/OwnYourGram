@@ -3,7 +3,7 @@ OwnYourGram
 
 [OwnYourGram](https://ownyourgram.com) will check for photos posted to your Instagram account and send them to your website via [Micropub](https://micropub.net).
 
-Note that this works by scraping the Instagram website so may periodically stop working as Instagram adjusts their rate limits and policies.
+UPDATE: This is very likely a dead project at this point. Instagram has been working hard to prevent any form of automated requests, and I have not yet found a good workaround. It will pretty much immediately fail running it as a centralized service like I have been doing, it's possible you may have some luck with your own installation of it, but even then I am not confident enough to continue putting work into this.
 
 ## Installation
 
