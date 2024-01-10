@@ -72,11 +72,6 @@
         <ul class="nav navbar-right" style="font-size: 8pt;">
           <li><a href="https://indieauth.net/">What's This?</a></li>
         </ul>
-        <form action="/auth/start" method="get" class="navbar-form navbar-right">
-          <input type="url" name="me" placeholder="yourdomain.com" class="form-control" autocomplete="url" />
-          <button type="submit" class="btn">Sign In</button>
-          <input type="hidden" name="redirect_uri" value="https://<?= $_SERVER['SERVER_NAME'] ?>/indieauth" />
-        </form>
       <?php } ?>
     </div>
   </div>
