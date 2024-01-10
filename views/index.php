@@ -1,6 +1,6 @@
 <?php if(!Config::$newUsersAllowed): ?>
   <div class="alert alert-danger">
-    We're experiencing trouble with Instagram blocking requests from this website. New accounts are disabled, and you will experience long delays importing photos on existing accounts.
+    RIP OwnYourGram. 2014-2024. During its lifetime, OwnYourGram saved 34,644 photos from silos.
   </div>
 <?php endif; ?>
 
