@@ -1,6 +1,6 @@
 {
   "require": {
-    "slim/slim": "2.2.*",
+    "slim/slim": "2.6.*",
     "saltybeagle/savant3": "dev-master",
     "j4mie/idiorm": "1.4.*",
     "predis/predis": "~1.0",
