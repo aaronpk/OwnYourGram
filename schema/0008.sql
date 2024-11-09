@@ -1,2 +1,0 @@
-ALTER TABLE photos
-ADD COLUMN published DATETIME DEFAULT NULL AFTER instagram_img;

@@ -1,2 +1,0 @@
-ALTER TABLE users
-ADD COLUMN send_media_as VARCHAR(20) NOT NULL DEFAULT 'upload';
